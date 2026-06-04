@@ -1,0 +1,61 @@
+name: Veri Güncelle
+
+# Berlin saatiyle 09:00, 11:00, 13:00, 15:00, 17:00
+# GitHub cron UTC çalışır; yaz/kış saatini (CEST/CET) doğru yakalamak için
+# gündüz her saat tetikleriz ve aşağıda Berlin saatine göre filtreleriz.
+on:
+  schedule:
+    - cron: '0 6-16 * * *'
+  workflow_dispatch:        # elle de çalıştırabilirsin (Actions sekmesi → Run workflow)
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Berlin saatini kontrol et
+        id: gate
+        run: |
+          H=$(TZ=Europe/Berlin date +%H)
+          echo "Berlin saati: $H"
+          if echo " 09 11 13 15 17 " | grep -q " $H "; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "Hedef saat değil, atlanıyor."
+            echo "run=no" >> "$GITHUB_OUTPUT"
+          fi
+        # workflow_dispatch ile elle çalıştırınca saat filtresini atla:
+      - name: Elle tetikleme override
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "FORCE=yes" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'yes' || github.event_name == 'workflow_dispatch'
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'yes' || github.event_name == 'workflow_dispatch'
+        with:
+          python-version: '3.12'
+
+      - name: yfinance kur
+        if: steps.gate.outputs.run == 'yes' || github.event_name == 'workflow_dispatch'
+        run: pip install yfinance
+
+      - name: Veriyi çek (data.js üret)
+        if: steps.gate.outputs.run == 'yes' || github.event_name == 'workflow_dispatch'
+        run: python fetch_data.py
+
+      - name: Değişiklikleri commit'le
+        if: steps.gate.outputs.run == 'yes' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.js data.json
+          if git diff --staged --quiet; then
+            echo "Değişiklik yok."
+          else
+            git commit -m "veri güncelle ($(TZ=Europe/Berlin date '+%Y-%m-%d %H:%M'))"
+            git push
+          fi
