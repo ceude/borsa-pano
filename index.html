@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Borsa Pano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f7f9; --surface:#ffffff; --line:#e9edf2; --line2:#f1f4f8;
+    --ink:#0f151c; --dim:#5d6b7a; --faint:#9aa6b2;
+    --up:#10b981; --up-bg:#e7f8f1;
+    --down:#f0556b; --down-bg:#fdebef;
+    --neutral:#94a0ad;
+    --brand:#0bbfa6; --brand-ink:#053b34; --brand-bg:#e4f7f3;
+    --bist:#0bbfa6; --dax:#3b82f6;
+    --shadow:0 1px 2px rgba(16,21,28,.05), 0 10px 28px -18px rgba(16,21,28,.18);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--ink);
+    font-family:"Plus Jakarta Sans",system-ui,sans-serif; min-height:100vh; font-variant-numeric:tabular-nums;
+    -webkit-font-smoothing:antialiased;}
+  .mono{font-family:"Plus Jakarta Sans",sans-serif}
+  h1,h2,h3{font-family:"Schibsted Grotesk",sans-serif; letter-spacing:-.02em}
+  .up{color:var(--up)} .down{color:var(--down)} .neutral{color:var(--neutral)}
+  .na{color:var(--faint)}
+  .q{font-size:9px; margin-right:5px; vertical-align:1px}
+  .q.good{color:var(--up)} .q.mid{color:#d99a00} .q.bad{color:var(--down)}
+  button{font-family:inherit}
+
+  /* ===== market gate ===== */
+  #gate{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px}
+  .gate-card{max-width:560px; width:100%; text-align:center}
+  .gate-card h1{font-size:40px; margin:0 0 6px; font-weight:800}
+  .gate-card h1 .dot{color:var(--brand)}
+  .gate-card p{color:var(--dim); margin:0 0 30px; font-size:15px}
+  .gate-opts{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media(max-width:520px){.gate-opts{grid-template-columns:1fr}}
+  .gate-opt{background:var(--surface); border:1px solid var(--line); border-radius:20px;
+    padding:30px 22px; cursor:pointer; box-shadow:var(--shadow); transition:.18s; text-align:left}
+  .gate-opt:hover{transform:translateY(-3px); border-color:var(--brand)}
+  .gate-opt .tag{font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase}
+  .gate-opt.bist .tag{color:var(--bist)} .gate-opt.dax .tag{color:var(--dax)}
+  .gate-opt h2{font-size:26px; margin:10px 0 4px}
+  .gate-opt .cur{color:var(--faint); font-size:13px; font-family:"Plus Jakarta Sans"}
+
+  /* ===== ticker ===== */
+  .ticker{background:var(--surface); border-bottom:1px solid var(--line); overflow:hidden;
+    white-space:nowrap; height:38px; display:flex; align-items:center; position:sticky; top:0; z-index:40}
+  .ticker-track{display:inline-flex; gap:30px; padding-left:30px; animation:scroll 200s linear infinite}
+  .ticker:hover .ticker-track{animation-play-state:paused}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .tk{font-family:"Plus Jakarta Sans",sans-serif; font-size:12.5px; cursor:pointer}
+  .tk b{font-weight:600} .tk .px{color:var(--dim); margin-left:6px}
+  .tk .ch{margin-left:6px; font-weight:600} .tk:hover b{color:var(--brand)}
+
+  /* ===== header ===== */
+  header{max-width:1200px; margin:0 auto; padding:24px 22px 6px;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap}
+  .hbrand h1{font-size:26px; margin:0; font-weight:800}
+  .hbrand h1 .dot{color:var(--brand)}
+  .hbrand .sub{color:var(--dim); font-size:13px; margin-top:2px}
+  .hright{display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:12px}
+  .switch{display:flex; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:3px}
+  .switch button{border:none; background:transparent; padding:7px 16px; border-radius:999px;
+    font-weight:700; font-size:13px; color:var(--dim); cursor:pointer}
+  .switch button.on{color:#fff}
+  .switch button.on.bist{background:var(--bist)} .switch button.on.dax{background:var(--dax)}
+  .ratebox{background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:6px 11px; color:var(--dim); font-family:"Plus Jakarta Sans"}
+  .upd{color:var(--faint)}
+
+  nav{max-width:1200px; margin:14px auto 0; padding:0 22px; display:flex; gap:4px; flex-wrap:wrap; overflow-x:auto}
+  .tab{background:transparent; border:none; color:var(--dim); font-weight:600; font-size:14px;
+    padding:10px 15px; border-radius:10px; cursor:pointer; white-space:nowrap}
+  .tab:hover{background:var(--surface)}
+  .tab.active{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+
+  main{max-width:1200px; margin:12px auto 0; padding:0 22px 90px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:20px}
+  .view{display:none} .view.active{display:block}
+
+  .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px}
+  input.search,select,input.fld{background:var(--bg); border:1px solid var(--line); color:var(--ink);
+    padding:10px 13px; border-radius:11px; font-family:"Plus Jakarta Sans"; font-size:13px}
+  input.search{flex:1; min-width:160px}
+  input.search:focus,select:focus,input.fld:focus{outline:none; border-color:var(--brand)}
+  .sub{display:block; font-size:10.5px; color:var(--faint); font-family:"Plus Jakarta Sans"; margin-top:2px; font-weight:400}
+
+  .scroll{overflow:auto; border-radius:11px}
+  table{width:100%; border-collapse:collapse; font-size:13px}
+  th{position:sticky; top:0; background:var(--surface); color:var(--faint); text-align:right;
+    padding:11px 12px; font-weight:600; font-size:11px; letter-spacing:.04em; text-transform:uppercase;
+    cursor:pointer; user-select:none; white-space:nowrap; border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  th.l{text-align:left} th:hover{color:var(--ink)} th .arr{color:var(--brand); font-size:10px}
+  td{padding:11px 12px; text-align:right; border-bottom:1px solid var(--line2);
+    font-family:"Plus Jakarta Sans"; white-space:nowrap}
+  tr:hover td{background:var(--line2)}
+  .sym{font-weight:700; color:var(--ink); cursor:pointer; font-family:"Plus Jakarta Sans"}
+  .sym:hover{color:var(--brand)}
+  .nm{color:var(--faint); font-size:11px; font-family:"Plus Jakarta Sans"}
+  .badge{font-size:10px; padding:2px 8px; border-radius:7px; font-weight:700;
+    font-family:"Plus Jakarta Sans"; vertical-align:middle}
+  .b-bist{background:var(--brand-bg); color:var(--bist)}
+  .b-dax{background:#e8f0fe; color:var(--dax)}
+  .scorebar{display:inline-flex; align-items:center; gap:8px; justify-content:flex-end}
+  .bar{width:60px; height:7px; background:var(--line); border-radius:5px; overflow:hidden}
+  .bar i{display:block; height:100%; background:linear-gradient(90deg,#7be0c8,var(--brand))}
+  .cov{font-size:10px; color:var(--faint)}
+  .miniact{background:var(--bg); border:1px solid var(--line); color:var(--brand);
+    padding:5px 10px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600}
+  .miniact:hover{border-color:var(--brand)}
+
+  /* ===== sim trade box (prominent) ===== */
+  .simgrid{display:grid; grid-template-columns:380px 1fr; gap:18px}
+  @media(max-width:880px){.simgrid{grid-template-columns:1fr}}
+  .trade{background:linear-gradient(160deg,#ffffff,#f3fbf9); border:1.5px solid var(--brand);
+    border-radius:18px; padding:22px; box-shadow:0 14px 34px -22px rgba(11,191,166,.55)}
+  .trade h3{margin:0 0 4px; font-size:18px}
+  .trade .lead{color:var(--dim); font-size:12.5px; margin-bottom:16px}
+  .bigpx{font-family:"Plus Jakarta Sans"; font-size:34px; font-weight:600; line-height:1}
+  .bigpx .c{font-size:20px; color:var(--faint)}
+  .pxrow{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:4px}
+  .pxsub{color:var(--faint); font-size:12px; font-family:"Plus Jakarta Sans"; margin-bottom:16px}
+  .qtyrow{display:flex; gap:10px; margin-bottom:8px}
+  .qtyrow input.fld{flex:1; font-size:16px; padding:13px}
+  .cost{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:13px 15px; margin:12px 0}
+  .cost .k{color:var(--faint); font-size:11px; text-transform:uppercase; letter-spacing:.04em}
+  .cost .v{font-family:"Plus Jakarta Sans"; font-size:22px; font-weight:600; margin-top:3px}
+  .act{display:flex; gap:10px}
+  .go{flex:1; border:none; padding:14px; border-radius:12px; font-weight:800; cursor:pointer; font-size:15px}
+  .go.buy{background:var(--up); color:#fff} .go.buy:hover{filter:brightness(1.05)}
+  .go.sell{background:#fff; color:var(--down); border:1.5px solid var(--down)}
+  .go:disabled{opacity:.4; cursor:not-allowed}
+  .stat{display:flex; gap:24px; flex-wrap:wrap; margin-bottom:14px}
+  .stat .k{color:var(--faint); font-size:11px; text-transform:uppercase; letter-spacing:.04em}
+  .stat .v{font-family:"Plus Jakarta Sans"; font-size:24px; font-weight:600; margin-top:3px}
+  .ghost{background:var(--surface); border:1px solid var(--line); color:var(--dim);
+    padding:8px 13px; border-radius:9px; cursor:pointer; font-size:12px; font-weight:600}
+  .ghost:hover{border-color:var(--brand); color:var(--brand)}
+  .hint{color:var(--faint); font-size:11.5px; line-height:1.55}
+  .empty{color:var(--faint); text-align:center; padding:32px; font-size:13px}
+  .log .e{font-family:"Plus Jakarta Sans"; font-size:12px; padding:9px 0; border-bottom:1px solid var(--line2);
+    display:flex; justify-content:space-between; gap:10px}
+  .log .t{color:var(--faint); font-size:10.5px}
+
+  textarea{width:100%; background:var(--bg); border:1px solid var(--line); color:var(--ink);
+    border-radius:12px; padding:14px; font-family:"Plus Jakarta Sans"; font-size:13px; line-height:1.6; resize:vertical}
+  textarea:focus{outline:none; border-color:var(--brand)}
+
+  /* ===== detail ===== */
+  .back{background:none; border:none; color:var(--dim); cursor:pointer; font-weight:600; font-size:14px; padding:0; margin-bottom:14px}
+  .back:hover{color:var(--brand)}
+  .dhead{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px}
+  .dhead .px{font-family:"Plus Jakarta Sans"; font-size:30px; font-weight:600}
+  .metrics{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-bottom:20px}
+  .metric{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:13px 15px}
+  .metric .k{color:var(--faint); font-size:11px; text-transform:uppercase; letter-spacing:.03em}
+  .metric .v{font-family:"Plus Jakarta Sans"; font-size:18px; font-weight:600; margin-top:4px}
+
+  /* ===== chart ===== */
+  .chart{width:100%; height:auto}
+  .chart .grid{stroke:var(--line); stroke-width:1}
+  .chart .ylab{fill:var(--faint); font-size:10px; font-family:"Plus Jakarta Sans"; text-anchor:end}
+  .chart .xlab{fill:var(--faint); font-size:10px; font-family:"Plus Jakarta Sans"}
+  .seg{display:flex; gap:4px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:3px; width:max-content}
+  .seg button{border:none; background:transparent; padding:6px 16px; border-radius:999px; font-weight:700; font-size:13px; color:var(--dim); cursor:pointer}
+  .seg button.on{background:var(--brand); color:#fff}
+  .disclaimer{margin-top:18px; color:var(--faint); font-size:11.5px; line-height:1.6; border-top:1px solid var(--line); padding-top:14px}
+</style>
+</head>
+<body>
+
+<!-- MARKET GATE -->
+<div id="gate">
+  <div class="gate-card">
+    <h1>Borsa Pano<span class="dot">.</span></h1>
+    <p>Hesaplar karışmasın diye tek piyasa seç. İstediğin zaman üstten değiştirebilirsin.</p>
+    <div class="gate-opts">
+      <div class="gate-opt bist" data-m="BIST">
+        <div class="tag">Borsa İstanbul</div>
+        <h2>BIST</h2>
+        <div class="cur">₺ TRY · EUR karşılığı gösterilir</div>
+      </div>
+      <div class="gate-opt dax" data-m="DAX">
+        <div class="tag">Deutscher Aktienindex</div>
+        <h2>DAX</h2>
+        <div class="cur">€ EUR</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <header>
+    <div class="hbrand">
+      <h1>Borsa Pano<span class="dot">.</span></h1>
+      <div class="sub" id="updTxt"></div>
+    </div>
+    <div class="hright">
+      <div class="switch" id="mktSwitch">
+        <button data-m="BIST">BIST</button>
+        <button data-m="DAX">DAX</button>
+      </div>
+      <span class="ratebox" id="rateBox"></span>
+    </div>
+  </header>
+
+  <nav id="nav">
+    <button class="tab active" data-v="screen">Tarama</button>
+    <button class="tab" data-v="all">Tüm Liste</button>
+    <button class="tab" data-v="sim">Simülatör</button>
+    <button class="tab" data-v="real">Gerçek Portföy</button>
+    <button class="tab" data-v="hist">Geçmiş Grafik</button>
+    <button class="tab" data-v="notes">Notlar</button>
+  </nav>
+
+  <main>
+    <section class="view active card" id="v-screen">
+      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"></div>
+      <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr></thead><tbody id="screenBody"></tbody></table></div>
+      <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir (5 = tam).</div>
+    </section>
+
+    <section class="view card" id="v-all">
+      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"></div>
+      <div class="scroll"><table id="allTable"><thead><tr><th class="l">Hisse</th><th>Fiyat</th><th>Günlük %</th><th>Hacim</th><th></th></tr></thead><tbody id="allBody"></tbody></table></div>
+    </section>
+
+    <section class="view card" id="v-sim">
+      <div class="stat">
+        <div><div class="k">Nakit</div><div class="v" id="cashV">—</div></div>
+        <div><div class="k">Pozisyon</div><div class="v" id="holdV">—</div></div>
+        <div><div class="k">Toplam</div><div class="v" id="totV">—</div></div>
+        <div><div class="k">Kâr/Zarar</div><div class="v" id="pnlV">—</div></div>
+      </div>
+      <div class="simgrid">
+        <div class="trade">
+          <h3>İşlem</h3>
+          <div class="lead">Sanal parayla al-sat. Önce kâğıtta dene.</div>
+          <select id="simSel" style="width:100%; margin-bottom:14px"></select>
+          <div class="pxrow"><span class="hint">Güncel fiyat</span></div>
+          <div class="bigpx" id="simBigPx">—</div>
+          <div class="pxsub" id="simBigSub"></div>
+          <div class="qtyrow"><input class="fld mono" id="simQty" type="number" min="1" step="1" value="100" placeholder="adet"></div>
+          <div class="cost"><div class="k">Tahmini tutar</div><div class="v" id="simCost">—</div></div>
+          <div class="act"><button class="go buy" id="simBuy">AL</button><button class="go sell" id="simSell">SAT</button></div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+            <h3 style="margin:0; font-size:16px">Pozisyonlar</h3>
+            <div style="display:flex; gap:8px">
+              <button class="ghost" id="simToReal">Tümünü gerçeğe aktar</button>
+              <button class="ghost" id="setCash">Nakit ayarla</button>
+              <button class="ghost" id="resetSim">Sıfırla</button>
+            </div>
+          </div>
+          <div class="scroll" id="simHold"></div>
+          <h3 style="font-size:16px; margin:20px 0 8px">İşlem Geçmişi</h3>
+          <div class="log scroll" id="simLog" style="max-height:230px"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view card" id="v-real">
+      <div class="stat">
+        <div><div class="k">Maliyet</div><div class="v" id="rCost">—</div></div>
+        <div><div class="k">Güncel Değer</div><div class="v" id="rVal">—</div></div>
+        <div><div class="k">Kâr/Zarar</div><div class="v" id="rPnl">—</div></div>
+      </div>
+      <div class="card" style="background:var(--bg); box-shadow:none; margin-bottom:16px">
+        <h3 style="margin:0 0 12px; font-size:16px">Pozisyon ekle</h3>
+        <div class="controls">
+          <input class="fld" id="rSym" list="symList" placeholder="sembol (örn THYAO)" style="width:160px">
+          <input class="fld" id="rQty" type="number" min="1" placeholder="adet" style="width:100px">
+          <input class="fld" id="rPrice" type="number" step="0.0001" placeholder="alış fiyatı (boş=güncel)" style="width:180px">
+          <input class="fld" id="rDate" type="date" style="width:160px">
+          <input class="fld" id="rRate" type="number" step="0.0001" placeholder="o günkü EUR/TRY (ops.)" style="width:200px" title="BIST için: boş bırakırsan güncel kur kullanılır">
+          <button class="miniact" id="rAdd" style="padding:10px 16px">Ekle</button>
+        </div>
+        <datalist id="symList"></datalist>
+        <div class="hint">Alış fiyatını ve tarihi elle girebilirsin. BIST'te "o günkü EUR/TRY"yi girersen EUR kârın o günkü kura göre doğru hesaplanır; boş bırakırsan güncel kur kullanılır.</div>
+      </div>
+      <div class="scroll" id="realHold"></div>
+    </section>
+
+    <section class="view card" id="v-hist">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px">
+        <h3 style="margin:0">Portföy geçmişi</h3>
+        <div class="seg" id="histSeg"><button data-c="try" class="on">TRY</button><button data-c="usd">USD</button></div>
+      </div>
+      <div id="histChart"></div>
+      <div class="card" style="background:var(--bg); box-shadow:none; margin-top:16px">
+        <h3 style="margin:0 0 8px; font-size:16px">Veri içe aktar</h3>
+        <div class="hint" style="margin-bottom:10px">Excel/CSV'den her satır: <b>tarih, TRY toplam[, 3. sütun]</b>. Tarih: YYYY-MM-DD veya GG.AA.YYYY. Başlık satırı varsa otomatik atlanır.</div>
+        <div class="controls">
+          <span class="hint">3. sütun:</span>
+          <div class="seg" id="thirdSeg"><button data-t="none" class="on">Yok</button><button data-t="usd">USD değeri</button><button data-t="usdtry">USD/TRY kuru</button></div>
+        </div>
+        <textarea id="histInput" style="min-height:150px" placeholder="2019-01-31, 125000&#10;2019-02-28, 131000&#10;2020-01-31, 180000&#10;…"></textarea>
+        <div style="margin-top:10px; display:flex; gap:8px">
+          <button class="miniact" id="histImport" style="padding:10px 16px">İçe aktar & çiz</button>
+          <button class="ghost" id="histClear">Temizle</button>
+        </div>
+      </div>
+      <div class="disclaimer">6 yıllık Excel verini bana yollarsan statik olarak da gömebilirim. USD eğrisi için ya doğrudan USD toplamını ya da o tarihteki USD/TRY kurunu vermen gerekir — yoksa USD geçmişi doğru çıkmaz.</div>
+    </section>
+
+    <section class="view card" id="v-notes">
+      <div class="hint" style="margin-bottom:10px">Genel notlar / günlük haberler / banka önerileri. Hisseye özel not için bir hisseye tıkla.</div>
+      <textarea id="notesArea" style="min-height:340px" placeholder="03.06 — X Bankası THYAO için 'AL', hedef …"></textarea>
+    </section>
+
+    <!-- DETAIL -->
+    <section class="view card" id="v-detail">
+      <button class="back" id="detailBack">← geri</button>
+      <div class="dhead" id="detailHead"></div>
+      <div class="metrics" id="detailMetrics"></div>
+      <button class="miniact" id="detailToSim" style="padding:10px 16px; margin-bottom:18px">Simülatöre gönder</button>
+      <h3 style="font-size:16px; margin:0 0 8px">Bu hisse için notlarım</h3>
+      <textarea id="detailNotes" style="min-height:160px" placeholder="Bu hisseye dair gözlemlerin, hedef fiyat, neden aldın…"></textarea>
+    </section>
+  </main>
+</div>
+
+<script>
+function startApp(){
+"use strict";
+var DATA = window.STOCK_DATA || null;
+var STOCKS = (DATA && DATA.stocks) ? DATA.stocks : [];
+var RATES = (DATA && DATA.rates) ? DATA.rates : {EURTRY:null, USDTRY:null};
+var EURTRY = RATES.EURTRY;
+var $ = function(id){return document.getElementById(id);};
+
+/* ---------- helpers ---------- */
+function fmt(n,d){ d=(d==null?2:d); return (n==null||isNaN(n))?'—':Number(n).toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function fmtInt(n){ return n==null?'—':Number(n).toLocaleString('tr-TR'); }
+function clean(sym){ return sym.replace(/\.(IS|DE)$/,''); }
+function ccySym(m){ return m==='BIST'?'₺':'€'; }
+function ccyCode(m){ return m==='BIST'?'TRY':'EUR'; }
+function pnlCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
+function chCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
+function find(sym){ for(var i=0;i<STOCKS.length;i++) if(STOCKS[i].symbol===sym) return STOCKS[i]; return null; }
+/* metrik kalite isareti: yesil=iyi, amber=orta, kirmizi=zayif */
+function qDot(metric,v){
+  if(v==null||isNaN(v)) return '';
+  var t;
+  if(metric==='pe')      t = v<=0?'bad': v<10?'good': v<=20?'mid':'bad';
+  else if(metric==='pb') t = v<=0?'bad': v<1.5?'good': v<=3?'mid':'bad';
+  else if(metric==='roe')t = v>=20?'good': v>=10?'mid':'bad';
+  else if(metric==='de') t = v<50?'good': v<=100?'mid':'bad';
+  else if(metric==='margin') t = v>=15?'good': v>=5?'mid':'bad';
+  else return '';
+  return '<span class="q '+t+'" title="'+t+'">●</span>';
+}
+function eurOf(tryAmt, rate){ rate = rate || EURTRY; return rate? tryAmt/rate : null; }
+/* amount with EUR sub-line for BIST */
+function amt(m, val, rateAtTime){
+  var s = ccySym(m)+fmt(val);
+  if(m==='BIST'){ var e=eurOf(val,rateAtTime); return s + '<span class="sub">'+(e!=null?'≈ €'+fmt(e):'')+'</span>'; }
+  return s;
+}
+function shortNum(v){ var a=Math.abs(v);
+  if(a>=1e9) return (v/1e9).toFixed(1)+'B'; if(a>=1e6) return (v/1e6).toFixed(1)+'M';
+  if(a>=1e3) return (v/1e3).toFixed(0)+'K'; return ''+Math.round(v); }
+
+/* ---------- storage ---------- */
+var LS='borsapano.v2';
+function load(){ try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){return {};} }
+var S = load();
+S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
+S.notes = S.notes || ''; S.hist = S.hist || [];
+function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
+function simFor(m){ if(!S.sim[m]) S.sim[m]={cash:(m==='BIST'?100000:10000), holdings:{}, log:[]}; return S.sim[m]; }
+function realFor(m){ if(!S.real[m]) S.real[m]={lots:[]}; return S.real[m]; }
+
+/* ---------- market state ---------- */
+var MK = S.lastMarket || null;
+function marketStocks(){ return STOCKS.filter(function(s){return s.market===MK;}); }
+
+/* gate */
+function showGate(){ $('gate').style.display='flex'; $('app').style.display='none'; }
+function showApp(){ $('gate').style.display='none'; $('app').style.display='block'; renderAll(); }
+document.querySelectorAll('.gate-opt').forEach(function(o){
+  o.onclick=function(){ MK=o.dataset.m; S.lastMarket=MK; save(); syncSwitch(); showApp(); };
+});
+function syncSwitch(){
+  $('mktSwitch').querySelectorAll('button').forEach(function(b){
+    var on=b.dataset.m===MK; b.className = on ? ('on '+(MK==='BIST'?'bist':'dax')) : '';
+  });
+}
+$('mktSwitch').querySelectorAll('button').forEach(function(b){
+  b.onclick=function(){ MK=b.dataset.m; S.lastMarket=MK; save(); syncSwitch(); renderAll(); goView('screen'); };
+});
+
+/* header meta */
+function renderMeta(){
+  if(window.__DATA_ERR || !DATA){ $('updTxt').textContent='⚠ data.js yok — Colab betiğini çalıştır'; $('rateBox').textContent=''; return; }
+  $('updTxt').textContent = 'güncellendi: ' + new Date(DATA.updatedAt).toLocaleString('tr-TR') + ' · ' + MK + ' ' + marketStocks().length + ' hisse';
+  $('rateBox').textContent = 'EUR/TRY ' + fmt(RATES.EURTRY) + ' · USD/TRY ' + fmt(RATES.USDTRY);
+}
+
+/* ---------- ticker ---------- */
+function renderTicker(){
+  var arr = marketStocks().filter(function(s){return s.price!=null;});
+  if(!arr.length){ $('tickerTrack').innerHTML='<span class="tk na">veri bekleniyor…</span>'; return; }
+  var html = arr.map(function(s){
+    var c=chCls(s.changePct), a=s.changePct==null?'':s.changePct>0?'▲':s.changePct<0?'▼':'·';
+    return '<span class="tk" data-sym="'+s.symbol+'"><b>'+clean(s.symbol)+'</b>'+
+      '<span class="px">'+fmt(s.price)+'</span><span class="ch '+c+'">'+a+
+      (s.changePct==null?'':fmt(Math.abs(s.changePct))+'%')+'</span></span>';
+  }).join('');
+  $('tickerTrack').innerHTML = html+html;
+  $('tickerTrack').querySelectorAll('.tk').forEach(function(t){ t.onclick=function(){openStock(t.dataset.sym);}; });
+}
+
+/* ---------- tabs ---------- */
+function goView(v){
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('active', x.dataset.v===v);});
+  document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
+  $('v-'+v).classList.add('active');
+}
+document.querySelectorAll('.tab').forEach(function(t){ t.onclick=function(){goView(t.dataset.v);}; });
+
+/* ---------- screener ---------- */
+var COLS=[
+  {k:'symbol',t:'Hisse',l:true},{k:'score',t:'Skor'},{k:'price',t:'Fiyat'},
+  {k:'changePct',t:'Gün %'},{k:'pe',t:'F/K'},{k:'pb',t:'P/D'},
+  {k:'roe',t:'Özsr.K %'},{k:'debtToEquity',t:'Borç/Özsr'},{k:'netMargin',t:'Marj %'},
+  {k:'scoreCoverage',t:'Veri'},{k:'act',t:''}
+];
+var qScreen='', sortK='score', sortDir=-1;
+function buildHead(){
+  $('screenHead').innerHTML = COLS.map(function(c){
+    var arr=c.k===sortK?'<span class="arr">'+(sortDir<0?'▼':'▲')+'</span>':'';
+    return '<th class="'+(c.l?'l':'')+'" data-k="'+c.k+'">'+c.t+' '+arr+'</th>';
+  }).join('');
+  $('screenHead').querySelectorAll('th').forEach(function(th){
+    var k=th.dataset.k; if(k==='act') return;
+    th.onclick=function(){ if(sortK===k){sortDir*=-1;}else{sortK=k; sortDir=(k==='symbol')?1:-1;} renderScreen(); };
+  });
+}
+function renderScreen(){
+  buildHead();
+  var rows=marketStocks().filter(function(s){
+    if(qScreen){var q=qScreen.toLowerCase(); if(!(s.symbol.toLowerCase().indexOf(q)>=0||(s.name||'').toLowerCase().indexOf(q)>=0))return false;}
+    return true;
+  });
+  rows.sort(function(a,b){
+    if(sortK==='symbol') return sortDir*a.symbol.localeCompare(b.symbol);
+    var va=a[sortK],vb=b[sortK];
+    if(va==null&&vb==null)return 0; if(va==null)return 1; if(vb==null)return -1; return sortDir*(va-vb);
+  });
+  $('screenBody').innerHTML = rows.map(function(s){
+    var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':'b-dax';
+    var sc=s.score==null?'<span class="na">—</span>':'<div class="scorebar"><div class="bar"><i style="width:'+s.score+'%"></i></div><b>'+fmt(s.score,0)+'</b></div>';
+    function na(v){return v==null?'<span class="na">—</span>':v;}
+    return '<tr>'+
+      '<td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,32)+'</div></td>'+
+      '<td>'+sc+'</td><td>'+na(fmt(s.price))+'</td>'+
+      '<td class="'+c+'">'+(s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</td>'+
+      '<td>'+(s.pe==null?'<span class="na">—</span>':qDot('pe',s.pe)+fmt(s.pe))+'</td>'+
+      '<td>'+(s.pb==null?'<span class="na">—</span>':qDot('pb',s.pb)+fmt(s.pb))+'</td>'+
+      '<td>'+(s.roe==null?'<span class="na">—</span>':qDot('roe',s.roe)+fmt(s.roe)+'%')+'</td>'+
+      '<td>'+(s.debtToEquity==null?'<span class="na">—</span>':qDot('de',s.debtToEquity)+fmt(s.debtToEquity))+'</td>'+
+      '<td>'+(s.netMargin==null?'<span class="na">—</span>':qDot('margin',s.netMargin)+fmt(s.netMargin)+'%')+'</td>'+
+      '<td><span class="cov">'+(s.scoreCoverage||0)+'/5</span></td>'+
+      '<td><button class="miniact" data-sym="'+s.symbol+'">Sim</button></td></tr>';
+  }).join('') || '<tr><td colspan="11" class="empty">eşleşen hisse yok</td></tr>';
+  $('screenBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+  $('screenBody').querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
+}
+$('searchScreen').oninput=function(e){qScreen=e.target.value; renderScreen();};
+
+/* ---------- all list ---------- */
+var qAll='';
+function renderAllList(){
+  var rows=marketStocks().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);});
+  if(qAll){var q=qAll.toLowerCase(); rows=rows.filter(function(s){return s.symbol.toLowerCase().indexOf(q)>=0||(s.name||'').toLowerCase().indexOf(q)>=0;});}
+  $('allBody').innerHTML = rows.map(function(s){
+    var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':'b-dax';
+    return '<tr><td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,40)+'</div></td>'+
+      '<td>'+(s.price==null?'<span class="na">—</span>':fmt(s.price))+'</td>'+
+      '<td class="'+c+'">'+(s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</td>'+
+      '<td>'+fmtInt(s.volume)+'</td>'+
+      '<td><button class="miniact" data-sym="'+s.symbol+'">Sim</button></td></tr>';
+  }).join('') || '<tr><td colspan="5" class="empty">eşleşen hisse yok</td></tr>';
+  $('allBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+  $('allBody').querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
+}
+$('searchAll').oninput=function(e){qAll=e.target.value; renderAllList();};
+
+/* ---------- detail ---------- */
+var lastView='screen';
+function openStock(sym){
+  var s=find(sym); if(!s) return;
+  lastView = document.querySelector('.tab.active') ? document.querySelector('.tab.active').dataset.v : 'screen';
+  var badge=s.market==='BIST'?'b-bist':'b-dax';
+  $('detailHead').innerHTML =
+    '<div><h2 style="margin:0; font-size:24px">'+clean(s.symbol)+' <span class="badge '+badge+'">'+s.market+'</span></h2>'+
+    '<div class="nm" style="font-size:14px; margin-top:4px">'+(s.name||'')+' · '+(s.sector||'-')+'</div></div>'+
+    '<div style="text-align:right"><div class="px">'+(s.price==null?'—':ccySym(s.market)+fmt(s.price))+'</div>'+
+    '<div class="'+chCls(s.changePct)+'" style="font-family:inherit; font-weight:700">'+(s.changePct==null?'':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</div>'+
+    (s.market==='BIST'&&s.price!=null?'<div class="sub">≈ €'+fmt(eurOf(s.price))+'</div>':'')+'</div>';
+  var M=[
+    ['Fiyat', s.price==null?'—':ccySym(s.market)+fmt(s.price)],
+    ['Önceki Kapanış', s.prevClose==null?'—':ccySym(s.market)+fmt(s.prevClose)],
+    ['Günlük %', s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%'],
+    ['Hacim', fmtInt(s.volume)],
+    ['Piyasa Değeri', s.marketCap==null?'—':shortNum(s.marketCap)],
+    ['F/K', fmt(s.pe)], ['P/D', fmt(s.pb)],
+    ['Özsermaye Kârlılığı', s.roe==null?'—':fmt(s.roe)+'%'],
+    ['Borç/Özsermaye', fmt(s.debtToEquity)],
+    ['Net Marj', s.netMargin==null?'—':fmt(s.netMargin)+'%'],
+    ['Net Kâr', s.netIncome==null?'—':shortNum(s.netIncome)],
+    ['Skor', s.score==null?'—':fmt(s.score,0)+' /100'],
+    ['Veri kapsamı', (s.scoreCoverage||0)+'/5'],
+    ['Para birimi', s.currency||ccyCode(s.market)]
+  ];
+  $('detailMetrics').innerHTML = M.map(function(m){return '<div class="metric"><div class="k">'+m[0]+'</div><div class="v">'+m[1]+'</div></div>';}).join('');
+  var ta=$('detailNotes'); ta.value=S.stockNotes[sym]||'';
+  ta.oninput=function(){ S.stockNotes[sym]=ta.value; save(); };
+  $('detailToSim').onclick=function(){ selectInSim(sym); };
+  goView('detail');
+}
+$('detailBack').onclick=function(){ goView(lastView); };
+
+/* ---------- simulator ---------- */
+function fillSimSelect(){
+  $('simSel').innerHTML = marketStocks().filter(function(s){return s.price!=null;})
+    .sort(function(a,b){return a.symbol.localeCompare(b.symbol);})
+    .map(function(s){return '<option value="'+s.symbol+'">'+clean(s.symbol)+' — '+(s.name||'').slice(0,26)+'</option>';}).join('');
+}
+function selectInSim(sym){ goView('sim'); $('simSel').value=sym; updateSimPx(); }
+function updateSimPx(){
+  var s=find($('simSel').value);
+  if(!s){ $('simBigPx').textContent='—'; $('simBigSub').textContent=''; $('simCost').textContent='—'; return; }
+  $('simBigPx').innerHTML = '<span class="c">'+ccySym(s.market)+'</span>'+fmt(s.price);
+  $('simBigSub').innerHTML = (s.market==='BIST'?'≈ €'+fmt(eurOf(s.price))+' · ':'')+
+    (s.changePct==null?'':'gün '+(s.changePct>0?'+':'')+fmt(s.changePct)+'%');
+  recalcCost();
+}
+function recalcCost(){
+  var s=find($('simSel').value); var q=parseInt($('simQty').value,10);
+  if(!s||!s.price||!q){ $('simCost').textContent='—'; return; }
+  $('simCost').innerHTML = amt(s.market, s.price*q);
+}
+$('simSel').onchange=updateSimPx;
+$('simQty').oninput=recalcCost;
+
+function trade(side){
+  var s=find($('simSel').value); var q=parseInt($('simQty').value,10);
+  if(!s||!s.price||!q||q<1) return;
+  var sim=simFor(MK); var cost=s.price*q; var rate=(MK==='BIST'?EURTRY:null);
+  if(side==='buy'){
+    if(cost>sim.cash){ alert('Yetersiz nakit. Gerekli '+ccySym(MK)+fmt(cost)+' / Mevcut '+ccySym(MK)+fmt(sim.cash)); return; }
+    sim.cash-=cost; var h=sim.holdings[s.symbol]||{qty:0,cost:0,eurCost:0};
+    h.cost+=cost; h.qty+=q; if(MK==='BIST') h.eurCost=(h.eurCost||0)+(rate?cost/rate:0); sim.holdings[s.symbol]=h;
+  } else {
+    var h2=sim.holdings[s.symbol]; if(!h2||h2.qty<q){ alert('Yeterli pozisyon yok.'); return; }
+    var avg=h2.cost/h2.qty; h2.cost-=avg*q; if(MK==='BIST'){var ea=(h2.eurCost||0)/h2.qty; h2.eurCost=(h2.eurCost||0)-ea*q;} h2.qty-=q; sim.cash+=cost;
+    if(h2.qty<=0) delete sim.holdings[s.symbol];
+  }
+  sim.log.unshift({t:Date.now(), side:side, sym:s.symbol, qty:q, px:s.price, rate:rate});
+  save(); renderSim();
+}
+$('simBuy').onclick=function(){trade('buy');};
+$('simSell').onclick=function(){trade('sell');};
+$('setCash').onclick=function(){ var sim=simFor(MK); var v=prompt('Başlangıç nakdi ('+ccyCode(MK)+'):', sim.cash); if(v!=null&&!isNaN(parseFloat(v))){sim.cash=parseFloat(v); save(); renderSim();} };
+$('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ S.sim[MK]={cash:(MK==='BIST'?100000:10000),holdings:{},log:[]}; save(); renderSim(); } };
+$('simToReal').onclick=function(){
+  var sim=simFor(MK), real=realFor(MK), n=0;
+  Object.keys(sim.holdings).forEach(function(sym){ var h=sim.holdings[sym];
+    real.lots.push({id:Date.now()+'-'+sym, sym:sym, qty:h.qty, price:h.cost/h.qty, date:new Date().toISOString().slice(0,10), rate:(MK==='BIST'?EURTRY:null)}); n++; });
+  if(n){ save(); renderReal(); alert(n+' pozisyon gerçek portföye aktarıldı.'); goView('real'); }
+  else alert('Aktarılacak pozisyon yok.');
+};
+function renderSim(){
+  var sim=simFor(MK); var holdVal=0, invested=0; var rows='';
+  Object.keys(sim.holdings).forEach(function(sym){
+    var h=sim.holdings[sym]; var s=find(sym); var px=s?s.price:null;
+    var val=px!=null?px*h.qty:null; var avg=h.qty?h.cost/h.qty:0;
+    var pnl=px!=null?(px-avg)*h.qty:null; var pct=(px!=null&&avg)?(px-avg)/avg*100:null;
+    if(val!=null) holdVal+=val; invested+=h.cost;
+    rows+='<tr><td><span class="sym" data-sym="'+sym+'">'+clean(sym)+'</span><div class="nm">'+h.qty+' adet @ '+fmt(avg)+'</div></td>'+
+      '<td>'+(px==null?'—':fmt(px))+'</td>'+
+      '<td>'+(val==null?'—':amt(MK,val))+'</td>'+
+      '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+fmt(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
+      '<td><button class="miniact" data-real="'+sym+'">→ Gerçeğe</button></td></tr>';
+  });
+  $('simHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Fiyat</th><th>Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>')
+    :'<div class="empty">pozisyon yok — bir hisse seç ve AL</div>';
+  $('simHold').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+  $('simHold').querySelectorAll('[data-real]').forEach(function(b){b.onclick=function(){
+    var sym=b.dataset.real, h=simFor(MK).holdings[sym]; if(!h)return;
+    realFor(MK).lots.push({id:Date.now()+'-'+sym,sym:sym,qty:h.qty,price:h.cost/h.qty,date:new Date().toISOString().slice(0,10),rate:(MK==='BIST'?EURTRY:null)});
+    save(); renderReal(); alert(clean(sym)+' gerçek portföye eklendi.');
+  };});
+  var total=sim.cash+holdVal, pnl=holdVal-invested;
+  $('cashV').innerHTML=amt(MK,sim.cash); $('holdV').innerHTML=amt(MK,holdVal); $('totV').innerHTML=amt(MK,total);
+  $('pnlV').innerHTML=(pnl>0?'+':'')+amt(MK,pnl); $('pnlV').className='v '+pnlCls(pnl);
+  $('simLog').innerHTML = sim.log.length? sim.log.map(function(e){
+    var d=new Date(e.t); var sc=e.side==='buy'?'up':'down'; var st=e.side==='buy'?'AL':'SAT';
+    var eur=(e.rate?' · ≈€'+fmt(eurOf(e.px*e.qty,e.rate)):'');
+    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
+  }).join(''):'<div class="empty">işlem yok</div>';
+}
+
+/* ---------- real portfolio ---------- */
+function fillSymList(){
+  $('symList').innerHTML = marketStocks().map(function(s){return '<option value="'+clean(s.symbol)+'">'+(s.name||'')+'</option>';}).join('');
+}
+function resolveSym(input){
+  input=(input||'').trim().toUpperCase(); if(!input) return null;
+  var suf=MK==='BIST'?'.IS':'.DE';
+  if(find(input)) return input;
+  if(find(input+suf)) return input+suf;
+  return input+suf; // izin ver: listede olmasa da ekle
+}
+$('rAdd').onclick=function(){
+  var sym=resolveSym($('rSym').value); if(!sym){alert('Sembol gir.');return;}
+  var qty=parseInt($('rQty').value,10); if(!qty||qty<1){alert('Adet gir.');return;}
+  var s=find(sym);
+  var price=parseFloat($('rPrice').value); if(isNaN(price)){ price=s?s.price:null; }
+  if(price==null||isNaN(price)){alert('Alış fiyatı gir (güncel fiyat yok).');return;}
+  var date=$('rDate').value || new Date().toISOString().slice(0,10);
+  var rate=parseFloat($('rRate').value); if(isNaN(rate)) rate=(MK==='BIST'?EURTRY:null);
+  realFor(MK).lots.push({id:Date.now()+'-'+sym, sym:sym, qty:qty, price:price, date:date, rate:rate});
+  save(); $('rSym').value='';$('rQty').value='';$('rPrice').value='';$('rRate').value=''; renderReal();
+};
+function renderReal(){
+  var real=realFor(MK); var totCost=0, totVal=0; var rows='';
+  real.lots.forEach(function(l){
+    var s=find(l.sym); var px=s?s.price:null;
+    var cost=l.price*l.qty; var val=px!=null?px*l.qty:null;
+    var pnl=val!=null?val-cost:null; var pct=cost?(pnl/cost*100):null;
+    totCost+=cost; if(val!=null) totVal+=val;
+    var eurCost=(MK==='BIST'&&l.rate)?'<span class="sub">alış ≈ €'+fmt(eurOf(cost,l.rate))+'</span>':'';
+    var eurVal=(MK==='BIST'&&px!=null)?'<span class="sub">≈ €'+fmt(eurOf(val))+'</span>':'';
+    var eurPnl=null;
+    if(MK==='BIST'&&val!=null&&l.rate){ eurPnl=eurOf(val)-eurOf(cost,l.rate); }
+    rows+='<tr><td><span class="sym" data-sym="'+l.sym+'">'+clean(l.sym)+'</span><div class="nm">'+l.qty+' adet @ '+fmt(l.price)+'<br>'+l.date+'</div></td>'+
+      '<td>'+ccySym(MK)+fmt(cost)+eurCost+'</td>'+
+      '<td>'+(val==null?'—':ccySym(MK)+fmt(val)+eurVal)+'</td>'+
+      '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+fmt(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+
+        (eurPnl!=null?'<span class="sub">'+(eurPnl>0?'+':'')+'€'+fmt(eurPnl)+'</span>':'')+'</td>'+
+      '<td><button class="miniact" data-del="'+l.id+'">sil</button></td></tr>';
+  });
+  $('realHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Maliyet</th><th>Güncel</th><th>K/Z</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>')
+    :'<div class="empty">henüz gerçek pozisyon yok</div>';
+  $('realHold').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+  $('realHold').querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){
+    realFor(MK).lots=realFor(MK).lots.filter(function(l){return l.id!==b.dataset.del;}); save(); renderReal();
+  };});
+  var pnl=totVal-totCost;
+  $('rCost').innerHTML=amt(MK,totCost); $('rVal').innerHTML=amt(MK,totVal);
+  $('rPnl').innerHTML=(pnl>0?'+':'')+amt(MK,pnl); $('rPnl').className='v '+pnlCls(pnl);
+}
+
+/* ---------- history chart ---------- */
+var histCur='try';
+function num(x){ x=(''+x).trim(); if(x.indexOf(',')>=0&&x.indexOf('.')>=0){x=x.replace(/\./g,'').replace(',','.');} else if(x.indexOf(',')>=0){x=x.replace(',','.');} x=x.replace(/\s/g,''); var n=parseFloat(x); return isNaN(n)?null:n; }
+function normDate(d){ d=d.trim(); var m=d.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})$/); if(m){return m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2);} return d; }
+function isDateish(d){ return /^\d{4}-\d{1,2}-\d{1,2}$/.test(d)||/^\d{1,2}[.\/]\d{1,2}[.\/]\d{4}$/.test(d); }
+function lineChart(points, color){
+  if(!points.length) return '<div class="empty">veri yok — aşağıdan içe aktar</div>';
+  var W=760,H=280,Pl=58,Pr=18,Pt=18,Pb=36;
+  var ys=points.map(function(p){return p.y;});
+  var lo=Math.min.apply(null,ys), hi=Math.max.apply(null,ys); var pad=(hi-lo)*0.08||1; lo-=pad; hi+=pad;
+  function px(i){return Pl+(i/((points.length-1)||1))*(W-Pl-Pr);}
+  function py(v){return Pt+(1-(v-lo)/((hi-lo)||1))*(H-Pt-Pb);}
+  var d=points.map(function(p,i){return (i?'L':'M')+px(i).toFixed(1)+' '+py(p.y).toFixed(1);}).join(' ');
+  var area=d+' L '+px(points.length-1).toFixed(1)+' '+(H-Pb)+' L '+px(0).toFixed(1)+' '+(H-Pb)+' Z';
+  var grid='',ticks=4;
+  for(var i=0;i<=ticks;i++){var v=lo+(hi-lo)*i/ticks; var y=py(v); grid+='<line class="grid" x1="'+Pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-Pr)+'" y2="'+y.toFixed(1)+'"/><text class="ylab" x="'+(Pl-8)+'" y="'+(y+4).toFixed(1)+'">'+shortNum(v)+'</text>';}
+  var xl='';[0,Math.floor(points.length/2),points.length-1].forEach(function(i){ if(points[i]) xl+='<text class="xlab" x="'+px(i).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle">'+points[i].label+'</text>'; });
+  var last=points[points.length-1];
+  return '<svg viewBox="0 0 '+W+' '+H+'" class="chart">'+grid+
+    '<path d="'+area+'" fill="'+color+'" opacity="0.10"/>'+
+    '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
+    '<circle cx="'+px(points.length-1).toFixed(1)+'" cy="'+py(last.y).toFixed(1)+'" r="4" fill="'+color+'"/>'+xl+'</svg>';
+}
+function renderHist(){
+  var data=S.hist.slice().sort(function(a,b){return (a.date<b.date?-1:1);});
+  var pts=data.map(function(r){
+    var y = histCur==='try' ? r.tryv : r.usd;
+    return {y:y, label:(r.date||'').slice(0,7)};
+  }).filter(function(p){return p.y!=null&&!isNaN(p.y);});
+  var color = histCur==='try' ? '#0bbfa6' : '#3b82f6';
+  $('histChart').innerHTML = lineChart(pts, color);
+  if(pts.length){
+    var first=pts[0].y, last=pts[pts.length-1].y; var ch=first?((last-first)/first*100):0;
+    $('histChart').innerHTML += '<div class="hint" style="margin-top:8px">Son: <b class="mono">'+(histCur==='try'?'₺':'$')+fmt(last)+'</b> · ilk kayıttan beri <b class="'+chCls(ch)+'">'+(ch>0?'+':'')+fmt(ch,1)+'%</b> ('+pts.length+' kayıt)</div>';
+  }
+}
+$('histSeg').querySelectorAll('button').forEach(function(b){b.onclick=function(){histCur=b.dataset.c; $('histSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);}); renderHist();};});
+var thirdCol='none';
+$('thirdSeg').querySelectorAll('button').forEach(function(b){b.onclick=function(){thirdCol=b.dataset.t; $('thirdSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});};});
+$('histImport').onclick=function(){
+  var lines=$('histInput').value.split(/\r?\n/); var out=[]; var skippedHeader=false;
+  lines.forEach(function(line){
+    if(!line.trim()) return; var p=line.split(/[,;\t]/).map(function(x){return x.trim();});
+    if(p.length<2) return;
+    if(!skippedHeader && !isDateish(p[0])){ skippedHeader=true; return; }
+    var date=normDate(p[0]); var tryv=num(p[1]); if(tryv==null) return;
+    var usd=null;
+    if(thirdCol==='usd' && p[2]!=null) usd=num(p[2]);
+    else if(thirdCol==='usdtry' && p[2]!=null){ var r=num(p[2]); usd=r?tryv/r:null; }
+    out.push({date:date, tryv:tryv, usd:usd});
+  });
+  if(!out.length){ alert('Veri okunamadı. Format: tarih, TRY[, 3.sütun]'); return; }
+  S.hist=out; save(); renderHist(); alert(out.length+' kayıt içe aktarıldı.');
+};
+$('histClear').onclick=function(){ if(confirm('Geçmiş veri silinsin mi?')){S.hist=[]; save(); $('histInput').value=''; renderHist();} };
+
+/* ---------- notes ---------- */
+$('notesArea').value=S.notes||'';
+$('notesArea').oninput=function(){ S.notes=$('notesArea').value; save(); };
+
+/* ---------- render all ---------- */
+function renderAll(){
+  syncSwitch(); renderMeta(); renderTicker(); fillSimSelect(); fillSymList();
+  renderScreen(); renderAllList(); updateSimPx(); renderSim(); renderReal(); renderHist();
+}
+
+/* ---------- boot ---------- */
+if(MK){ syncSwitch(); showApp(); } else { showGate(); }
+}
+function loadData(cb){
+  var url='data.js';
+  if(location.protocol.indexOf('http')===0) url+='?t='+Date.now(); // Pages/GitHub: cache kir, dosyada: duz
+  var s=document.createElement('script'); s.src=url; s.async=false;
+  s.onload=function(){cb();};
+  s.onerror=function(){ window.__DATA_ERR=true; cb(); };
+  document.head.appendChild(s);
+}
+loadData(startApp);
+</script>
+</body>
+</html>
