@@ -67,6 +67,74 @@ def safe(d, *keys):
     return None
 
 
+def compute_technicals(h):
+    """Gunluk geçmişten (1y) kisa-orta vade teknik gostergeleri hesapla."""
+    out = {"ma50": None, "ma200": None, "rsi14": None, "atrPct": None,
+           "ret1m": None, "ret3m": None, "pctFromHigh": None, "relVol": None}
+    try:
+        closes = [float(x) for x in h["Close"].dropna().tolist()]
+        highs = [float(x) for x in h["High"].dropna().tolist()]
+        lows = [float(x) for x in h["Low"].dropna().tolist()]
+        vols = [float(x) for x in h["Volume"].dropna().tolist()]
+    except Exception:
+        return out
+    n = len(closes)
+    if n < 2:
+        return out
+    price = closes[-1]
+    if n >= 50:
+        out["ma50"] = round(sum(closes[-50:]) / 50, 4)
+    if n >= 200:
+        out["ma200"] = round(sum(closes[-200:]) / 200, 4)
+    if n >= 22:
+        out["ret1m"] = round((price / closes[-22] - 1) * 100, 2)
+    if n >= 64:
+        out["ret3m"] = round((price / closes[-64] - 1) * 100, 2)
+    window = closes[-252:] if n >= 252 else closes
+    hi = max(window)
+    if hi > 0:
+        out["pctFromHigh"] = round((price / hi - 1) * 100, 2)
+    # RSI(14)
+    if n >= 15:
+        gains = losses = 0.0
+        for i in range(n - 14, n):
+            ch = closes[i] - closes[i - 1]
+            if ch >= 0:
+                gains += ch
+            else:
+                losses -= ch
+        ag, al = gains / 14, losses / 14
+        out["rsi14"] = 100.0 if al == 0 else round(100 - 100 / (1 + ag / al), 1)
+    # ATR(14) yuzde
+    if n >= 15 and len(highs) == n and len(lows) == n:
+        trs = []
+        for i in range(n - 14, n):
+            trs.append(max(highs[i] - lows[i],
+                           abs(highs[i] - closes[i - 1]),
+                           abs(lows[i] - closes[i - 1])))
+        atr = sum(trs) / len(trs)
+        if price > 0:
+            out["atrPct"] = round(atr / price * 100, 2)
+    # Bagil hacim (son gun / 20 gun ort)
+    if len(vols) >= 21:
+        avg20 = sum(vols[-21:-1]) / 20
+        if avg20 > 0:
+            out["relVol"] = round(vols[-1] / avg20, 2)
+    return out
+
+
+def fetch_index_ret1m(sym):
+    """Endeksin 1 aylik (~22 gun) getirisi - bagil guc icin."""
+    try:
+        h = yf.Ticker(sym).history(period="3mo", interval="1d")
+        c = [float(x) for x in h["Close"].dropna().tolist()]
+        if len(c) >= 22:
+            return round((c[-1] / c[-22] - 1) * 100, 2)
+    except Exception as e:
+        print(f"  ! {sym} endeks hatasi: {e}")
+    return None
+
+
 def fetch_one(symbol, market):
     t = yf.Ticker(symbol)
     info = {}
@@ -101,6 +169,22 @@ def fetch_one(symbol, market):
         except Exception:
             pass
 
+    # 1 yillik gecmis -> teknik gostergeler (ayni veriyle fiyat/hacim yedegi)
+    tech = {"ma50": None, "ma200": None, "rsi14": None, "atrPct": None,
+            "ret1m": None, "ret3m": None, "pctFromHigh": None, "relVol": None}
+    try:
+        h1 = t.history(period="1y", interval="1d")
+        if len(h1) > 0:
+            tech = compute_technicals(h1)
+            if price is None:
+                price = float(h1["Close"].iloc[-1])
+            if prev is None and len(h1) >= 2:
+                prev = float(h1["Close"].iloc[-2])
+            if volume is None:
+                volume = float(h1["Volume"].iloc[-1])
+    except Exception as e:
+        print(f"  ! {symbol} teknik hatasi: {e}")
+
     change_pct = None
     if price is not None and prev:
         change_pct = (price - prev) / prev * 100.0
@@ -134,6 +218,11 @@ def fetch_one(symbol, market):
         "debtToEquity": round(de, 2) if de is not None else None,
         "netMargin": round(margin * 100, 2) if margin is not None else None,  # yuzde
         "netIncome": int(net_income) if net_income is not None else None,
+        # --- teknik (kisa-orta vade) ---
+        "ma50": tech["ma50"], "ma200": tech["ma200"],
+        "rsi14": tech["rsi14"], "atrPct": tech["atrPct"],
+        "ret1m": tech["ret1m"], "ret3m": tech["ret3m"],
+        "pctFromHigh": tech["pctFromHigh"], "relVol": tech["relVol"],
     }
 
 
@@ -236,11 +325,19 @@ def main():
     }
     print(f"  EUR/TRY={rates['EURTRY']}  USD/TRY={rates['USDTRY']}")
 
+    print("Endeks getirileri cekiliyor (DAX, BIST)...")
+    benchmarks = {
+        "DAX": fetch_index_ret1m("^GDAXI"),
+        "BIST": fetch_index_ret1m("XU100.IS"),
+    }
+    print(f"  DAX 1A={benchmarks['DAX']}  BIST 1A={benchmarks['BIST']}")
+
     payload = {
         "updatedAt": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
         "count": len(rows),
         "weights": WEIGHTS,
         "rates": rates,
+        "benchmarks": benchmarks,
         "stocks": rows,
     }
 
