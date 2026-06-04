@@ -292,11 +292,12 @@
 
     <section class="view card" id="v-sim">
       <div class="stat">
+        <div><div class="k">Yatırılan</div><div class="v" id="simDepV">—</div></div>
         <div><div class="k">Nakit</div><div class="v" id="cashV">—</div></div>
         <div><div class="k">Maliyet</div><div class="v" id="simInvV">—</div></div>
         <div><div class="k">Pozisyon</div><div class="v" id="holdV">—</div></div>
         <div><div class="k">Toplam</div><div class="v" id="totV">—</div></div>
-        <div><div class="k">Kâr/Zarar</div><div class="v" id="pnlV">—</div></div>
+        <div><div class="k">Toplam K/Z</div><div class="v" id="pnlV">—</div></div>
       </div>
       <div class="simgrid">
         <div class="trade">
@@ -315,7 +316,7 @@
             <h3 style="margin:0; font-size:16px">Pozisyonlar</h3>
             <div style="display:flex; gap:8px">
               <button class="ghost" id="simToReal">Tümünü gerçeğe aktar</button>
-              <button class="ghost" id="setCash">Nakit ayarla</button>
+              <button class="ghost" id="setCash">Para yatır/çek</button>
               <button class="ghost" id="resetSim">Sıfırla</button>
             </div>
           </div>
@@ -515,7 +516,13 @@ var S = load();
 S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.hist = S.hist || []; S.simHist = S.simHist || {};
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
-function simFor(m){ if(!S.sim[m]) S.sim[m]={cash:(m==='BIST'?100000:10000), holdings:{}, log:[]}; return S.sim[m]; }
+function simFor(m){
+  var start=(m==='BIST'?100000:10000);
+  if(!S.sim[m]) S.sim[m]={cash:start, deposited:start, holdings:{}, log:[]};
+  var r=S.sim[m];
+  if(r.deposited===undefined){ r.deposited=start; save(); } // eski sim'ler: varsayılan başlangıç = yatırılan
+  return r;
+}
 function realFor(m){
   if(!S.real[m]) S.real[m]={holdings:{}, log:[]};
   var r=S.real[m];
@@ -743,8 +750,16 @@ function trade(side){
 }
 $('simBuy').onclick=function(){trade('buy');};
 $('simSell').onclick=function(){trade('sell');};
-$('setCash').onclick=function(){ var sim=simFor(MK); var v=prompt('Başlangıç nakdi ('+ccyCode(MK)+'):', sim.cash); if(v!=null&&!isNaN(parseFloat(v))){sim.cash=parseFloat(v); save(); renderSim();} };
-$('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ S.sim[MK]={cash:(MK==='BIST'?100000:10000),holdings:{},log:[]}; save(); renderSim(); } };
+$('setCash').onclick=function(){
+  var sim=simFor(MK);
+  var v=prompt('Para yatır / çek ('+ccyCode(MK)+')\nYatırmak için pozitif, çekmek için negatif gir (örn: 1000 = yatır, -500 = çek):','0');
+  if(v==null) return;
+  var amt=parseFloat(v); if(isNaN(amt)||amt===0) return;
+  if(amt<0 && Math.abs(amt)>sim.cash){ alert('Çekilecek tutar nakitten fazla.'); return; }
+  sim.cash+=amt; sim.deposited=(sim.deposited||0)+amt;
+  save(); renderSim();
+};
+$('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ var start=(MK==='BIST'?100000:10000); S.sim[MK]={cash:start,deposited:start,holdings:{},log:[]}; save(); renderSim(); } };
 /* sim: günü grafiğe kaydet */
 function simTotalVal(){
   var sim=simFor(MK), holdVal=0;
@@ -793,7 +808,8 @@ function renderSim(){
     realFor(MK).log.push({t:Date.now(),side:'buy',sym:sym,qty:hh.qty,px:hh.cost/hh.qty,rate:(MK==='BIST'?EURTRY:null)});
     save(); renderReal(); renderScreen(); renderAllList(); alert(clean(sym)+' gerçek portföye eklendi.');
   };});
-  var total=sim.cash+holdVal, pnl=holdVal-invested;
+  var total=sim.cash+holdVal, dep=sim.deposited||0, pnl=total-dep;
+  $('simDepV').innerHTML=amt(MK,dep);
   $('cashV').innerHTML=amt(MK,sim.cash); $('simInvV').innerHTML=amt(MK,invested);
   $('holdV').innerHTML=amt(MK,holdVal); $('totV').innerHTML=amt(MK,total);
   $('pnlV').innerHTML=(pnl>0?'+':'')+amt(MK,pnl); $('pnlV').className='v '+pnlCls(pnl);
