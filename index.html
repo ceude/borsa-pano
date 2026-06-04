@@ -41,6 +41,21 @@
   .movergrid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
   @media(max-width:880px){.movergrid{grid-template-columns:1fr}}
   .moverbox h3{font-size:15px; margin:0 0 10px}
+  .glossary{margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px}
+  .gloss{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow)}
+  .gloss h4{margin:0 0 5px; font-family:"Schibsted Grotesk",sans-serif; font-size:14px}
+  .gloss p{margin:0; font-size:12px; color:var(--dim); line-height:1.5}
+  .gloss .scale{margin-top:7px; font-size:11px; color:var(--faint)}
+  .gloss .scale b{font-weight:700}
+  .glosshead{margin:26px 0 4px; font-size:13px; color:var(--faint); text-transform:uppercase; letter-spacing:.05em}
+  .eduwrap{max-width:1200px; margin:4px auto 70px; padding:0 22px}
+  .edu{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px}
+  .edu>h3{font-size:16px; margin:0 0 14px}
+  .edugrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px}
+  .eduitem{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .eduitem b{font-size:13.5px} .eduitem p{margin:7px 0 0; font-size:12px; color:var(--dim); line-height:1.5}
+  .eduitem .rng{font-size:11px; margin-top:8px; color:var(--faint); line-height:1.7}
+  .eduitem .rng .g{color:var(--up)} .eduitem .rng .m{color:#d99a00} .eduitem .rng .b{color:var(--down)}
   .q{font-size:9px; margin-right:5px; vertical-align:1px}
   .q.good{color:var(--up)} .q.mid{color:#d99a00} .q.bad{color:var(--down)}
   button{font-family:inherit}
@@ -310,19 +325,26 @@
         <div><div class="k">Kâr/Zarar</div><div class="v" id="rPnl">—</div></div>
       </div>
       <div class="card" style="background:var(--bg); box-shadow:none; margin-bottom:16px">
-        <h3 style="margin:0 0 12px; font-size:16px">Pozisyon ekle</h3>
+        <h3 style="margin:0 0 12px; font-size:16px">İşlem (al / sat)</h3>
         <div class="controls">
-          <input class="fld" id="rSym" list="symList" placeholder="sembol (örn THYAO)" style="width:160px">
-          <input class="fld" id="rQty" type="number" min="1" placeholder="adet" style="width:100px">
-          <input class="fld" id="rPrice" type="number" step="0.0001" placeholder="alış fiyatı (boş=güncel)" style="width:180px">
-          <input class="fld" id="rDate" type="date" style="width:160px">
-          <input class="fld" id="rRate" type="number" step="0.0001" placeholder="o günkü EUR/TRY (ops.)" style="width:200px" title="BIST için: boş bırakırsan güncel kur kullanılır">
-          <button class="miniact" id="rAdd" style="padding:10px 16px">Ekle</button>
+          <input class="fld" id="rSym" list="symList" placeholder="sembol (örn THYAO)" style="width:150px">
+          <input class="fld" id="rQty" type="number" min="1" placeholder="adet" style="width:90px">
+          <input class="fld" id="rPrice" type="number" step="0.0001" placeholder="fiyat (boş=güncel)" style="width:160px">
+          <input class="fld" id="rDate" type="date" style="width:155px">
+          <input class="fld" id="rRate" type="number" step="0.0001" placeholder="o günkü EUR/TRY (ops.)" style="width:185px" title="BIST için: boş bırakırsan güncel kur kullanılır">
+          <button class="go buy" id="rBuy" style="flex:none; padding:10px 22px">AL</button>
+          <button class="go sell" id="rSell" style="flex:none; padding:10px 22px">SAT</button>
         </div>
         <datalist id="symList"></datalist>
-        <div class="hint">Alış fiyatını ve tarihi elle girebilirsin. BIST'te "o günkü EUR/TRY"yi girersen EUR kârın o günkü kura göre doğru hesaplanır; boş bırakırsan güncel kur kullanılır.</div>
+        <div class="hint">Gerçek işlemlerini gir: aynı hisseye tekrar AL dersen ortalama maliyetin otomatik güncellenir; SAT dersen pozisyon azalır (parçalı al/sat olur). Fiyat boşsa güncel fiyat, tarih boşsa bugün kullanılır. BIST'te "o günkü EUR/TRY"yi girersen EUR kârın o güne sabitlenir.</div>
       </div>
+      <h3 style="font-size:16px; margin:0 0 8px">Pozisyonlarım</h3>
       <div class="scroll" id="realHold"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 8px">
+        <h3 style="font-size:16px; margin:0">İşlem Geçmişi</h3>
+        <button class="ghost" id="resetReal">Tümünü sıfırla</button>
+      </div>
+      <div class="log scroll" id="realLog" style="max-height:240px"></div>
     </section>
 
     <section class="view card" id="v-hist">
@@ -344,7 +366,7 @@
           <button class="ghost" id="histClear">Temizle</button>
         </div>
       </div>
-      <div class="disclaimer">USD eğrisi için ya doğrudan USD toplamını ya da o tarihteki USD/TRY kurunu vermeniz gerekmektedir.</div>
+      <div class="disclaimer">6 yıllık Excel verini bana yollarsan statik olarak da gömebilirim. USD eğrisi için ya doğrudan USD toplamını ya da o tarihteki USD/TRY kurunu vermen gerekir — yoksa USD geçmişi doğru çıkmaz.</div>
     </section>
 
     <section class="view card" id="v-notes">
@@ -361,7 +383,63 @@
       <h3 style="font-size:16px; margin:0 0 8px">Bu hisse için notlarım</h3>
       <textarea id="detailNotes" style="min-height:160px" placeholder="Bu hisseye dair gözlemlerin, hedef fiyat, neden aldın…"></textarea>
     </section>
+    <div class="glosshead">Kısa sözlük</div>
+    <div class="glossary">
+      <div class="gloss">
+        <h4>F/K — Fiyat / Kazanç</h4>
+        <p>Hisse fiyatının, şirketin yıllık net kârının kaç katı olduğunu gösterir. Düşükse hisse kârına göre ucuz sayılır.</p>
+        <div class="scale"><b class="up">&lt;10 ucuz</b> · <b style="color:#d99a00">10–20 makul</b> · <b class="down">&gt;20 pahalı</b> · negatifse şirket zarar ediyordur</div>
+      </div>
+      <div class="gloss">
+        <h4>P/D — Piyasa / Defter</h4>
+        <p>Fiyatın, şirketin özsermayesinin (defter değeri) kaç katı olduğu. 1 = tam defter değeri. Sektöre göre değişir.</p>
+        <div class="scale"><b class="up">&lt;1,5 ucuz</b> · <b style="color:#d99a00">1,5–3 normal</b> · <b class="down">&gt;3 pahalı</b></div>
+      </div>
+      <div class="gloss">
+        <h4>Özsermaye Kârlılığı — ROE</h4>
+        <p>Şirketin kendi sermayesiyle ne kadar verimli kâr ürettiği. Yüksek olması, paranın iyi çalıştığı anlamına gelir.</p>
+        <div class="scale"><b class="up">&gt;%20 güçlü</b> · <b style="color:#d99a00">%10–20 orta</b> · <b class="down">&lt;%10 zayıf</b></div>
+      </div>
+      <div class="gloss">
+        <h4>Net Marj</h4>
+        <p>Satışların yüzde kaçının net kâra dönüştüğü. Yüksek marj, işin daha kârlı olduğunu gösterir.</p>
+        <div class="scale"><b class="up">&gt;%15 iyi</b> · <b style="color:#d99a00">%5–15 orta</b> · <b class="down">&lt;%5 zayıf</b></div>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:10px; text-align:center">Bu aralıklar kabaca yön gösterir; sektöre ve şirketin durumuna göre değişir, kesin kural değildir.</div>
   </main>
+
+  <div class="eduwrap">
+    <div class="edu">
+      <h3>Kısa kısa: bu oranlar ne anlatır?</h3>
+      <div class="edugrid">
+        <div class="eduitem"><b>F/K — Fiyat / Kazanç</b>
+          <p>Hissenin fiyatının, şirketin hisse başına yıllık kârına oranı. Kabaca "kaç yılda kendini amorti eder". Düşük = ucuz.</p>
+          <div class="rng"><span class="g">●</span> &lt;10 ucuz &nbsp; <span class="m">●</span> 10–20 makul &nbsp; <span class="b">●</span> &gt;20 pahalı / negatif = zarar</div>
+        </div>
+        <div class="eduitem"><b>P/D — Piyasa / Defter Değeri</b>
+          <p>Fiyatın, şirketin özkaynağına (defter değeri) oranı. 1 = piyasa şirkete tam defter değeri biçiyor.</p>
+          <div class="rng"><span class="g">●</span> &lt;1,5 ucuz &nbsp; <span class="m">●</span> 1,5–3 makul &nbsp; <span class="b">●</span> &gt;3 pahalı</div>
+        </div>
+        <div class="eduitem"><b>Özsermaye Kârlılığı — ROE</b>
+          <p>Şirketin, ortakların koyduğu sermayeyle ne kadar kâr ürettiği. Yüksek = sermayeyi verimli kullanıyor.</p>
+          <div class="rng"><span class="g">●</span> &gt;%20 güçlü &nbsp; <span class="m">●</span> %10–20 orta &nbsp; <span class="b">●</span> &lt;%10 zayıf</div>
+        </div>
+        <div class="eduitem"><b>Borç / Özsermaye</b>
+          <p>Şirketin borcunun özkaynağına oranı. Düşük = sağlam bilanço; yüksek = borca bağımlı, risk artar.</p>
+          <div class="rng"><span class="g">●</span> &lt;%50 düşük &nbsp; <span class="m">●</span> %50–100 orta &nbsp; <span class="b">●</span> &gt;%100 yüksek</div>
+        </div>
+        <div class="eduitem"><b>Net Marj</b>
+          <p>Her 100 TL satıştan geriye kalan net kâr. Yüksek marj = fiyatlama gücü ve verimlilik.</p>
+          <div class="rng"><span class="g">●</span> &gt;%15 iyi &nbsp; <span class="m">●</span> %5–15 orta &nbsp; <span class="b">●</span> &lt;%5 zayıf</div>
+        </div>
+        <div class="eduitem"><b>Skor (0–100)</b>
+          <p>Yukarıdaki beş oranı birleştiren değer/kalite puanı. "Ucuz ve sağlam mı"yı özetler — fiyatın yükseleceği anlamına gelmez.</p>
+          <div class="rng">Eşikler sektöre göre değişir; bunlar genel pusuladır, kesin kural değil. Yatırım tavsiyesi değildir.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -413,7 +491,37 @@ S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.hist = S.hist || [];
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
 function simFor(m){ if(!S.sim[m]) S.sim[m]={cash:(m==='BIST'?100000:10000), holdings:{}, log:[]}; return S.sim[m]; }
-function realFor(m){ if(!S.real[m]) S.real[m]={lots:[]}; return S.real[m]; }
+function realFor(m){
+  if(!S.real[m]) S.real[m]={holdings:{}, log:[]};
+  var r=S.real[m];
+  if(r.lots && !r._migrated){            // eski 'lots' modelinden işlem geçmişine göç
+    r.log = r.log || [];
+    r.lots.forEach(function(l){
+      var t = l.date ? new Date(l.date+'T12:00:00').getTime() : (Date.now());
+      r.log.push({t:t, side:'buy', sym:l.sym, qty:l.qty, px:l.price, rate:l.rate||null, manual:true});
+    });
+    delete r.lots; r._migrated=true; save();
+  }
+  if(!r.log) r.log=[];
+  return r;
+}
+/* gerçek portföy: işlem geçmişini kronolojik oynatıp pozisyonları hesapla (ortalama maliyet) */
+function computeRealHoldings(real){
+  var h={};
+  real.log.slice().sort(function(a,b){return a.t-b.t;}).forEach(function(e){
+    var x=h[e.sym]||{qty:0,cost:0,eurCost:0};
+    if(e.side==='buy'){
+      var cost=e.px*e.qty; x.qty+=e.qty; x.cost+=cost;
+      if(MK==='BIST'&&e.rate) x.eurCost+=cost/e.rate;
+    } else {
+      if(x.qty>0){ var sell=Math.min(e.qty,x.qty); var avg=x.cost/x.qty;
+        x.cost-=avg*sell; if(MK==='BIST'){var ea=x.eurCost/x.qty; x.eurCost-=ea*sell;} x.qty-=sell; }
+    }
+    h[e.sym]=x;
+  });
+  Object.keys(h).forEach(function(k){ if(h[k].qty<=0.0000001) delete h[k]; });
+  return h;
+}
 
 /* ---------- market state ---------- */
 var MK = S.lastMarket || null;
@@ -610,9 +718,9 @@ $('simSell').onclick=function(){trade('sell');};
 $('setCash').onclick=function(){ var sim=simFor(MK); var v=prompt('Başlangıç nakdi ('+ccyCode(MK)+'):', sim.cash); if(v!=null&&!isNaN(parseFloat(v))){sim.cash=parseFloat(v); save(); renderSim();} };
 $('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ S.sim[MK]={cash:(MK==='BIST'?100000:10000),holdings:{},log:[]}; save(); renderSim(); } };
 $('simToReal').onclick=function(){
-  var sim=simFor(MK), real=realFor(MK), n=0;
-  Object.keys(sim.holdings).forEach(function(sym){ var h=sim.holdings[sym];
-    real.lots.push({id:Date.now()+'-'+sym, sym:sym, qty:h.qty, price:h.cost/h.qty, date:new Date().toISOString().slice(0,10), rate:(MK==='BIST'?EURTRY:null)}); n++; });
+  var sim=simFor(MK), real=realFor(MK), n=0, now=Date.now();
+  Object.keys(sim.holdings).forEach(function(sym){ var hh=sim.holdings[sym];
+    real.log.push({t:now, side:'buy', sym:sym, qty:hh.qty, px:hh.cost/hh.qty, rate:(MK==='BIST'?EURTRY:null)}); n++; });
   if(n){ save(); renderReal(); alert(n+' pozisyon gerçek portföye aktarıldı.'); goView('real'); }
   else alert('Aktarılacak pozisyon yok.');
 };
@@ -633,8 +741,8 @@ function renderSim(){
     :'<div class="empty">pozisyon yok — bir hisse seç ve AL</div>';
   $('simHold').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
   $('simHold').querySelectorAll('[data-real]').forEach(function(b){b.onclick=function(){
-    var sym=b.dataset.real, h=simFor(MK).holdings[sym]; if(!h)return;
-    realFor(MK).lots.push({id:Date.now()+'-'+sym,sym:sym,qty:h.qty,price:h.cost/h.qty,date:new Date().toISOString().slice(0,10),rate:(MK==='BIST'?EURTRY:null)});
+    var sym=b.dataset.real, hh=simFor(MK).holdings[sym]; if(!hh)return;
+    realFor(MK).log.push({t:Date.now(),side:'buy',sym:sym,qty:hh.qty,px:hh.cost/hh.qty,rate:(MK==='BIST'?EURTRY:null)});
     save(); renderReal(); alert(clean(sym)+' gerçek portföye eklendi.');
   };});
   var total=sim.cash+holdVal, pnl=holdVal-invested;
@@ -658,44 +766,58 @@ function resolveSym(input){
   if(find(input+suf)) return input+suf;
   return input+suf; // izin ver: listede olmasa da ekle
 }
-$('rAdd').onclick=function(){
+function realTrade(side){
   var sym=resolveSym($('rSym').value); if(!sym){alert('Sembol gir.');return;}
   var qty=parseInt($('rQty').value,10); if(!qty||qty<1){alert('Adet gir.');return;}
   var s=find(sym);
   var price=parseFloat($('rPrice').value); if(isNaN(price)){ price=s?s.price:null; }
-  if(price==null||isNaN(price)){alert('Alış fiyatı gir (güncel fiyat yok).');return;}
-  var date=$('rDate').value || new Date().toISOString().slice(0,10);
+  if(price==null||isNaN(price)){alert('Fiyat gir (güncel fiyat yok).');return;}
+  var real=realFor(MK);
+  if(side==='sell'){
+    var pos=computeRealHoldings(real)[sym];
+    if(!pos || pos.qty<qty){ alert('Yeterli pozisyon yok. Mevcut: '+(pos?pos.qty:0)); return; }
+  }
+  var dateStr=$('rDate').value;
+  var t = dateStr ? new Date(dateStr+'T12:00:00').getTime() : Date.now();
   var rate=parseFloat($('rRate').value); if(isNaN(rate)) rate=(MK==='BIST'?EURTRY:null);
-  realFor(MK).lots.push({id:Date.now()+'-'+sym, sym:sym, qty:qty, price:price, date:date, rate:rate});
-  save(); $('rSym').value='';$('rQty').value='';$('rPrice').value='';$('rRate').value=''; renderReal();
-};
+  real.log.push({t:t, side:side, sym:sym, qty:qty, px:price, rate:rate, manual:true});
+  save();
+  $('rSym').value='';$('rQty').value='';$('rPrice').value='';$('rRate').value='';
+  renderReal();
+}
+$('rBuy').onclick=function(){realTrade('buy');};
+$('rSell').onclick=function(){realTrade('sell');};
+$('resetReal').onclick=function(){ if(confirm('Bu piyasanın gerçek portföyü ve işlem geçmişi silinsin mi?')){ S.real[MK]={holdings:{},log:[]}; save(); renderReal(); } };
 function renderReal(){
-  var real=realFor(MK); var totCost=0, totVal=0; var rows='';
-  real.lots.forEach(function(l){
-    var s=find(l.sym); var px=s?s.price:null;
-    var cost=l.price*l.qty; var val=px!=null?px*l.qty:null;
-    var pnl=val!=null?val-cost:null; var pct=cost?(pnl/cost*100):null;
-    totCost+=cost; if(val!=null) totVal+=val;
-    var eurCost=(MK==='BIST'&&l.rate)?'<span class="sub">alış ≈ €'+fmt(eurOf(cost,l.rate))+'</span>':'';
-    var eurVal=(MK==='BIST'&&px!=null)?'<span class="sub">≈ €'+fmt(eurOf(val))+'</span>':'';
-    var eurPnl=null;
-    if(MK==='BIST'&&val!=null&&l.rate){ eurPnl=eurOf(val)-eurOf(cost,l.rate); }
-    rows+='<tr><td><span class="sym" data-sym="'+l.sym+'">'+clean(l.sym)+'</span><div class="nm">'+l.qty+' adet @ '+fmt(l.price)+'<br>'+l.date+'</div></td>'+
-      '<td>'+ccySym(MK)+fmt(cost)+eurCost+'</td>'+
+  var real=realFor(MK); var h=computeRealHoldings(real);
+  var totCost=0, totVal=0; var rows='';
+  Object.keys(h).sort().forEach(function(sym){
+    var pos=h[sym]; var s=find(sym); var px=s?s.price:null;
+    var avg=pos.qty?pos.cost/pos.qty:0;
+    var val=px!=null?px*pos.qty:null;
+    var pnl=val!=null?val-pos.cost:null; var pct=pos.cost?(pnl/pos.cost*100):null;
+    totCost+=pos.cost; if(val!=null) totVal+=val;
+    var eurCost=(MK==='BIST'&&pos.eurCost)?'<span class="sub">alış ≈ €'+fmt(pos.eurCost)+'</span>':'';
+    var eurVal=(MK==='BIST'&&val!=null)?'<span class="sub">≈ €'+fmt(eurOf(val))+'</span>':'';
+    var eurPnl=(MK==='BIST'&&val!=null&&pos.eurCost)?(eurOf(val)-pos.eurCost):null;
+    rows+='<tr><td><span class="sym" data-sym="'+sym+'">'+clean(sym)+'</span><div class="nm">'+pos.qty+' adet · ort. '+fmt(avg)+'</div></td>'+
+      '<td>'+(px==null?'<span class="na">—</span>':fmt(px))+'</td>'+
+      '<td>'+ccySym(MK)+fmt(pos.cost)+eurCost+'</td>'+
       '<td>'+(val==null?'—':ccySym(MK)+fmt(val)+eurVal)+'</td>'+
       '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+fmt(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+
-        (eurPnl!=null?'<span class="sub">'+(eurPnl>0?'+':'')+'€'+fmt(eurPnl)+'</span>':'')+'</td>'+
-      '<td><button class="miniact" data-del="'+l.id+'">sil</button></td></tr>';
+        (eurPnl!=null?'<span class="sub">'+(eurPnl>0?'+':'')+'€'+fmt(eurPnl)+'</span>':'')+'</td></tr>';
   });
-  $('realHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Maliyet</th><th>Güncel</th><th>K/Z</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>')
-    :'<div class="empty">henüz gerçek pozisyon yok</div>';
+  $('realHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Güncel Fiyat</th><th>Maliyet</th><th>Güncel Değer</th><th>K/Z</th></tr></thead><tbody>'+rows+'</tbody></table>')
+    :'<div class="empty">henüz gerçek pozisyon yok — yukarıdan AL ile ekle</div>';
   $('realHold').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
-  $('realHold').querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){
-    realFor(MK).lots=realFor(MK).lots.filter(function(l){return l.id!==b.dataset.del;}); save(); renderReal();
-  };});
   var pnl=totVal-totCost;
   $('rCost').innerHTML=amt(MK,totCost); $('rVal').innerHTML=amt(MK,totVal);
   $('rPnl').innerHTML=(pnl>0?'+':'')+amt(MK,pnl); $('rPnl').className='v '+pnlCls(pnl);
+  $('realLog').innerHTML = real.log.length ? real.log.slice().sort(function(a,b){return b.t-a.t;}).map(function(e){
+    var sc=e.side==='buy'?'up':'down'; var st=e.side==='buy'?'AL':'SAT';
+    var eur=(MK==='BIST'&&e.rate)?' · ≈€'+fmt(eurOf(e.px*e.qty,e.rate)):'';
+    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+'</span><span class="t">'+new Date(e.t).toLocaleDateString('tr-TR')+'</span></div>';
+  }).join('') : '<div class="empty">işlem yok</div>';
 }
 
 /* ---------- history chart ---------- */
