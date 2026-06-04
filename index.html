@@ -28,6 +28,12 @@
   h1,h2,h3{font-family:"Schibsted Grotesk",sans-serif; letter-spacing:-.02em}
   .up{color:var(--up)} .down{color:var(--down)} .neutral{color:var(--neutral)}
   .na{color:var(--faint)}
+  .pmark{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:0; flex:none}
+  .pmark.sim{background:#7c5cff}
+  .pmark.real{background:#ec4899}
+  .pmark.both{background:linear-gradient(135deg,#7c5cff 0 50%,#ec4899 50% 100%)}
+  .pmleg{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--faint)}
+  .pmleg .pmark{margin:0 2px 0 8px}
   .adbanner{display:flex; align-items:center; gap:14px; padding:9px 18px; text-decoration:none;
     background:linear-gradient(100deg,#0c8f6b,#13b585 55%,#1ecb9b); color:#fff}
   .adbanner:hover{filter:brightness(1.04)}
@@ -265,13 +271,13 @@
 
   <main>
     <section class="view active card" id="v-screen">
-      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"></div>
+      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr></thead><tbody id="screenBody"></tbody></table></div>
       <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir (5 = tam).</div>
     </section>
 
     <section class="view card" id="v-all">
-      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"></div>
+      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="allTable"><thead><tr><th class="l">Hisse</th><th>Fiyat</th><th>Günlük %</th><th>Hacim</th><th></th></tr></thead><tbody id="allBody"></tbody></table></div>
     </section>
 
@@ -482,6 +488,15 @@ function qDot(metric,v){
   else return '';
   return '<span class="q '+t+'" title="'+t+'">●</span>';
 }
+/* portföy işareti: mor=sim, pembe=gerçek, yarı-yarıya=ikisi */
+function pmark(sym, simH, realH){
+  var inS = simH[sym] && simH[sym].qty>0;
+  var inR = realH[sym] && realH[sym].qty>0;
+  if(inS && inR) return '<span class="pmark both" title="Simülatör + Gerçek portföy"></span>';
+  if(inS) return '<span class="pmark sim" title="Simülatörde var"></span>';
+  if(inR) return '<span class="pmark real" title="Gerçek portföyde var"></span>';
+  return '';
+}
 function eurOf(tryAmt, rate){ rate = rate || EURTRY; return rate? tryAmt/rate : null; }
 /* amount with EUR sub-line for BIST */
 function amt(m, val, rateAtTime){
@@ -602,6 +617,7 @@ function buildHead(){
 }
 function renderScreen(){
   buildHead();
+  var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   var rows=marketStocks().filter(function(s){
     if(qScreen){var q=qScreen.toLowerCase(); if(!(s.symbol.toLowerCase().indexOf(q)>=0||(s.name||'').toLowerCase().indexOf(q)>=0))return false;}
     return true;
@@ -616,7 +632,7 @@ function renderScreen(){
     var sc=s.score==null?'<span class="na">—</span>':'<div class="scorebar"><div class="bar"><i style="width:'+s.score+'%"></i></div><b>'+fmt(s.score,0)+'</b></div>';
     function na(v){return v==null?'<span class="na">—</span>':v;}
     return '<tr>'+
-      '<td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,32)+'</div></td>'+
+      '<td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,32)+'</div></td>'+
       '<td>'+sc+'</td><td>'+na(fmt(s.price))+'</td>'+
       '<td class="'+c+'">'+(s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</td>'+
       '<td>'+(s.pe==null?'<span class="na">—</span>':qDot('pe',s.pe)+fmt(s.pe))+'</td>'+
@@ -635,11 +651,12 @@ $('searchScreen').oninput=function(e){qScreen=e.target.value; renderScreen();};
 /* ---------- all list ---------- */
 var qAll='';
 function renderAllList(){
+  var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   var rows=marketStocks().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);});
   if(qAll){var q=qAll.toLowerCase(); rows=rows.filter(function(s){return s.symbol.toLowerCase().indexOf(q)>=0||(s.name||'').toLowerCase().indexOf(q)>=0;});}
   $('allBody').innerHTML = rows.map(function(s){
     var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':'b-dax';
-    return '<tr><td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,40)+'</div></td>'+
+    return '<tr><td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,40)+'</div></td>'+
       '<td>'+(s.price==null?'<span class="na">—</span>':fmt(s.price))+'</td>'+
       '<td class="'+c+'">'+(s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</td>'+
       '<td>'+fmtInt(s.volume)+'</td>'+
@@ -722,7 +739,7 @@ function trade(side){
     if(h2.qty<=0) delete sim.holdings[s.symbol];
   }
   sim.log.unshift({t:Date.now(), side:side, sym:s.symbol, qty:q, px:s.price, rate:rate});
-  save(); renderSim();
+  save(); renderSim(); renderScreen(); renderAllList();
 }
 $('simBuy').onclick=function(){trade('buy');};
 $('simSell').onclick=function(){trade('sell');};
@@ -751,7 +768,7 @@ $('simToReal').onclick=function(){
   var sim=simFor(MK), real=realFor(MK), n=0, now=Date.now();
   Object.keys(sim.holdings).forEach(function(sym){ var hh=sim.holdings[sym];
     real.log.push({t:now, side:'buy', sym:sym, qty:hh.qty, px:hh.cost/hh.qty, rate:(MK==='BIST'?EURTRY:null)}); n++; });
-  if(n){ save(); renderReal(); alert(n+' pozisyon gerçek portföye aktarıldı.'); goView('real'); }
+  if(n){ save(); renderReal(); renderScreen(); renderAllList(); alert(n+' pozisyon gerçek portföye aktarıldı.'); goView('real'); }
   else alert('Aktarılacak pozisyon yok.');
 };
 function renderSim(){
@@ -774,7 +791,7 @@ function renderSim(){
   $('simHold').querySelectorAll('[data-real]').forEach(function(b){b.onclick=function(){
     var sym=b.dataset.real, hh=simFor(MK).holdings[sym]; if(!hh)return;
     realFor(MK).log.push({t:Date.now(),side:'buy',sym:sym,qty:hh.qty,px:hh.cost/hh.qty,rate:(MK==='BIST'?EURTRY:null)});
-    save(); renderReal(); alert(clean(sym)+' gerçek portföye eklendi.');
+    save(); renderReal(); renderScreen(); renderAllList(); alert(clean(sym)+' gerçek portföye eklendi.');
   };});
   var total=sim.cash+holdVal, pnl=holdVal-invested;
   $('cashV').innerHTML=amt(MK,sim.cash); $('simInvV').innerHTML=amt(MK,invested);
@@ -815,7 +832,7 @@ function realTrade(side){
   real.log.push({t:t, side:side, sym:sym, qty:qty, px:price, rate:rate, manual:true});
   save();
   $('rSym').value='';$('rQty').value='';$('rPrice').value='';$('rRate').value='';
-  renderReal();
+  renderReal(); renderScreen(); renderAllList();
 }
 $('rBuy').onclick=function(){realTrade('buy');};
 $('rSell').onclick=function(){realTrade('sell');};
