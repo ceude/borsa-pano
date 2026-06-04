@@ -249,6 +249,7 @@
         <button data-m="DAX">DAX</button>
       </div>
       <span class="ratebox" id="rateBox"></span>
+      <button class="ghost" id="autoBtn" title="10 dakikada bir verileri tazeler"></button>
     </div>
   </header>
 
@@ -560,7 +561,8 @@ function renderMeta(){
 
 /* ---------- ticker ---------- */
 function renderTicker(){
-  var arr = marketStocks().filter(function(s){return s.price!=null;});
+  var arr = marketStocks().filter(function(s){return s.price!=null;})
+    .sort(function(a,b){return a.symbol.localeCompare(b.symbol);});
   if(!arr.length){ $('tickerTrack').innerHTML='<span class="tk na">veri bekleniyor…</span>'; return; }
   var html = arr.map(function(s){
     var c=chCls(s.changePct), a=s.changePct==null?'':s.changePct>0?'▲':s.changePct<0?'▼':'·';
@@ -969,6 +971,37 @@ function renderAll(){
   syncSwitch(); renderMeta(); renderTicker(); fillSimSelect(); fillSymList();
   renderScreen(); renderAllList(); renderMovers(); updateSimPx(); renderSim(); renderSimChart(); renderReal(); renderHist();
 }
+
+/* ---------- otomatik yenileme (Yol A) ---------- */
+var autoTimer=null;
+function refreshData(){
+  var url='data.js'+(location.protocol.indexOf('http')===0?('?t='+Date.now()):'');
+  var s=document.createElement('script'); s.async=true; s.src=url;
+  s.onload=function(){
+    DATA = window.STOCK_DATA || DATA;
+    STOCKS = (DATA&&DATA.stocks)?DATA.stocks:STOCKS;
+    RATES = (DATA&&DATA.rates)?DATA.rates:RATES;
+    EURTRY = RATES.EURTRY;
+    if(MK) renderAll();
+    if(s.parentNode) s.parentNode.removeChild(s);
+  };
+  s.onerror=function(){ if(s.parentNode) s.parentNode.removeChild(s); };
+  document.head.appendChild(s);
+}
+function updateAutoBtn(){
+  var b=$('autoBtn'); if(!b) return;
+  if(S.auto){ b.textContent='⟳ Oto 10dk: açık'; b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
+  else { b.textContent='⟳ Oto: kapalı'; b.style.color=''; b.style.borderColor=''; }
+}
+function setAuto(on){
+  S.auto=on; save();
+  if(autoTimer){ clearInterval(autoTimer); autoTimer=null; }
+  if(on){ autoTimer=setInterval(refreshData, 10*60*1000); }
+  updateAutoBtn();
+}
+$('autoBtn').onclick=function(){ setAuto(!S.auto); };
+if(S.auto===undefined) S.auto=true;   // varsayilan: acik
+setAuto(S.auto);
 
 /* ---------- boot ---------- */
 if(MK){ syncSwitch(); showApp(); } else { showGate(); }
