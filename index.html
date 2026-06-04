@@ -28,6 +28,10 @@
   h1,h2,h3{font-family:"Schibsted Grotesk",sans-serif; letter-spacing:-.02em}
   .up{color:var(--up)} .down{color:var(--down)} .neutral{color:var(--neutral)}
   .na{color:var(--faint)}
+  #screenFilterRow th{position:static; cursor:default; padding:6px 8px; background:var(--bg)}
+  .colf{width:100%; min-width:54px; background:var(--surface); border:1px solid var(--line); border-radius:7px; padding:5px 7px; font-size:11px; font-family:inherit; color:var(--ink); text-align:right}
+  .colf:focus{outline:none; border-color:var(--brand)}
+  .colf::placeholder{color:var(--faint)}
   .pmark{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:0; flex:none}
   .pmark.sim{background:#7c5cff}
   .pmark.real{background:#ec4899}
@@ -278,8 +282,8 @@
     </section>
 
     <section class="view active card" id="v-screen">
-      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
-      <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr></thead><tbody id="screenBody"></tbody></table></div>
+      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
+      <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr><tr id="screenFilterRow"></tr></thead><tbody id="screenBody"></tbody></table></div>
       <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir (5 = tam).</div>
     </section>
 
@@ -725,16 +729,51 @@ document.querySelectorAll('.tab').forEach(function(t){ t.onclick=function(){goVi
 
 /* ---------- screener ---------- */
 var COLS=[
-  {k:'symbol',t:'Hisse',l:true},{k:'score',t:'Skor'},{k:'price',t:'Fiyat'},
-  {k:'changePct',t:'Gün %'},{k:'pe',t:'F/K'},{k:'pb',t:'P/D'},
-  {k:'roe',t:'Özsr.K %'},{k:'debtToEquity',t:'Borç/Özsr'},{k:'netMargin',t:'Marj %'},
-  {k:'scoreCoverage',t:'Veri'},{k:'act',t:''}
+  {k:'symbol',t:'Hisse',l:true,tip:'Hisse kodu ve şirket adı.'},
+  {k:'score',t:'Skor',tip:'0–100 değer/kalite puanı. Düşük F/K, düşük P/D, yüksek özsermaye kârlılığı, düşük borç ve yüksek marj puanı yükseltir.'},
+  {k:'price',t:'Fiyat',tip:'Hissenin güncel fiyatı (yaklaşık 15 dk gecikmeli).'},
+  {k:'changePct',t:'Gün %',tip:'Bugünkü yüzde değişim (önceki güne göre).'},
+  {k:'pe',t:'F/K',tip:'Fiyat/Kazanç: fiyat, yıllık kârın kaç katı. Düşük = ucuz. Kabaca <10 ucuz, 10–20 makul, >20 pahalı.'},
+  {k:'pb',t:'P/D',tip:'Piyasa/Defter: fiyat, özsermayenin (defter değeri) kaç katı. <1,5 ucuz, 1,5–3 normal, >3 pahalı.'},
+  {k:'roe',t:'Özsr.K %',tip:'Özsermaye Kârlılığı (ROE): şirket kendi sermayesiyle ne kadar verimli kâr üretiyor. Yüksek iyi.'},
+  {k:'debtToEquity',t:'Borç/Özsr',tip:'Borcun özsermayeye oranı. Düşük = daha az borçlu, daha sağlam.'},
+  {k:'netMargin',t:'Marj %',tip:'Net kâr marjı: satışın yüzde kaçı net kâra dönüşüyor. Yüksek iyi (sektöre göre değişir).'},
+  {k:'scoreCoverage',t:'Veri',tip:'Skorun kaç metrikten hesaplandığı (5 = tam). Düşükse skora temkinli yaklaş.'},
+  {k:'act',t:''}
 ];
-var qScreen='', sortK='score', sortDir=-1;
+var qScreen='', sortK='score', sortDir=-1, colFilters={};
+/* sütun filtresi: "<10", ">5", "<=2", "1,5", "10-20" gibi ifadeleri ayrıştır */
+function parseCond(expr){
+  expr=(''+(expr||'')).trim().replace(',','.'); if(!expr) return null;
+  var m;
+  if(m=expr.match(/^(<=|>=|<|>|=)\s*(-?\d*\.?\d+)$/)) return {op:m[1], n:parseFloat(m[2])};
+  if(m=expr.match(/^(-?\d*\.?\d+)\s*(?:\.\.|-)\s*(-?\d*\.?\d+)$/)) return {op:'range', a:parseFloat(m[1]), b:parseFloat(m[2])};
+  if(m=expr.match(/^(-?\d*\.?\d+)$/)) return {op:'=', n:parseFloat(m[1])};
+  return {op:'invalid'};
+}
+function testCond(val, c){
+  if(c==null||c.op==='invalid') return true;
+  if(val==null||isNaN(val)) return false;
+  if(c.op==='<') return val<c.n; if(c.op==='<=') return val<=c.n;
+  if(c.op==='>') return val>c.n; if(c.op==='>=') return val>=c.n;
+  if(c.op==='=') return Math.abs(val-c.n)<1e-9;
+  if(c.op==='range'){ var lo=Math.min(c.a,c.b), hi=Math.max(c.a,c.b); return val>=lo&&val<=hi; }
+  return true;
+}
+function buildFilterRow(){
+  $('screenFilterRow').innerHTML = COLS.map(function(c){
+    if(c.k==='symbol'||c.k==='act') return '<th class="'+(c.l?'l':'')+'"></th>';
+    return '<th><input class="colf" data-k="'+c.k+'" placeholder="örn. &lt;10" title="Bu sütunu filtrele. Örnek: &lt;10, &gt;5, &lt;=2, 1,5 ya da aralık 10-20"></th>';
+  }).join('');
+  $('screenFilterRow').querySelectorAll('.colf').forEach(function(inp){
+    inp.value = colFilters[inp.dataset.k]||'';
+    inp.oninput=function(){ colFilters[inp.dataset.k]=inp.value; renderScreen(); };
+  });
+}
 function buildHead(){
   $('screenHead').innerHTML = COLS.map(function(c){
     var arr=c.k===sortK?'<span class="arr">'+(sortDir<0?'▼':'▲')+'</span>':'';
-    return '<th class="'+(c.l?'l':'')+'" data-k="'+c.k+'">'+c.t+' '+arr+'</th>';
+    return '<th class="'+(c.l?'l':'')+'" data-k="'+c.k+'"'+(c.tip?' title="'+c.tip+'"':'')+'>'+c.t+' '+arr+'</th>';
   }).join('');
   $('screenHead').querySelectorAll('th').forEach(function(th){
     var k=th.dataset.k; if(k==='act') return;
@@ -777,7 +816,17 @@ function renderGunun(){
       '<td>'+fmt(s.price)+'</td>'+
       '<td><button class="miniact" data-sym="'+s.symbol+'">Sim</button></td></tr>';
   }).join('');
-  box.innerHTML='<table><thead><tr><th class="l">Hisse</th><th class="l">Sektör</th><th>Setup</th><th>Trend</th><th>Göreli Güç</th><th>1A %</th><th>RSI</th><th>ATR%</th><th>Fiyat</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+  box.innerHTML='<table><thead><tr>'+
+    '<th class="l" title="Hisse senedinin kodu ve şirketin adı.">Hisse</th>'+
+    '<th class="l" title="Şirketin faaliyet alanı (banka, otomotiv, teknoloji…). Aynı sektörden listeye en fazla 2 hisse alınır.">Sektör</th>'+
+    '<th title="0–100 arası kısa vade puanı. Trend, momentum, piyasaya göre güç, RSI, volatilite ve hacmi birleştirir. Yüksek = kısa vadeli kurulum daha güçlü görünüyor. Kâr garantisi DEĞİLDİR.">GÜNLÜK SKOR</th>'+
+    '<th title="Fiyatın ortalamalarına göre yönü. Fiyat hem 50 hem 200 günlük ortalamanın üstündeyse güçlü yükseliş; altındaysa zayıf demektir.">Trend</th>'+
+    '<th title="Hissenin son 1 aydaki getirisi eksi endeksin getirisi. Pozitifse hisse piyasanın geri kalanından daha iyi performans göstermiş (relatif güç).">Göreli Güç</th>'+
+    '<th title="Son ~1 aylık (21 işlem günü) fiyat değişimi. Kısa vadeli momentumu, yani işlerin gidişatını gösterir.">1A %</th>'+
+    '<th title="Göreli Güç Endeksi (0–100). 55–70 sağlıklı yükseliş; 70 üstü aşırı alım (geri çekilme riski); 30 altı aşırı satım.">RSI</th>'+
+    '<th title="Ortalama günlük dalgalanma, fiyatın yüzdesi olarak. %1.5–4 ideal; çok düşükse hareket yok (makas tuzağı), çok yüksekse riskli.">ATR%</th>'+
+    '<th title="Hissenin güncel fiyatı (yaklaşık 15 dakika gecikmeli).">Fiyat</th>'+
+    '<th></th></tr></thead><tbody>'+rows+'</tbody></table>';
   box.querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
   box.querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
 }
@@ -786,6 +835,11 @@ function renderScreen(){
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   var rows=marketStocks().filter(function(s){
     if(qScreen){var q=qScreen.toLowerCase(); if(!(s.symbol.toLowerCase().indexOf(q)>=0||(s.name||'').toLowerCase().indexOf(q)>=0))return false;}
+    for(var fi=0; fi<COLS.length; fi++){
+      var ck=COLS[fi].k; if(ck==='symbol'||ck==='act') continue;
+      var cond=parseCond(colFilters[ck]);
+      if(cond && cond.op!=='invalid' && !testCond(s[ck], cond)) return false;
+    }
     return true;
   });
   rows.sort(function(a,b){
@@ -813,6 +867,8 @@ function renderScreen(){
   $('screenBody').querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
 }
 $('searchScreen').oninput=function(e){qScreen=e.target.value; renderScreen();};
+buildFilterRow();
+$('clearFilters').onclick=function(){ colFilters={}; $('screenFilterRow').querySelectorAll('.colf').forEach(function(i){i.value='';}); qScreen=''; $('searchScreen').value=''; renderScreen(); };
 
 /* ---------- all list ---------- */
 var qAll='';
