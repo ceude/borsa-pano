@@ -264,8 +264,9 @@
   </header>
 
   <nav id="nav">
-    <button class="tab" data-v="gunun">Günün Hisseleri</button>
-    <button class="tab active" data-v="screen">Tarama</button>
+    <button class="tab" data-v="trade">Günlük Trade</button>
+    <button class="tab" data-v="gunun">Kısa Vade Adayları</button>
+    <button class="tab active" data-v="screen">Orta/Uzun Vade Adayları</button>
     <button class="tab" data-v="all">Tüm Liste</button>
     <button class="tab" data-v="movers">En Çok Artan/Azalan</button>
     <button class="tab" data-v="sim">Simülatör</button>
@@ -275,6 +276,19 @@
   </nav>
 
   <main>
+    <section class="view card" id="v-trade">
+      <h3 style="margin:0 0 8px">Günlük Trade <span class="badge b-dax" style="background:#fff3cd;color:#9a7400">yapım aşamasında</span></h3>
+      <div class="hint" style="line-height:1.6">
+        Bu sekme gerçek <b>gün içi (intraday)</b> modül için ayrıldı — diğer sekmelerden farklı olarak
+        gün-içi sinyallere dayanacak (gap / açılış aralığı / VWAP / gün-içi relatif güç / hacim patlaması gibi).<br><br>
+        Kurgusunu birlikte konuşacağız. Dürüst not: bunun düzgün çalışması için <b>gerçek-zamanlı (gecikmesiz) gün-içi veri</b>
+        gerekir; mevcut ~15 dk gecikmeli ve günlük veriyle güvenilir gün-içi sinyal üretilemez. O yüzden önce
+        <b>veri kaynağını</b> ve kuralları netleştirmemiz lazım.<br><br>
+        Şu an aktif ve çalışan iki tarama: <b>Kısa Vade Adayları</b> (momentum/trend, gün-hafta) ve
+        <b>Orta/Uzun Vade Adayları</b> (değer/kalite). Gün içi kurgu hazır olunca burayı dolduracağız.
+      </div>
+    </section>
+
     <section class="view card" id="v-gunun">
       <div class="hint" id="gununInfo" style="margin-bottom:14px"></div>
       <div class="scroll" id="gununBody"></div>
