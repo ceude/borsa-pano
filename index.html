@@ -28,6 +28,19 @@
   h1,h2,h3{font-family:"Schibsted Grotesk",sans-serif; letter-spacing:-.02em}
   .up{color:var(--up)} .down{color:var(--down)} .neutral{color:var(--neutral)}
   .na{color:var(--faint)}
+  .adbanner{display:flex; align-items:center; gap:14px; padding:9px 18px; text-decoration:none;
+    background:linear-gradient(100deg,#0c8f6b,#13b585 55%,#1ecb9b); color:#fff}
+  .adbanner:hover{filter:brightness(1.04)}
+  .adbanner img{width:42px; height:42px; border-radius:10px; flex:none; box-shadow:0 2px 10px rgba(0,0,0,.28); background:#0a5}
+  .adt{flex:1; min-width:0; line-height:1.25}
+  .adspon{font-size:9px; opacity:.75; text-transform:uppercase; letter-spacing:.1em; display:block}
+  .adt b{font-family:"Schibsted Grotesk",sans-serif; font-weight:800; font-size:15px; display:block}
+  .addesc{font-size:12px; opacity:.92}
+  .adcta{flex:none; background:#fff; color:#0c7a5e; font-weight:800; font-size:13px; padding:9px 16px; border-radius:999px; white-space:nowrap}
+  @media(max-width:560px){ .addesc{display:none} .adcta{padding:8px 12px} .adbanner img{width:36px;height:36px} }
+  .movergrid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+  @media(max-width:880px){.movergrid{grid-template-columns:1fr}}
+  .moverbox h3{font-size:15px; margin:0 0 10px}
   .q{font-size:9px; margin-right:5px; vertical-align:1px}
   .q.good{color:var(--up)} .q.mid{color:#d99a00} .q.bad{color:var(--down)}
   button{font-family:inherit}
@@ -199,6 +212,15 @@
 
 <!-- APP -->
 <div id="app" style="display:none">
+  <a class="adbanner" id="adBanner" target="_blank" rel="noopener">
+    <img id="adLogo" alt="SprachSnack">
+    <div class="adt">
+      <span class="adspon">REKLAM</span>
+      <b>SprachSnack: Deutsche Wörter</b>
+      <span class="addesc">3500+ TELC kelimesiyle Almanca öğren · Ücretsiz</span>
+    </div>
+    <span class="adcta">App Store ↗</span>
+  </a>
   <div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
 
   <header>
@@ -218,6 +240,7 @@
   <nav id="nav">
     <button class="tab active" data-v="screen">Tarama</button>
     <button class="tab" data-v="all">Tüm Liste</button>
+    <button class="tab" data-v="movers">En Çok Artan/Azalan</button>
     <button class="tab" data-v="sim">Simülatör</button>
     <button class="tab" data-v="real">Gerçek Portföy</button>
     <button class="tab" data-v="hist">Geçmiş Grafik</button>
@@ -234,6 +257,15 @@
     <section class="view card" id="v-all">
       <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"></div>
       <div class="scroll"><table id="allTable"><thead><tr><th class="l">Hisse</th><th>Fiyat</th><th>Günlük %</th><th>Hacim</th><th></th></tr></thead><tbody id="allBody"></tbody></table></div>
+    </section>
+
+    <section class="view card" id="v-movers">
+      <div class="movergrid">
+        <div class="moverbox"><h3 class="up">▲ En Çok Artan 5</h3><div class="scroll" id="moversUp"></div></div>
+        <div class="moverbox"><h3 class="down">▼ En Çok Azalan 5</h3><div class="scroll" id="moversDown"></div></div>
+        <div class="moverbox"><h3>● En Çok Hacim 5</h3><div class="scroll" id="moversVol"></div></div>
+      </div>
+      <div class="disclaimer">O günkü (son veri çekimine göre) seçili piyasanın hareketleri. Artan/azalan günlük % değişime, hacim lideri işlem hacmine göre. Bir hisseye tıklayınca detay sayfası açılır.</div>
     </section>
 
     <section class="view card" id="v-sim">
@@ -726,10 +758,45 @@ $('histClear').onclick=function(){ if(confirm('Geçmiş veri silinsin mi?')){S.h
 $('notesArea').value=S.notes||'';
 $('notesArea').oninput=function(){ S.notes=$('notesArea').value; save(); };
 
+/* ---------- ad banner ---------- */
+/* App Store linkini buraya yapistir (su an arama sayfasina gidiyor): */
+var AD_URL  = 'https://apps.apple.com/app/id6755360072';
+var AD_LOGO = 'https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/42/b4/36/42b43605-401c-4aa2-b956-2b888a0e8235/Placeholder.mill/400x400bb-75.webp';
+(function initAd(){
+  var a=$('adBanner'); if(a){ a.href=AD_URL; }
+  var img=$('adLogo'); if(img){ img.src=AD_LOGO; img.onerror=function(){ this.style.display='none'; }; }
+})();
+
+/* ---------- movers ---------- */
+function moverRow(s){
+  var c=chCls(s.changePct);
+  return '<tr><td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span></td>'+
+    '<td>'+fmt(s.price)+'</td>'+
+    '<td class="'+c+'">'+(s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</td>'+
+    '<td>'+(s.pe==null?'<span class="na">—</span>':qDot('pe',s.pe)+fmt(s.pe))+'</td>'+
+    '<td>'+(s.pb==null?'<span class="na">—</span>':qDot('pb',s.pb)+fmt(s.pb))+'</td></tr>';
+}
+function moverTable(list){
+  if(!list.length) return '<div class="empty">veri yok</div>';
+  return '<table><thead><tr><th class="l">Hisse</th><th>Fiyat</th><th>Gün %</th><th>F/K</th><th>P/D</th></tr></thead><tbody>'+
+    list.map(moverRow).join('')+'</tbody></table>';
+}
+function renderMovers(){
+  var withCh=marketStocks().filter(function(s){return s.changePct!=null && s.price!=null;});
+  var withVol=marketStocks().filter(function(s){return s.volume!=null && s.price!=null;});
+  var up=withCh.slice().sort(function(a,b){return b.changePct-a.changePct;}).slice(0,5);
+  var down=withCh.slice().sort(function(a,b){return a.changePct-b.changePct;}).slice(0,5);
+  var vol=withVol.slice().sort(function(a,b){return b.volume-a.volume;}).slice(0,5);
+  $('moversUp').innerHTML=moverTable(up);
+  $('moversDown').innerHTML=moverTable(down);
+  $('moversVol').innerHTML=moverTable(vol);
+  document.querySelectorAll('#v-movers .sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+}
+
 /* ---------- render all ---------- */
 function renderAll(){
   syncSwitch(); renderMeta(); renderTicker(); fillSimSelect(); fillSymList();
-  renderScreen(); renderAllList(); updateSimPx(); renderSim(); renderReal(); renderHist();
+  renderScreen(); renderAllList(); renderMovers(); updateSimPx(); renderSim(); renderReal(); renderHist();
 }
 
 /* ---------- boot ---------- */
