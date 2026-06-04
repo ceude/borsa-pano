@@ -20,7 +20,7 @@ jobs:
         run: |
           H=$(TZ=Europe/Berlin date +%H)
           echo "Berlin saati: $H"
-          if echo " 09 11 13 15 17 " | grep -q " $H "; then
+          if echo " 09 10 11 12 13 14 15 16 17 " | grep -q " $H "; then
             echo "run=yes" >> "$GITHUB_OUTPUT"
           else
             echo "Hedef saat değil, atlanıyor."
