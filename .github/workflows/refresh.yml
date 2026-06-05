@@ -1,11 +1,11 @@
 name: Veri Güncelle
 
-# Berlin saatiyle 09:30, 11:30, 13:30, 15:30, 17:30
+# Berlin saatiyle 09:00'dan 17:30'a kadar HER YARIM SAATTE (09:00, 09:30, 10:00, ... 17:30)
 # GitHub cron UTC çalışır; yaz/kış saatini (CEST/CET) doğru yakalamak için
-# gündüz her saatin yarısında tetikleriz ve aşağıda Berlin saatine göre filtreleriz.
+# her saatin :00 ve :30'unda tetikler, aşağıda Berlin saatine göre filtreleriz.
 on:
   schedule:
-    - cron: '30 6-16 * * *'
+    - cron: '0,30 6-16 * * *'
   workflow_dispatch:        # elle de çalıştırabilirsin (Actions sekmesi → Run workflow)
 
 permissions:
