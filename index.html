@@ -833,13 +833,14 @@ function renderTrade(){
     'Piyasa: <b class="'+chCls(mktAvg)+'">'+(mktAvg>0?'+':'')+fmt(mktAvg,2)+'%</b> ortalama · '+
     '<b class="up">'+up+'</b> yükselen / <b class="down">'+down+'</b> düşen. '+
     (mktAvg>=0?'Yeşil zemin — gün içi long aramak daha mantıklı.':'<b class="down">Kırmızı zemin</b> — gün içi long riskli, temkinli ol.');
+  var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   var list=ms.map(function(s){ s._gi=gunIciSkoru(s,mktAvg); return s; })
     .filter(function(s){ return s._gi!=null && s.changePct>0; })
     .sort(function(a,b){return b._gi-a._gi;}).slice(0,12);
   if(!list.length){ $('tradeBody').innerHTML='<div class="empty">Bugün yukarı yönlü hareketli hisse görünmüyor (gecikmeli veri).</div>'; }
   else {
     var rows=list.map(function(s){
-      return '<tr><td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,22)+'</div></td>'+
+      return '<tr><td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,22)+'</div></td>'+
         '<td><div class="scorebar"><div class="bar"><i style="width:'+s._gi+'%"></i></div><b>'+s._gi+'</b></div></td>'+
         '<td class="'+chCls(s.changePct)+'">'+(s.changePct>0?'+':'')+fmt(s.changePct)+'%</td>'+
         '<td>'+(s.relVol==null?'<span class="na">—</span>':fmt(s.relVol,2)+'×')+'</td>'+
@@ -912,9 +913,10 @@ function renderGunun(){
     '. Filtre: yükselen trend (fiyat&gt;MA50) + canlı volatilite + likidite; sıralama Kısa Vade Skoru.'+
     (res.manual?' <b class="down">Aday çok — son seçimi sen yap.</b>':'');
   if(!res.stocks.length){ box.innerHTML='<div class="empty">Bugün setup kriterlerine uyan hisse yok (yükselen trendde, hareketli ve göreli güçlü hisse bulunamadı).</div>'; return; }
+  var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   var rows=res.stocks.map(function(s){
     var rs=s._rs, rsCls=chCls(rs);
-    return '<tr><td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,24)+'</div></td>'+
+    return '<tr><td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,24)+'</div></td>'+
       '<td>'+sektorTR(s.sector)+'</td>'+
       '<td><div class="scorebar"><div class="bar"><i style="width:'+(s._setup||0)+'%"></i></div><b>'+fmt(s._setup,0)+'</b></div></td>'+
       '<td>'+trendIcon(s)+'</td>'+
