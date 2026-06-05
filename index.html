@@ -271,15 +271,35 @@
     <button class="tab" data-v="movers">En Çok Artan/Azalan</button>
     <button class="tab" data-v="sim">Simülatör</button>
     <button class="tab" data-v="real">Gerçek Portföy</button>
-    <button class="tab" data-v="hist">Geçmiş Grafik</button>
     <button class="tab" data-v="notes">Notlar</button>
   </nav>
 
   <main>
     <section class="view card" id="v-trade">
-      <h3 style="margin:0 0 8px">Günlük Trade <span class="badge b-dax" style="background:#fff3cd;color:#9a7400">yapım aşamasında</span></h3>
-      <div class="hint" style="line-height:1.6">
-        Geliştirme Aşamasında.
+      <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
+        <b>Önce oku.</b> Bu modül ~15 dk <b>gecikmeli</b> ve günde yalnız birkaç kez güncellenen veriyle çalışır → gerçek-zamanlı scalp/gün-içi icra için <b>uygun değildir</b>. Burası "bugün ne hareketli, hacim nerede, piyasayı kim yeniyor" diye bakılan <b>gecikmeli bir izleme listesi</b> ve bir <b>risk hesaplayıcıdır</b>. Hiçbir satır "al" sinyali değildir; gün içi yön güvenilir tahmin edilemez. Gerçek paradan önce Simülatörde dene, <b>her işleme stop koy</b>. Yatırım tavsiyesi değildir.
+      </div>
+      <div class="hint" id="tradeRegime" style="margin-bottom:12px"></div>
+      <h3 style="font-size:16px; margin:0 0 8px">Gün içi hareketliler <span class="cov">(gecikmeli)</span></h3>
+      <div class="scroll" id="tradeBody"></div>
+
+      <div class="trade" style="margin-top:22px">
+        <h3>İşlem planı / risk hesaplayıcı</h3>
+        <div class="lead">Asıl önemli soru: ne kadar riskle, kaç adet, stop nerede? Trader'ı ayakta tutan kısım budur.</div>
+        <div class="qtyrow">
+          <input class="fld" id="tpAcct" type="number" placeholder="hesap büyüklüğü" style="flex:1">
+          <input class="fld" id="tpRisk" type="number" step="0.1" value="1" placeholder="risk %" style="width:90px" title="İşlem başına göze aldığın kayıp, hesabın yüzdesi olarak. Önerilen %0.5–2.">
+        </div>
+        <div class="qtyrow">
+          <select id="tpSym" style="flex:1"></select>
+          <input class="fld" id="tpEntry" type="number" step="0.0001" placeholder="giriş fiyatı" style="width:130px">
+        </div>
+        <div class="qtyrow">
+          <input class="fld" id="tpAtrMult" type="number" step="0.1" value="1.5" placeholder="ATR×" style="width:110px" title="Stop mesafesi = ATR'nin kaç katı. 1.5–2 tipik.">
+          <span class="hint" style="flex:1; align-self:center">stop = giriş − (ATR× × günlük ATR)</span>
+        </div>
+        <button class="go buy" id="tpCalc" style="margin-top:8px">Hesapla</button>
+        <div id="tpOut" style="margin-top:14px"></div>
       </div>
     </section>
 
@@ -383,7 +403,6 @@
             <h3 style="margin:0; font-size:16px">Pozisyonlarım</h3>
             <div style="display:flex; gap:8px">
               <button class="ghost" id="realDeposit">Para yatır/çek</button>
-              <button class="ghost" id="realSaveDay">Günü grafiğe kaydet</button>
               <button class="ghost" id="resetReal">Sıfırla</button>
             </div>
           </div>
@@ -392,28 +411,11 @@
           <div class="log scroll" id="realLog" style="max-height:230px"></div>
         </div>
       </div>
-    </section>
-
-    <section class="view card" id="v-hist">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px">
-        <h3 style="margin:0">Portföy geçmişi</h3>
-        <div class="seg" id="histSeg"><button data-c="try" class="on">TRY</button><button data-c="usd">USD</button></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin:22px 0 8px">
+        <h3 style="font-size:16px; margin:0">Portföy değeri (kaydettiğin günler)</h3>
+        <button class="ghost" id="realSaveDay">Günü grafiğe kaydet</button>
       </div>
-      <div id="histChart"></div>
-      <div class="card" style="background:var(--bg); box-shadow:none; margin-top:16px">
-        <h3 style="margin:0 0 8px; font-size:16px">Veri içe aktar</h3>
-        <div class="hint" style="margin-bottom:10px">Excel/CSV'den her satır: <b>tarih, TRY toplam[, 3. sütun]</b>. Tarih: YYYY-MM-DD veya GG.AA.YYYY. Başlık satırı varsa otomatik atlanır.</div>
-        <div class="controls">
-          <span class="hint">3. sütun:</span>
-          <div class="seg" id="thirdSeg"><button data-t="none" class="on">Yok</button><button data-t="usd">USD değeri</button><button data-t="usdtry">USD/TRY kuru</button></div>
-        </div>
-        <textarea id="histInput" style="min-height:150px" placeholder="2019-01-31, 125000&#10;2019-02-28, 131000&#10;2020-01-31, 180000&#10;…"></textarea>
-        <div style="margin-top:10px; display:flex; gap:8px">
-          <button class="miniact" id="histImport" style="padding:10px 16px">İçe aktar & çiz</button>
-          <button class="ghost" id="histClear">Temizle</button>
-        </div>
-      </div>
-      <div class="disclaimer">6 yıllık Excel verini bana yollarsan statik olarak da gömebilirim. USD eğrisi için ya doğrudan USD toplamını ya da o tarihteki USD/TRY kurunu vermen gerekir — yoksa USD geçmişi doğru çıkmaz.</div>
+      <div id="realChart"></div>
     </section>
 
     <section class="view card" id="v-notes">
@@ -635,7 +637,7 @@ var LS='borsapano.v2';
 function load(){ try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){return {};} }
 var S = load();
 S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
-S.notes = S.notes || ''; S.hist = S.hist || []; S.simHist = S.simHist || {};
+S.notes = S.notes || ''; S.simHist = S.simHist || {}; S.realHist = S.realHist || {};
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
 function simFor(m){
   var start=(m==='BIST'?100000:10000);
@@ -794,6 +796,94 @@ function trendIcon(s){
   if(s.price>s.ma50) return '<b class="up">↑</b>';
   return '<b class="down">↓</b>';
 }
+/* ===== GÜNLÜK TRADE (gecikmeli gün içi izleme + risk hesaplayıcı) ===== */
+function gunIciSkoru(s, mktAvg){
+  if(s.changePct==null) return null;
+  var ch=s.changePct, sc=0;
+  // Yön + güç (35): pozitif ama aşırı uzamamış (parabolik = kovalama riski)
+  if(ch>0) sc += (ch<=3.5) ? (ch/3.5*35) : Math.max(10, 35-(ch-3.5)*5);
+  // Relatif hacim (30): konviksiyon
+  if(s.relVol!=null) sc += Math.max(0, Math.min(30, (s.relVol-0.8)*30));
+  // Bugün piyasaya göre güç (20)
+  if(mktAvg!=null) sc += Math.max(0, Math.min(20, (ch-mktAvg)*8));
+  // Trend uyumu (15)
+  if(s.ma50!=null && s.price!=null){ if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200) sc+=15; else if(s.price>s.ma50) sc+=9; }
+  return Math.round(Math.max(0,Math.min(100,sc)));
+}
+function renderTrade(){
+  var ms=marketStocks();
+  var withCh=ms.filter(function(s){return typeof s.changePct==='number';});
+  var mktAvg=withCh.length? withCh.reduce(function(a,s){return a+s.changePct;},0)/withCh.length : null;
+  var up=withCh.filter(function(s){return s.changePct>0;}).length, down=withCh.length-up;
+  $('tradeRegime').innerHTML = mktAvg==null ? 'Piyasa verisi yok.' :
+    'Piyasa: <b class="'+chCls(mktAvg)+'">'+(mktAvg>0?'+':'')+fmt(mktAvg,2)+'%</b> ortalama · '+
+    '<b class="up">'+up+'</b> yükselen / <b class="down">'+down+'</b> düşen. '+
+    (mktAvg>=0?'Yeşil zemin — gün içi long aramak daha mantıklı.':'<b class="down">Kırmızı zemin</b> — gün içi long riskli, temkinli ol.');
+  var list=ms.map(function(s){ s._gi=gunIciSkoru(s,mktAvg); return s; })
+    .filter(function(s){ return s._gi!=null && s.changePct>0; })
+    .sort(function(a,b){return b._gi-a._gi;}).slice(0,12);
+  if(!list.length){ $('tradeBody').innerHTML='<div class="empty">Bugün yukarı yönlü hareketli hisse görünmüyor (gecikmeli veri).</div>'; }
+  else {
+    var rows=list.map(function(s){
+      return '<tr><td><span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,22)+'</div></td>'+
+        '<td><div class="scorebar"><div class="bar"><i style="width:'+s._gi+'%"></i></div><b>'+s._gi+'</b></div></td>'+
+        '<td class="'+chCls(s.changePct)+'">'+(s.changePct>0?'+':'')+fmt(s.changePct)+'%</td>'+
+        '<td>'+(s.relVol==null?'<span class="na">—</span>':fmt(s.relVol,2)+'×')+'</td>'+
+        '<td class="'+chCls(mktAvg!=null?s.changePct-mktAvg:null)+'">'+(mktAvg==null?'—':((s.changePct-mktAvg)>0?'+':'')+fmt(s.changePct-mktAvg,2)+'%')+'</td>'+
+        '<td>'+trendIcon(s)+'</td>'+
+        '<td>'+(s.atrPct==null?'<span class="na">—</span>':fmt(s.atrPct,1)+'%')+'</td>'+
+        '<td>'+fmt(s.price)+'</td>'+
+        '<td><button class="miniact" data-plan="'+s.symbol+'">Plan</button></td></tr>';
+    }).join('');
+    $('tradeBody').innerHTML='<table><thead><tr>'+
+      '<th class="l" title="Hisse kodu ve şirket.">Hisse</th>'+
+      '<th title="0–100 gün içi ilgi puanı: bugünkü hareketin gücü + relatif hacim + piyasaya göre güç + trend uyumu. Yüksek = bugün dikkat çeken. AL sinyali DEĞİL.">Gün İçi Skor</th>'+
+      '<th title="Bugünkü yüzde değişim (önceki kapanışa göre, ~15 dk gecikmeli).">Gün %</th>'+
+      '<th title="Relatif hacim: bugünkü hacim ÷ son 20 günün ortalaması. 1.0 üstü = normalden hareketli; yüksek = konviksiyon.">Rel.Hacim</th>'+
+      '<th title="Hissenin bugünkü getirisi eksi piyasanın ortalaması. Pozitifse bugün piyasayı yeniyor.">Rel.Güç</th>'+
+      '<th title="Fiyatın 50/200 günlük ortalamaya göre yönü.">Trend</th>'+
+      '<th title="Ortalama günlük dalgalanma. Stop mesafesi ve hareket beklentisi için kullanılır.">ATR%</th>'+
+      '<th title="Güncel fiyat (~15 dk gecikmeli).">Fiyat</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $('tradeBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+    $('tradeBody').querySelectorAll('[data-plan]').forEach(function(b){b.onclick=function(){
+      var sym=b.dataset.plan, s=find(sym);
+      $('tpSym').value=sym; if(s&&s.price!=null) $('tpEntry').value=s.price; tpCalc();
+      $('tpSym').scrollIntoView({behavior:'smooth', block:'center'});
+    };});
+  }
+  // dropdown
+  $('tpSym').innerHTML = ms.filter(function(s){return s.price!=null;})
+    .sort(function(a,b){return a.symbol.localeCompare(b.symbol);})
+    .map(function(s){return '<option value="'+s.symbol+'">'+clean(s.symbol)+' — '+(s.name||'').slice(0,24)+'</option>';}).join('');
+}
+function tpCalc(){
+  var acct=parseFloat($('tpAcct').value), riskPct=parseFloat($('tpRisk').value);
+  var sym=$('tpSym').value, s=find(sym);
+  var entry=parseFloat($('tpEntry').value); if(isNaN(entry)&&s) entry=s.price;
+  var atrMult=parseFloat($('tpAtrMult').value); if(isNaN(atrMult)) atrMult=1.5;
+  var out=$('tpOut');
+  if(!s||isNaN(acct)||isNaN(riskPct)||isNaN(entry)){ out.innerHTML='<div class="hint down">Hesap büyüklüğü, risk %, hisse ve giriş fiyatını gir.</div>'; return; }
+  if(s.atrPct==null){ out.innerHTML='<div class="hint down">Bu hisse için volatilite (ATR) verisi yok; stop mesafesi hesaplanamadı. Manuel stop kullan.</div>'; return; }
+  var stopDistPct=atrMult*s.atrPct;
+  var stopPrice=entry*(1-stopDistPct/100);
+  var perShare=entry-stopPrice;
+  var riskAmt=acct*riskPct/100;
+  var shares=perShare>0? Math.floor(riskAmt/perShare):0;
+  var posVal=shares*entry;
+  var notes=[];
+  if(shares<1) notes.push('Risk bütçen bu stop mesafesi için 1 adet bile almıyor — ya risk %\'ni artır ya stop\'u daralt (daha düşük ATR×).');
+  if(posVal>acct) notes.push('Pozisyon değeri hesabından büyük — bu işlem kaldıraç gerektirir; dikkat.');
+  var c=ccySym(MK);
+  out.innerHTML='<div class="metrics">'+
+    '<div class="metric"><div class="k">Stop fiyatı</div><div class="v">'+c+fmt(stopPrice)+'</div></div>'+
+    '<div class="metric"><div class="k">Stop mesafesi</div><div class="v">'+fmt(stopDistPct,1)+'%</div></div>'+
+    '<div class="metric"><div class="k">Riske ettiğin</div><div class="v">'+c+fmt(riskAmt)+'</div></div>'+
+    '<div class="metric"><div class="k">Adet</div><div class="v">'+shares+'</div></div>'+
+    '<div class="metric"><div class="k">Pozisyon değeri</div><div class="v">'+c+fmt(posVal)+'</div></div>'+
+    '</div>'+
+    (notes.length?'<div class="hint down" style="margin-top:8px">'+notes.join('<br>')+'</div>':'')+
+    '<div class="hint" style="margin-top:8px">Mantık: stop'+'\'a düşersen kaybın ≈ '+c+fmt(riskAmt)+' (hesabının %'+fmt(riskPct,1)+'\'i). Kâr hedefini en az riskin 1.5–2 katı koy; zaman çıkışını (örn. gün sonu) önceden belirle.</div>';
+}
 function renderGunun(){
   var bench = (DATA && DATA.benchmarks) ? DATA.benchmarks[MK] : null;
   var res = gununHisseleri(marketStocks(), {bench:bench});
@@ -827,7 +917,7 @@ function renderGunun(){
   box.innerHTML='<table><thead><tr>'+
     '<th class="l" title="Hisse senedinin kodu ve şirketin adı.">Hisse</th>'+
     '<th class="l" title="Şirketin faaliyet alanı (banka, otomotiv, teknoloji…). Aynı sektörden listeye en fazla 2 hisse alınır.">Sektör</th>'+
-    '<th title="0–100 arası kısa vade puanı. Trend, momentum, piyasaya göre güç, RSI, volatilite ve hacmi birleştirir. Yüksek = kısa vadeli kurulum daha güçlü görünüyor. Kâr garantisi DEĞİLDİR.">GÜNLÜK SKOR</th>'+
+    '<th title="0–100 arası kısa vade puanı. Trend, momentum, piyasaya göre güç, RSI, volatilite ve hacmi birleştirir. Yüksek = kısa vadeli kurulum daha güçlü görünüyor. Kâr garantisi DEĞİLDİR.">Kısa Vade Skor</th>'+
     '<th title="Fiyatın ortalamalarına göre yönü. Fiyat hem 50 hem 200 günlük ortalamanın üstündeyse güçlü yükseliş; altındaysa zayıf demektir.">Trend</th>'+
     '<th title="Hissenin son 1 aydaki getirisi eksi endeksin getirisi. Pozitifse hisse piyasanın geri kalanından daha iyi performans göstermiş (relatif güç).">Göreli Güç</th>'+
     '<th title="Son ~1 aylık (21 işlem günü) fiyat değişimi. Kısa vadeli momentumu, yani işlerin gidişatını gösterir.">1A %</th>'+
@@ -875,6 +965,7 @@ function renderScreen(){
   $('screenBody').querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
 }
 $('searchScreen').oninput=function(e){qScreen=e.target.value; renderScreen();};
+$('tpCalc').onclick=tpCalc;
 buildFilterRow();
 $('clearFilters').onclick=function(){ colFilters={}; $('screenFilterRow').querySelectorAll('.colf').forEach(function(i){i.value='';}); qScreen=''; $('searchScreen').value=''; renderScreen(); };
 
@@ -1089,24 +1180,24 @@ function updateRealCost(){
 }
 ['rSym','rPrice','rQty'].forEach(function(id){ var el=$(id); if(el) el.oninput=updateRealCost; });
 $('resetReal').onclick=function(){ if(confirm('Bu piyasanın gerçek portföyü ve işlem geçmişi silinsin mi?')){ S.real[MK]={deposited:0,log:[]}; save(); renderReal(); renderScreen(); renderAllList(); } };
-/* gerçek portföy: günü Geçmiş Grafik'e kaydet */
-function realTotalVal(){
-  var h=computeRealHoldings(realFor(MK)); var tot=0, any=false;
-  Object.keys(h).forEach(function(sym){ var s=find(sym); if(s&&s.price!=null){ tot+=s.price*h[sym].qty; any=true; } });
-  return any?tot:null;
+/* gerçek portföy: günü grafiğe kaydet */
+function realTotalNow(){
+  var real=realFor(MK), h=computeRealHoldings(real), hv=0;
+  Object.keys(h).forEach(function(sym){ var s=find(sym); if(s&&s.price!=null) hv+=s.price*h[sym].qty; });
+  return realCash(real)+hv;
+}
+function renderRealChart(){
+  var arr=(S.realHist[MK]||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
+  var pts=arr.map(function(r){return {y:r.value, label:(r.date||'').slice(5)};});
+  if(!pts.length){ $('realChart').innerHTML='<div class="empty">Henüz kayıt yok — \"Günü grafiğe kaydet\" ile başla.</div>'; return; }
+  $('realChart').innerHTML = lineChart(pts,'#ec4899')+'<div class="hint" style="margin-top:8px">Son: <b>'+amt(MK,pts[pts.length-1].y)+'</b> · '+pts.length+' gün kayıtlı</div>';
 }
 $('realSaveDay').onclick=function(){
-  var val=realTotalVal();
-  if(val==null){ alert('Güncel fiyatı olan pozisyon yok.'); return; }
-  var tryv = MK==='BIST' ? val : (EURTRY ? val*EURTRY : null);
-  if(tryv==null){ alert('EUR/TRY kuru yok, kaydedilemedi.'); return; }
-  var usd = RATES.USDTRY ? tryv/RATES.USDTRY : null;
   var today=new Date().toISOString().slice(0,10);
-  S.hist = S.hist.filter(function(r){return r.date!==today;});
-  S.hist.push({date:today, tryv:tryv, usd:usd});
-  save(); renderHist();
-  alert("Bugünün portföy değeri Geçmiş Grafik'e kaydedildi.");
-  goView('hist');
+  if(!S.realHist[MK]) S.realHist[MK]=[];
+  S.realHist[MK]=S.realHist[MK].filter(function(r){return r.date!==today;});
+  S.realHist[MK].push({date:today, value:realTotalNow()});
+  save(); renderRealChart(); alert('Bugünün gerçek portföy değeri kaydedildi.');
 };
 function renderReal(){
   var real=realFor(MK); var h=computeRealHoldings(real);
@@ -1144,11 +1235,7 @@ function renderReal(){
   }).join('') : '<div class="empty">işlem yok</div>';
 }
 
-/* ---------- history chart ---------- */
-var histCur='try';
-function num(x){ x=(''+x).trim(); if(x.indexOf(',')>=0&&x.indexOf('.')>=0){x=x.replace(/\./g,'').replace(',','.');} else if(x.indexOf(',')>=0){x=x.replace(',','.');} x=x.replace(/\s/g,''); var n=parseFloat(x); return isNaN(n)?null:n; }
-function normDate(d){ d=d.trim(); var m=d.match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})$/); if(m){return m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2);} return d; }
-function isDateish(d){ return /^\d{4}-\d{1,2}-\d{1,2}$/.test(d)||/^\d{1,2}[.\/]\d{1,2}[.\/]\d{4}$/.test(d); }
+/* ---------- line chart (sim + gerçek portföy) ---------- */
 function lineChart(points, color){
   if(!points.length) return '<div class="empty">veri yok — aşağıdan içe aktar</div>';
   var W=760,H=280,Pl=58,Pr=18,Pt=18,Pb=36;
@@ -1167,38 +1254,6 @@ function lineChart(points, color){
     '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
     '<circle cx="'+px(points.length-1).toFixed(1)+'" cy="'+py(last.y).toFixed(1)+'" r="4" fill="'+color+'"/>'+xl+'</svg>';
 }
-function renderHist(){
-  var data=S.hist.slice().sort(function(a,b){return (a.date<b.date?-1:1);});
-  var pts=data.map(function(r){
-    var y = histCur==='try' ? r.tryv : r.usd;
-    return {y:y, label:(r.date||'').slice(0,7)};
-  }).filter(function(p){return p.y!=null&&!isNaN(p.y);});
-  var color = histCur==='try' ? '#0bbfa6' : '#3b82f6';
-  $('histChart').innerHTML = lineChart(pts, color);
-  if(pts.length){
-    var first=pts[0].y, last=pts[pts.length-1].y; var ch=first?((last-first)/first*100):0;
-    $('histChart').innerHTML += '<div class="hint" style="margin-top:8px">Son: <b class="mono">'+(histCur==='try'?'₺':'$')+fmt(last)+'</b> · ilk kayıttan beri <b class="'+chCls(ch)+'">'+(ch>0?'+':'')+fmt(ch,1)+'%</b> ('+pts.length+' kayıt)</div>';
-  }
-}
-$('histSeg').querySelectorAll('button').forEach(function(b){b.onclick=function(){histCur=b.dataset.c; $('histSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);}); renderHist();};});
-var thirdCol='none';
-$('thirdSeg').querySelectorAll('button').forEach(function(b){b.onclick=function(){thirdCol=b.dataset.t; $('thirdSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});};});
-$('histImport').onclick=function(){
-  var lines=$('histInput').value.split(/\r?\n/); var out=[]; var skippedHeader=false;
-  lines.forEach(function(line){
-    if(!line.trim()) return; var p=line.split(/[,;\t]/).map(function(x){return x.trim();});
-    if(p.length<2) return;
-    if(!skippedHeader && !isDateish(p[0])){ skippedHeader=true; return; }
-    var date=normDate(p[0]); var tryv=num(p[1]); if(tryv==null) return;
-    var usd=null;
-    if(thirdCol==='usd' && p[2]!=null) usd=num(p[2]);
-    else if(thirdCol==='usdtry' && p[2]!=null){ var r=num(p[2]); usd=r?tryv/r:null; }
-    out.push({date:date, tryv:tryv, usd:usd});
-  });
-  if(!out.length){ alert('Veri okunamadı. Format: tarih, TRY[, 3.sütun]'); return; }
-  S.hist=out; save(); renderHist(); alert(out.length+' kayıt içe aktarıldı.');
-};
-$('histClear').onclick=function(){ if(confirm('Geçmiş veri silinsin mi?')){S.hist=[]; save(); $('histInput').value=''; renderHist();} };
 
 /* ---------- notes ---------- */
 $('notesArea').value=S.notes||'';
@@ -1242,7 +1297,8 @@ function renderMovers(){
 /* ---------- render all ---------- */
 function renderAll(){
   syncSwitch(); renderMeta(); renderTicker(); fillSimSelect(); fillSymList();
-  renderGunun(); renderScreen(); renderAllList(); renderMovers(); updateSimPx(); renderSim(); renderSimChart(); renderReal(); renderHist();
+  renderGunun(); renderScreen(); renderAllList(); renderMovers(); updateSimPx(); renderSim(); renderSimChart(); renderReal(); renderRealChart();
+  renderTrade();
 }
 
 /* ---------- otomatik yenileme (Yol A) ---------- */
