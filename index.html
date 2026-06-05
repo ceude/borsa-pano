@@ -32,6 +32,10 @@
   .colf{width:100%; min-width:54px; background:var(--surface); border:1px solid var(--line); border-radius:7px; padding:5px 7px; font-size:11px; font-family:inherit; color:var(--ink); text-align:right}
   .colf:focus{outline:none; border-color:var(--brand)}
   .colf::placeholder{color:var(--faint)}
+  .tpfield{margin-bottom:12px}
+  .tpfield>label{display:block; font-size:12px; font-weight:600; color:var(--ink); margin-bottom:5px}
+  .tpfield .fld, .tpfield select{width:100%}
+  .tphelp{font-size:11px; color:var(--faint); margin-top:4px; line-height:1.45}
   .pmark{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:0; flex:none}
   .pmark.sim{background:#7c5cff}
   .pmark.real{background:#ec4899}
@@ -285,20 +289,33 @@
 
       <div class="trade" style="margin-top:22px">
         <h3>İşlem planı / risk hesaplayıcı</h3>
-        <div class="lead">Asıl önemli soru: ne kadar riskle, kaç adet, stop nerede? Trader'ı ayakta tutan kısım budur.</div>
-        <div class="qtyrow">
-          <input class="fld" id="tpAcct" type="number" placeholder="hesap büyüklüğü" style="flex:1">
-          <input class="fld" id="tpRisk" type="number" step="0.1" value="1" placeholder="risk %" style="width:90px" title="İşlem başına göze aldığın kayıp, hesabın yüzdesi olarak. Önerilen %0.5–2.">
+        <div class="lead">Şunu söyler: bu hisseye girersem <b>stop'u nereye koymalıyım</b>, <b>kaç adet almalıyım</b> ve <b>kötü senaryoda ne kadar kaybederim</b>. Aşağıdaki kutuları doldur, Hesapla'ya bas.</div>
+        <div class="tpfield">
+          <label>1) Hesap büyüklüğü — toplam paran</label>
+          <input class="fld" id="tpAcct" type="number" placeholder="örn. 100000">
+          <div class="tphelp">Bu işleme ayıracağın değil, toplam işlem hesabın.</div>
         </div>
-        <div class="qtyrow">
-          <select id="tpSym" style="flex:1"></select>
-          <input class="fld" id="tpEntry" type="number" step="0.0001" placeholder="giriş fiyatı" style="width:130px">
+        <div class="tpfield">
+          <label>2) İşlem başına risk (%)</label>
+          <input class="fld" id="tpRisk" type="number" step="0.1" value="1" placeholder="örn. 1">
+          <div class="tphelp">Bu tek işlemde kaybetmeyi göze aldığın oran. Önerilen %0.5–2. (Örn. %1 → 100.000'de 1.000 risk.)</div>
         </div>
-        <div class="qtyrow">
-          <input class="fld" id="tpAtrMult" type="number" step="0.1" value="1.5" placeholder="ATR×" style="width:110px" title="Stop mesafesi = ATR'nin kaç katı. 1.5–2 tipik.">
-          <span class="hint" style="flex:1; align-self:center">stop = giriş − (ATR× × günlük ATR)</span>
+        <div class="tpfield">
+          <label>3) Hisse</label>
+          <select id="tpSym"></select>
+          <div class="tphelp">Listeden seç, ya da yukarıdaki tablodaki <b>Plan</b> butonuna bas — bu kutu ve giriş fiyatı otomatik dolar.</div>
         </div>
-        <button class="go buy" id="tpCalc" style="margin-top:8px">Hesapla</button>
+        <div class="tpfield">
+          <label>4) Giriş fiyatı — almayı düşündüğün fiyat</label>
+          <input class="fld" id="tpEntry" type="number" step="0.0001" placeholder="boş = güncel fiyat">
+          <div class="tphelp">Boş bırakırsan seçili hissenin güncel fiyatı kullanılır.</div>
+        </div>
+        <div class="tpfield">
+          <label>5) Stop genişliği — ATR çarpanı</label>
+          <input class="fld" id="tpAtrMult" type="number" step="0.1" value="1.5" placeholder="örn. 1.5">
+          <div class="tphelp">Stop, girişin altına günlük dalgalanmanın (ATR) kaç katı konsun. 1.5–2 tipik. Düşük = dar stop, yüksek = geniş stop.</div>
+        </div>
+        <button class="go buy" id="tpCalc" style="margin-top:6px; width:100%">Hesapla</button>
         <div id="tpOut" style="margin-top:14px"></div>
       </div>
     </section>
@@ -581,12 +598,9 @@ function gununHisseleri(tumHisseler, opts){
   var limit = opts.limit!=null ? opts.limit : 8;
   var bench = opts.bench!=null ? opts.bench : null;   // endeks 1A getirisi (göreli güç için)
 
-  // Piyasa rejimi: kırmızıysa işlem yok (endeks değeri yok → ort. % değişim vekil)
+  // Piyasa ortalaması (bilgi amaçlı; artık işlemi engellemiyor)
   var withCh = tumHisseler.filter(function(s){ return typeof s.changePct==='number'; });
   var avgCh = withCh.length ? withCh.reduce(function(a,s){return a+s.changePct;},0)/withCh.length : 0;
-  if(opts.trendFilter!==false && avgCh < 0){
-    return { trade:false, reason:'market_red', avgChange:avgCh, manual:false, stocks:[], hasTech:true };
-  }
 
   // Teknik veri var mı? (eski data.js'te yok)
   var hasTech = tumHisseler.some(function(s){ return s.ma50!=null || s.ret1m!=null; });
@@ -833,7 +847,7 @@ function renderTrade(){
         '<td>'+trendIcon(s)+'</td>'+
         '<td>'+(s.atrPct==null?'<span class="na">—</span>':fmt(s.atrPct,1)+'%')+'</td>'+
         '<td>'+fmt(s.price)+'</td>'+
-        '<td><button class="miniact" data-plan="'+s.symbol+'">Plan</button></td></tr>';
+        '<td style="white-space:nowrap"><button class="miniact" data-plan="'+s.symbol+'">Plan</button> <button class="miniact" data-tradesim="'+s.symbol+'">Sim</button></td></tr>';
     }).join('');
     $('tradeBody').innerHTML='<table><thead><tr>'+
       '<th class="l" title="Hisse kodu ve şirket.">Hisse</th>'+
@@ -850,6 +864,7 @@ function renderTrade(){
       $('tpSym').value=sym; if(s&&s.price!=null) $('tpEntry').value=s.price; tpCalc();
       $('tpSym').scrollIntoView({behavior:'smooth', block:'center'});
     };});
+    $('tradeBody').querySelectorAll('[data-tradesim]').forEach(function(b){b.onclick=function(){ selectInSim(b.dataset.tradesim); };});
   }
   // dropdown
   $('tpSym').innerHTML = ms.filter(function(s){return s.price!=null;})
@@ -892,13 +907,9 @@ function renderGunun(){
     info.innerHTML='<b class="down">Teknik veri yok.</b> Bu strateji trend/momentum/volatilite gibi günlük teknik göstergeleri kullanır; bunlar yeni veri çekiminde gelir. <b>Actions → "Veri Güncelle"yi yeni sürümle bir kez çalıştır</b> (ya da güncel data.js gelene kadar bekle).';
     box.innerHTML=''; return;
   }
-  if(!res.trade){
-    info.innerHTML='<b class="down">Bugün işlem yok</b> — piyasa kırmızı (ort. '+fmt(res.avgChange,2)+'%). Strateji yalnız yeşil günlerde girer.';
-    box.innerHTML=''; return;
-  }
   var benchTxt = bench!=null ? (' · endeks 1A '+(bench>0?'+':'')+fmt(bench,1)+'%') : '';
-  info.innerHTML='Piyasa <b class="up">yeşil</b> (ort. '+(res.avgChange>0?'+':'')+fmt(res.avgChange,2)+'%)'+benchTxt+
-    '. Filtre: yükselen trend (fiyat&gt;MA50) + canlı volatilite + likidite; sıralama Setup Skoru.'+
+  info.innerHTML='Piyasa ort. <b class="'+chCls(res.avgChange)+'">'+(res.avgChange>0?'+':'')+fmt(res.avgChange,2)+'%</b>'+benchTxt+
+    '. Filtre: yükselen trend (fiyat&gt;MA50) + canlı volatilite + likidite; sıralama Kısa Vade Skoru.'+
     (res.manual?' <b class="down">Aday çok — son seçimi sen yap.</b>':'');
   if(!res.stocks.length){ box.innerHTML='<div class="empty">Bugün setup kriterlerine uyan hisse yok (yükselen trendde, hareketli ve göreli güçlü hisse bulunamadı).</div>'; return; }
   var rows=res.stocks.map(function(s){
