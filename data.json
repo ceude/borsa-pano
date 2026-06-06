@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-06T04:17:15+00:00",
+  "updatedAt": "2026-06-06T04:32:11+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -1008,7 +1008,7 @@
       "changePct": -1.78,
       "volume": 55064104,
       "marketCap": 316365996032,
-      "pe": 38.24,
+      "pe": 38.15,
       "pb": 8.24,
       "roe": 26.65,
       "debtToEquity": 16.8,
@@ -1260,7 +1260,7 @@
       "changePct": 1.5,
       "volume": 27747478,
       "marketCap": 43713880064,
-      "pe": 16.68,
+      "pe": 16.89,
       "pb": 2.71,
       "roe": 19.69,
       "debtToEquity": 55.75,
@@ -1274,7 +1274,7 @@
       "ret3m": 45.83,
       "pctFromHigh": -5.72,
       "relVol": 0.9,
-      "score": 57.4,
+      "score": 57.3,
       "scoreCoverage": 5
     },
     {
@@ -1848,7 +1848,7 @@
       "changePct": 1.14,
       "volume": 8120554,
       "marketCap": 447335497728,
-      "pe": 20.98,
+      "pe": 21.01,
       "pb": 2.37,
       "roe": 13.43,
       "debtToEquity": 30.44,
@@ -2282,7 +2282,7 @@
       "ret3m": 13.34,
       "pctFromHigh": -1.25,
       "relVol": 0.71,
-      "score": 45.4,
+      "score": 45.5,
       "scoreCoverage": 5
     },
     {
@@ -2772,7 +2772,7 @@
       "changePct": -1.02,
       "volume": 1500801,
       "marketCap": 126492483584,
-      "pe": 24.18,
+      "pe": 24.23,
       "pb": 1.26,
       "roe": 5.84,
       "debtToEquity": 88.84,
@@ -3192,7 +3192,7 @@
       "changePct": -2.46,
       "volume": 2298002,
       "marketCap": 93544923136,
-      "pe": 43.72,
+      "pe": 43.87,
       "pb": 1.18,
       "roe": 4.1,
       "debtToEquity": 131.94,
