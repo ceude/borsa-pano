@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-06T04:47:06+00:00",
+  "updatedAt": "2026-06-06T05:02:20+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -56,7 +56,7 @@ window.STOCK_DATA = {
       "changePct": -1.62,
       "volume": 18929677,
       "marketCap": 32312000512,
-      "pe": 2.9,
+      "pe": 2.86,
       "pb": 0.92,
       "roe": 32.86,
       "debtToEquity": null,
@@ -112,7 +112,7 @@ window.STOCK_DATA = {
       "changePct": -2.87,
       "volume": 65837001,
       "marketCap": 314929676288,
-      "pe": 4.26,
+      "pe": 4.13,
       "pb": 0.96,
       "roe": 25.11,
       "debtToEquity": null,
