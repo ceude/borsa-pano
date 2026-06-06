@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-06T02:47:24+00:00",
+  "updatedAt": "2026-06-06T03:02:32+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -56,7 +56,7 @@
       "changePct": -1.62,
       "volume": 18929677,
       "marketCap": 32312000512,
-      "pe": 2.86,
+      "pe": 2.9,
       "pb": 0.92,
       "roe": 32.86,
       "debtToEquity": null,
@@ -112,7 +112,7 @@
       "changePct": -2.87,
       "volume": 65837001,
       "marketCap": 314929676288,
-      "pe": 4.14,
+      "pe": 4.26,
       "pb": 0.96,
       "roe": 25.11,
       "debtToEquity": null,
