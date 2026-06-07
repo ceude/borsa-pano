@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-07T23:02:37+00:00",
+  "updatedAt": "2026-06-07T23:17:10+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.0891,
-    "USDTRY": 46.0828
+    "EURTRY": 53.1195,
+    "USDTRY": 46.0807
   },
   "benchmarks": {
     "DAX": 0.39,
@@ -70,7 +70,7 @@
       "ret3m": 0.88,
       "pctFromHigh": -16.75,
       "relVol": 0.65,
-      "score": 90.7,
+      "score": 90.5,
       "scoreCoverage": 4
     },
     {
@@ -477,7 +477,7 @@
       "volume": 80365215,
       "marketCap": 323315007488,
       "pe": 10.69,
-      "pb": 1.48,
+      "pb": 1.43,
       "roe": 15.44,
       "debtToEquity": null,
       "netMargin": 17.93,
@@ -490,7 +490,7 @@
       "ret3m": 6.03,
       "pctFromHigh": -10.63,
       "relVol": 1.69,
-      "score": 70.3,
+      "score": 70.4,
       "scoreCoverage": 4
     },
     {
@@ -574,7 +574,7 @@
       "ret3m": -0.24,
       "pctFromHigh": -14.54,
       "relVol": 2.19,
-      "score": 67.1,
+      "score": 67.0,
       "scoreCoverage": 5
     },
     {
@@ -662,34 +662,6 @@
       "scoreCoverage": 5
     },
     {
-      "symbol": "GWIND.IS",
-      "market": "BIST",
-      "name": "GALATA WIND ENERJI",
-      "sector": "Utilities",
-      "currency": "TRY",
-      "price": 26.46,
-      "prevClose": 26.92,
-      "changePct": -1.71,
-      "volume": 4757115,
-      "marketCap": 14288399360,
-      "pe": 17.07,
-      "pb": 0.91,
-      "roe": 6.11,
-      "debtToEquity": 20.77,
-      "netMargin": 28.74,
-      "netIncome": 834501312,
-      "ma50": 27.8776,
-      "ma200": 25.3351,
-      "rsi14": 39.7,
-      "atrPct": 3.67,
-      "ret1m": -7.16,
-      "ret3m": 9.34,
-      "pctFromHigh": -16.64,
-      "relVol": 0.53,
-      "score": 63.8,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "HEN3.DE",
       "market": "DAX",
       "name": "Henkel AG & Co. KGaA          I",
@@ -742,6 +714,34 @@
       "ret3m": 4.72,
       "pctFromHigh": -16.36,
       "relVol": 2.77,
+      "score": 63.6,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "GWIND.IS",
+      "market": "BIST",
+      "name": "GALATA WIND ENERJI",
+      "sector": "Utilities",
+      "currency": "TRY",
+      "price": 26.46,
+      "prevClose": 26.92,
+      "changePct": -1.71,
+      "volume": 4757115,
+      "marketCap": 14288399360,
+      "pe": 17.07,
+      "pb": 0.91,
+      "roe": 6.11,
+      "debtToEquity": 20.77,
+      "netMargin": 28.74,
+      "netIncome": 834501312,
+      "ma50": 27.8776,
+      "ma200": 25.3351,
+      "rsi14": 39.7,
+      "atrPct": 3.67,
+      "ret1m": -7.16,
+      "ret3m": 9.34,
+      "pctFromHigh": -16.64,
+      "relVol": 0.53,
       "score": 63.6,
       "scoreCoverage": 5
     },
@@ -1358,7 +1358,7 @@
       "ret3m": -5.32,
       "pctFromHigh": -17.57,
       "relVol": 0.85,
-      "score": 56.0,
+      "score": 55.9,
       "scoreCoverage": 5
     },
     {
@@ -1539,7 +1539,7 @@
       "prevClose": 55.8,
       "changePct": 0.36,
       "volume": 1136976,
-      "marketCap": 39959625728,
+      "marketCap": null,
       "pe": 17.18,
       "pb": 1.13,
       "roe": 6.83,
@@ -1569,7 +1569,7 @@
       "volume": 7843804,
       "marketCap": 84300005376,
       "pe": 9.77,
-      "pb": 0.72,
+      "pb": 0.73,
       "roe": 8.79,
       "debtToEquity": 206.37,
       "netMargin": 5.28,
@@ -2342,6 +2342,34 @@
       "scoreCoverage": 5
     },
     {
+      "symbol": "ECILC.IS",
+      "market": "BIST",
+      "name": "ECZACIBASI ILAC",
+      "sector": "Healthcare",
+      "currency": "TRY",
+      "price": 84.0,
+      "prevClose": 86.1,
+      "changePct": -2.44,
+      "volume": 2960522,
+      "marketCap": 57561849856,
+      "pe": null,
+      "pb": 0.87,
+      "roe": -1.45,
+      "debtToEquity": 5.88,
+      "netMargin": -8.63,
+      "netIncome": -848737024,
+      "ma50": 91.9669,
+      "ma200": 92.3966,
+      "rsi14": 48.6,
+      "atrPct": 3.45,
+      "ret1m": -2.04,
+      "ret3m": -24.78,
+      "pctFromHigh": -34.69,
+      "relVol": 0.48,
+      "score": 45.0,
+      "scoreCoverage": 4
+    },
+    {
       "symbol": "KRDMD.IS",
       "market": "BIST",
       "name": "KARDEMIR (D)",
@@ -2368,34 +2396,6 @@
       "relVol": 0.57,
       "score": 44.4,
       "scoreCoverage": 5
-    },
-    {
-      "symbol": "ECILC.IS",
-      "market": "BIST",
-      "name": "ECZACIBASI ILAC",
-      "sector": "Healthcare",
-      "currency": "TRY",
-      "price": 84.0,
-      "prevClose": 86.1,
-      "changePct": -2.44,
-      "volume": 2960522,
-      "marketCap": 57561849856,
-      "pe": null,
-      "pb": 0.94,
-      "roe": -1.45,
-      "debtToEquity": 5.88,
-      "netMargin": -8.63,
-      "netIncome": -848737024,
-      "ma50": 91.9669,
-      "ma200": 92.3966,
-      "rsi14": 48.6,
-      "atrPct": 3.45,
-      "ret1m": -2.04,
-      "ret3m": -24.78,
-      "pctFromHigh": -34.69,
-      "relVol": 0.48,
-      "score": 44.1,
-      "scoreCoverage": 4
     },
     {
       "symbol": "ISGYO.IS",
@@ -3038,7 +3038,7 @@
       "ret3m": 4.22,
       "pctFromHigh": -4.46,
       "relVol": 0.75,
-      "score": 35.2,
+      "score": 35.1,
       "scoreCoverage": 5
     },
     {
@@ -3150,7 +3150,7 @@
       "ret3m": 37.53,
       "pctFromHigh": -3.8,
       "relVol": 1.07,
-      "score": 33.5,
+      "score": 33.4,
       "scoreCoverage": 5
     },
     {
