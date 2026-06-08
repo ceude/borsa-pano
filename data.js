@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-08T19:17:30+00:00",
+  "updatedAt": "2026-06-08T19:32:19+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.1909,
-    "USDTRY": 46.095
+    "EURTRY": 53.1911,
+    "USDTRY": 46.0891
   },
   "benchmarks": {
     "DAX": 1.14,
@@ -42,7 +42,7 @@ window.STOCK_DATA = {
       "ret3m": -1.26,
       "pctFromHigh": -18.36,
       "relVol": 1.0,
-      "score": 93.7,
+      "score": 93.8,
       "scoreCoverage": 4
     },
     {
@@ -70,7 +70,7 @@ window.STOCK_DATA = {
       "ret3m": 1.54,
       "pctFromHigh": -14.95,
       "relVol": 0.55,
-      "score": 90.4,
+      "score": 90.5,
       "scoreCoverage": 4
     },
     {
@@ -98,7 +98,7 @@ window.STOCK_DATA = {
       "ret3m": -6.25,
       "pctFromHigh": -27.24,
       "relVol": 1.04,
-      "score": 87.9,
+      "score": 88.1,
       "scoreCoverage": 5
     },
     {
@@ -126,7 +126,7 @@ window.STOCK_DATA = {
       "ret3m": -9.22,
       "pctFromHigh": -23.5,
       "relVol": 0.89,
-      "score": 87.7,
+      "score": 87.9,
       "scoreCoverage": 4
     },
     {
@@ -154,7 +154,7 @@ window.STOCK_DATA = {
       "ret3m": -4.05,
       "pctFromHigh": -18.47,
       "relVol": 1.27,
-      "score": 86.3,
+      "score": 86.5,
       "scoreCoverage": 4
     },
     {
@@ -182,7 +182,7 @@ window.STOCK_DATA = {
       "ret3m": -3.73,
       "pctFromHigh": -20.55,
       "relVol": 1.23,
-      "score": 85.1,
+      "score": 85.2,
       "scoreCoverage": 4
     },
     {
@@ -210,7 +210,7 @@ window.STOCK_DATA = {
       "ret3m": 7.77,
       "pctFromHigh": -12.19,
       "relVol": 0.79,
-      "score": 84.9,
+      "score": 85.1,
       "scoreCoverage": 5
     },
     {
@@ -238,7 +238,7 @@ window.STOCK_DATA = {
       "ret3m": -13.26,
       "pctFromHigh": -25.72,
       "relVol": 1.28,
-      "score": 84.2,
+      "score": 84.4,
       "scoreCoverage": 4
     },
     {
@@ -266,7 +266,7 @@ window.STOCK_DATA = {
       "ret3m": -6.53,
       "pctFromHigh": -20.63,
       "relVol": 1.4,
-      "score": 83.8,
+      "score": 84.0,
       "scoreCoverage": 4
     },
     {
@@ -294,7 +294,7 @@ window.STOCK_DATA = {
       "ret3m": -6.7,
       "pctFromHigh": -17.15,
       "relVol": 1.08,
-      "score": 82.6,
+      "score": 82.8,
       "scoreCoverage": 5
     },
     {
@@ -322,7 +322,7 @@ window.STOCK_DATA = {
       "ret3m": 3.48,
       "pctFromHigh": -14.11,
       "relVol": 0.81,
-      "score": 81.2,
+      "score": 81.4,
       "scoreCoverage": 5
     },
     {
@@ -378,7 +378,7 @@ window.STOCK_DATA = {
       "ret3m": 5.13,
       "pctFromHigh": -16.28,
       "relVol": 0.67,
-      "score": 74.6,
+      "score": 74.8,
       "scoreCoverage": 4
     },
     {
@@ -406,7 +406,7 @@ window.STOCK_DATA = {
       "ret3m": 28.7,
       "pctFromHigh": -2.84,
       "relVol": 0.93,
-      "score": 72.6,
+      "score": 72.7,
       "scoreCoverage": 5
     },
     {
@@ -434,7 +434,7 @@ window.STOCK_DATA = {
       "ret3m": -10.45,
       "pctFromHigh": -22.62,
       "relVol": 0.65,
-      "score": 72.0,
+      "score": 72.1,
       "scoreCoverage": 5
     },
     {
@@ -462,7 +462,7 @@ window.STOCK_DATA = {
       "ret3m": -19.11,
       "pctFromHigh": -30.96,
       "relVol": 1.46,
-      "score": 71.4,
+      "score": 71.5,
       "scoreCoverage": 5
     },
     {
@@ -490,7 +490,7 @@ window.STOCK_DATA = {
       "ret3m": 6.78,
       "pctFromHigh": -9.24,
       "relVol": 1.32,
-      "score": 70.4,
+      "score": 70.6,
       "scoreCoverage": 4
     },
     {
@@ -518,7 +518,7 @@ window.STOCK_DATA = {
       "ret3m": -4.92,
       "pctFromHigh": -14.97,
       "relVol": 0.72,
-      "score": 70.2,
+      "score": 70.4,
       "scoreCoverage": 5
     },
     {
@@ -546,7 +546,7 @@ window.STOCK_DATA = {
       "ret3m": -13.29,
       "pctFromHigh": -24.91,
       "relVol": 0.98,
-      "score": 70.1,
+      "score": 70.2,
       "scoreCoverage": 5
     },
     {
@@ -574,7 +574,7 @@ window.STOCK_DATA = {
       "ret3m": 5.07,
       "pctFromHigh": -11.8,
       "relVol": 1.69,
-      "score": 66.7,
+      "score": 66.9,
       "scoreCoverage": 5
     },
     {
@@ -602,7 +602,7 @@ window.STOCK_DATA = {
       "ret3m": 20.23,
       "pctFromHigh": -11.56,
       "relVol": 1.35,
-      "score": 66.6,
+      "score": 66.8,
       "scoreCoverage": 4
     },
     {
@@ -658,7 +658,7 @@ window.STOCK_DATA = {
       "ret3m": 5.99,
       "pctFromHigh": -4.83,
       "relVol": 0.64,
-      "score": 64.5,
+      "score": 64.7,
       "scoreCoverage": 5
     },
     {
@@ -686,7 +686,7 @@ window.STOCK_DATA = {
       "ret3m": -2.91,
       "pctFromHigh": -20.07,
       "relVol": 1.26,
-      "score": 64.3,
+      "score": 64.4,
       "scoreCoverage": 5
     },
     {
@@ -714,7 +714,7 @@ window.STOCK_DATA = {
       "ret3m": 2.06,
       "pctFromHigh": -23.72,
       "relVol": 1.62,
-      "score": 64.0,
+      "score": 64.1,
       "scoreCoverage": 5
     },
     {
@@ -742,7 +742,7 @@ window.STOCK_DATA = {
       "ret3m": -8.04,
       "pctFromHigh": -18.27,
       "relVol": 0.76,
-      "score": 63.8,
+      "score": 63.9,
       "scoreCoverage": 5
     },
     {
@@ -770,7 +770,7 @@ window.STOCK_DATA = {
       "ret3m": 7.38,
       "pctFromHigh": -16.57,
       "relVol": 0.59,
-      "score": 63.6,
+      "score": 63.7,
       "scoreCoverage": 5
     },
     {
@@ -798,7 +798,7 @@ window.STOCK_DATA = {
       "ret3m": 12.58,
       "pctFromHigh": -4.32,
       "relVol": 0.78,
-      "score": 63.3,
+      "score": 63.5,
       "scoreCoverage": 4
     },
     {
@@ -826,7 +826,7 @@ window.STOCK_DATA = {
       "ret3m": -17.03,
       "pctFromHigh": -41.26,
       "relVol": 0.65,
-      "score": 62.9,
+      "score": 63.1,
       "scoreCoverage": 5
     },
     {
@@ -854,7 +854,7 @@ window.STOCK_DATA = {
       "ret3m": 18.78,
       "pctFromHigh": -4.97,
       "relVol": 1.52,
-      "score": 62.3,
+      "score": 62.4,
       "scoreCoverage": 5
     },
     {
@@ -882,7 +882,7 @@ window.STOCK_DATA = {
       "ret3m": 7.31,
       "pctFromHigh": -9.84,
       "relVol": 0.69,
-      "score": 61.6,
+      "score": 61.7,
       "scoreCoverage": 5
     },
     {
@@ -910,7 +910,7 @@ window.STOCK_DATA = {
       "ret3m": -17.41,
       "pctFromHigh": -28.32,
       "relVol": 1.18,
-      "score": 61.5,
+      "score": 61.6,
       "scoreCoverage": 5
     },
     {
@@ -938,8 +938,36 @@ window.STOCK_DATA = {
       "ret3m": 22.7,
       "pctFromHigh": -2.47,
       "relVol": 0.93,
-      "score": 61.4,
+      "score": 61.6,
       "scoreCoverage": 4
+    },
+    {
+      "symbol": "TRALT.IS",
+      "market": "BIST",
+      "name": "TURK ALTIN ISLETMELERI",
+      "sector": "Basic Materials",
+      "currency": "TRY",
+      "price": 46.04,
+      "prevClose": 45.14,
+      "changePct": 1.99,
+      "volume": 92039800,
+      "marketCap": 147443105792,
+      "pe": 28.96,
+      "pb": 3.45,
+      "roe": 12.37,
+      "debtToEquity": 0.03,
+      "netMargin": 24.89,
+      "netIncome": 5050929152,
+      "ma50": 44.4748,
+      "ma200": 39.9512,
+      "rsi14": 48.7,
+      "atrPct": 4.86,
+      "ret1m": 6.18,
+      "ret3m": -9.46,
+      "pctFromHigh": -24.77,
+      "relVol": 0.9,
+      "score": 60.8,
+      "scoreCoverage": 5
     },
     {
       "symbol": "ASTOR.IS",
@@ -970,34 +998,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "TRALT.IS",
-      "market": "BIST",
-      "name": "TURK ALTIN ISLETMELERI",
-      "sector": "Basic Materials",
-      "currency": "TRY",
-      "price": 46.04,
-      "prevClose": 45.14,
-      "changePct": 1.99,
-      "volume": 92039800,
-      "marketCap": 147443105792,
-      "pe": 28.96,
-      "pb": 3.45,
-      "roe": 12.37,
-      "debtToEquity": 0.03,
-      "netMargin": 24.89,
-      "netIncome": 5050929152,
-      "ma50": 44.4748,
-      "ma200": 39.9512,
-      "rsi14": 48.7,
-      "atrPct": 4.86,
-      "ret1m": 6.18,
-      "ret3m": -9.46,
-      "pctFromHigh": -24.77,
-      "relVol": 0.9,
-      "score": 60.6,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "TUPRS.IS",
       "market": "BIST",
       "name": "TUPRAS",
@@ -1022,7 +1022,7 @@ window.STOCK_DATA = {
       "ret3m": 0.73,
       "pctFromHigh": -13.32,
       "relVol": 1.02,
-      "score": 60.5,
+      "score": 60.6,
       "scoreCoverage": 5
     },
     {
@@ -1050,7 +1050,7 @@ window.STOCK_DATA = {
       "ret3m": -6.92,
       "pctFromHigh": -39.51,
       "relVol": 0.68,
-      "score": 59.9,
+      "score": 60.0,
       "scoreCoverage": 5
     },
     {
@@ -1078,7 +1078,7 @@ window.STOCK_DATA = {
       "ret3m": 13.6,
       "pctFromHigh": -7.44,
       "relVol": 1.12,
-      "score": 59.7,
+      "score": 59.8,
       "scoreCoverage": 5
     },
     {
@@ -1138,6 +1138,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "MTX.DE",
+      "market": "DAX",
+      "name": "MTU Aero Engines AG           N",
+      "sector": "Industrials",
+      "currency": "EUR",
+      "price": 302.1,
+      "prevClose": 301.8,
+      "changePct": 0.1,
+      "volume": 188015,
+      "marketCap": 16262457344,
+      "pe": 16.33,
+      "pb": 3.69,
+      "roe": 24.3,
+      "debtToEquity": 55.51,
+      "netMargin": 11.17,
+      "netIncome": 992000000,
+      "ma50": 302.7004,
+      "ma200": 348.3524,
+      "rsi14": 64.3,
+      "atrPct": 3.9,
+      "ret1m": -0.95,
+      "ret3m": -12.94,
+      "pctFromHigh": -23.99,
+      "relVol": 1.02,
+      "score": 58.7,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "CLEBI.IS",
       "market": "BIST",
       "name": "CELEBI",
@@ -1166,34 +1194,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "MTX.DE",
-      "market": "DAX",
-      "name": "MTU Aero Engines AG           N",
-      "sector": "Industrials",
-      "currency": "EUR",
-      "price": 302.1,
-      "prevClose": 301.8,
-      "changePct": 0.1,
-      "volume": 188015,
-      "marketCap": 16262457344,
-      "pe": 16.33,
-      "pb": 3.69,
-      "roe": 24.3,
-      "debtToEquity": 55.51,
-      "netMargin": 11.17,
-      "netIncome": 992000000,
-      "ma50": 302.7004,
-      "ma200": 348.3524,
-      "rsi14": 64.3,
-      "atrPct": 3.9,
-      "ret1m": -0.95,
-      "ret3m": -12.94,
-      "pctFromHigh": -23.99,
-      "relVol": 1.02,
-      "score": 58.6,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "ALARK.IS",
       "market": "BIST",
       "name": "ALARKO HOLDING",
@@ -1218,7 +1218,7 @@ window.STOCK_DATA = {
       "ret3m": 3.79,
       "pctFromHigh": -12.61,
       "relVol": 1.02,
-      "score": 58.4,
+      "score": 58.5,
       "scoreCoverage": 5
     },
     {
@@ -1246,7 +1246,7 @@ window.STOCK_DATA = {
       "ret3m": 35.25,
       "pctFromHigh": -10.23,
       "relVol": 0.58,
-      "score": 58.3,
+      "score": 58.5,
       "scoreCoverage": 5
     },
     {
@@ -1274,7 +1274,7 @@ window.STOCK_DATA = {
       "ret3m": -9.04,
       "pctFromHigh": -23.97,
       "relVol": 0.94,
-      "score": 57.5,
+      "score": 57.7,
       "scoreCoverage": 5
     },
     {
@@ -1302,7 +1302,7 @@ window.STOCK_DATA = {
       "ret3m": 9.31,
       "pctFromHigh": -8.36,
       "relVol": 1.8,
-      "score": 56.9,
+      "score": 57.0,
       "scoreCoverage": 5
     },
     {
@@ -1330,7 +1330,7 @@ window.STOCK_DATA = {
       "ret3m": 9.17,
       "pctFromHigh": -6.53,
       "relVol": 0.99,
-      "score": 56.4,
+      "score": 56.5,
       "scoreCoverage": 5
     },
     {
@@ -1358,7 +1358,7 @@ window.STOCK_DATA = {
       "ret3m": 1.21,
       "pctFromHigh": -26.27,
       "relVol": 0.86,
-      "score": 56.1,
+      "score": 56.2,
       "scoreCoverage": 5
     },
     {
@@ -1386,7 +1386,7 @@ window.STOCK_DATA = {
       "ret3m": -18.8,
       "pctFromHigh": -31.63,
       "relVol": 0.58,
-      "score": 56.1,
+      "score": 56.2,
       "scoreCoverage": 5
     },
     {
@@ -1414,7 +1414,7 @@ window.STOCK_DATA = {
       "ret3m": -19.13,
       "pctFromHigh": -32.92,
       "relVol": 1.05,
-      "score": 55.8,
+      "score": 55.9,
       "scoreCoverage": 5
     },
     {
@@ -1442,7 +1442,7 @@ window.STOCK_DATA = {
       "ret3m": 3.42,
       "pctFromHigh": -15.97,
       "relVol": 1.43,
-      "score": 55.4,
+      "score": 55.6,
       "scoreCoverage": 5
     },
     {
@@ -1470,7 +1470,7 @@ window.STOCK_DATA = {
       "ret3m": -2.1,
       "pctFromHigh": -15.76,
       "relVol": 0.96,
-      "score": 55.3,
+      "score": 55.4,
       "scoreCoverage": 5
     },
     {
@@ -1498,7 +1498,7 @@ window.STOCK_DATA = {
       "ret3m": 8.31,
       "pctFromHigh": -7.7,
       "relVol": 0.55,
-      "score": 54.7,
+      "score": 54.8,
       "scoreCoverage": 5
     },
     {
@@ -1526,35 +1526,7 @@ window.STOCK_DATA = {
       "ret3m": 10.64,
       "pctFromHigh": -12.88,
       "relVol": 0.7,
-      "score": 54.6,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "DB1.DE",
-      "market": "DAX",
-      "name": "DEUTSCHE BOERSE AG            N",
-      "sector": "Financial Services",
-      "currency": "EUR",
-      "price": 244.7,
-      "prevClose": 245.9,
-      "changePct": -0.49,
-      "volume": 418185,
-      "marketCap": 44561321984,
-      "pe": 21.83,
-      "pb": 4.25,
-      "roe": 19.2,
-      "debtToEquity": 65.44,
-      "netMargin": 27.26,
-      "netIncome": 2055000064,
-      "ma50": 250.6,
-      "ma200": 228.622,
-      "rsi14": 26.3,
-      "atrPct": 2.21,
-      "ret1m": 2.58,
-      "ret3m": 2.84,
-      "pctFromHigh": -10.41,
-      "relVol": 1.06,
-      "score": 54.6,
+      "score": 54.7,
       "scoreCoverage": 5
     },
     {
@@ -1582,7 +1554,35 @@ window.STOCK_DATA = {
       "ret3m": -5.92,
       "pctFromHigh": -37.96,
       "relVol": 0.87,
-      "score": 54.5,
+      "score": 54.7,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "DB1.DE",
+      "market": "DAX",
+      "name": "DEUTSCHE BOERSE AG            N",
+      "sector": "Financial Services",
+      "currency": "EUR",
+      "price": 244.7,
+      "prevClose": 245.9,
+      "changePct": -0.49,
+      "volume": 418185,
+      "marketCap": 44561321984,
+      "pe": 21.83,
+      "pb": 4.25,
+      "roe": 19.2,
+      "debtToEquity": 65.44,
+      "netMargin": 27.26,
+      "netIncome": 2055000064,
+      "ma50": 250.6,
+      "ma200": 228.622,
+      "rsi14": 26.3,
+      "atrPct": 2.21,
+      "ret1m": 2.58,
+      "ret3m": 2.84,
+      "pctFromHigh": -10.41,
+      "relVol": 1.06,
+      "score": 54.7,
       "scoreCoverage": 5
     },
     {
@@ -1610,7 +1610,7 @@ window.STOCK_DATA = {
       "ret3m": -18.79,
       "pctFromHigh": -27.19,
       "relVol": 0.74,
-      "score": 54.5,
+      "score": 54.7,
       "scoreCoverage": 5
     },
     {
@@ -1722,7 +1722,7 @@ window.STOCK_DATA = {
       "ret3m": 27.29,
       "pctFromHigh": -1.47,
       "relVol": 0.86,
-      "score": 52.7,
+      "score": 52.8,
       "scoreCoverage": 5
     },
     {
@@ -1750,7 +1750,7 @@ window.STOCK_DATA = {
       "ret3m": -20.46,
       "pctFromHigh": -30.86,
       "relVol": 0.67,
-      "score": 51.2,
+      "score": 51.3,
       "scoreCoverage": 5
     },
     {
@@ -1778,7 +1778,7 @@ window.STOCK_DATA = {
       "ret3m": 17.98,
       "pctFromHigh": -8.88,
       "relVol": 0.92,
-      "score": 50.9,
+      "score": 51.0,
       "scoreCoverage": 5
     },
     {
@@ -1806,35 +1806,7 @@ window.STOCK_DATA = {
       "ret3m": 11.39,
       "pctFromHigh": -8.08,
       "relVol": 1.0,
-      "score": 50.8,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "DOHOL.IS",
-      "market": "BIST",
-      "name": "DOGAN HOLDING",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 21.96,
-      "prevClose": 21.58,
-      "changePct": 1.76,
-      "volume": 12131942,
-      "marketCap": 56495898624,
-      "pe": 20.15,
-      "pb": 0.67,
-      "roe": 3.37,
-      "debtToEquity": 39.49,
-      "netMargin": 3.01,
-      "netIncome": 2806029056,
-      "ma50": 22.2226,
-      "ma200": 19.5752,
-      "rsi14": 47.1,
-      "atrPct": 4.68,
-      "ret1m": -10.29,
-      "ret3m": 8.82,
-      "pctFromHigh": -10.88,
-      "relVol": 1.51,
-      "score": 50.7,
+      "score": 50.9,
       "scoreCoverage": 5
     },
     {
@@ -1862,7 +1834,35 @@ window.STOCK_DATA = {
       "ret3m": 16.65,
       "pctFromHigh": -10.67,
       "relVol": 0.67,
-      "score": 50.7,
+      "score": 50.9,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "DOHOL.IS",
+      "market": "BIST",
+      "name": "DOGAN HOLDING",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 21.96,
+      "prevClose": 21.58,
+      "changePct": 1.76,
+      "volume": 12131942,
+      "marketCap": 56495898624,
+      "pe": 20.15,
+      "pb": 0.67,
+      "roe": 3.37,
+      "debtToEquity": 39.49,
+      "netMargin": 3.01,
+      "netIncome": 2806029056,
+      "ma50": 22.2226,
+      "ma200": 19.5752,
+      "rsi14": 47.1,
+      "atrPct": 4.68,
+      "ret1m": -10.29,
+      "ret3m": 8.82,
+      "pctFromHigh": -10.88,
+      "relVol": 1.51,
+      "score": 50.8,
       "scoreCoverage": 5
     },
     {
@@ -1890,7 +1890,7 @@ window.STOCK_DATA = {
       "ret3m": 56.22,
       "pctFromHigh": -4.66,
       "relVol": 0.93,
-      "score": 50.4,
+      "score": 50.5,
       "scoreCoverage": 5
     },
     {
@@ -1922,6 +1922,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "TOASO.IS",
+      "market": "BIST",
+      "name": "TOFAS OTO. FAB.",
+      "sector": "Consumer Cyclical",
+      "currency": "TRY",
+      "price": 291.0,
+      "prevClose": 294.0,
+      "changePct": -1.02,
+      "volume": 2218686,
+      "marketCap": 145499996160,
+      "pe": 12.62,
+      "pb": 2.42,
+      "roe": 22.18,
+      "debtToEquity": 117.65,
+      "netMargin": 2.9,
+      "netIncome": 11526304768,
+      "ma50": 291.685,
+      "ma200": 262.6432,
+      "rsi14": 48.2,
+      "atrPct": 3.45,
+      "ret1m": -9.28,
+      "ret3m": 5.44,
+      "pctFromHigh": -10.68,
+      "relVol": 0.92,
+      "score": 50.0,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "ENR.DE",
       "market": "DAX",
       "name": "Siemens Energy AG             N",
@@ -1947,34 +1975,6 @@ window.STOCK_DATA = {
       "pctFromHigh": -15.98,
       "relVol": 0.65,
       "score": 50.0,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "TOASO.IS",
-      "market": "BIST",
-      "name": "TOFAS OTO. FAB.",
-      "sector": "Consumer Cyclical",
-      "currency": "TRY",
-      "price": 291.0,
-      "prevClose": 294.0,
-      "changePct": -1.02,
-      "volume": 2218686,
-      "marketCap": 145499996160,
-      "pe": 12.62,
-      "pb": 2.42,
-      "roe": 22.18,
-      "debtToEquity": 117.65,
-      "netMargin": 2.9,
-      "netIncome": 11526304768,
-      "ma50": 291.685,
-      "ma200": 262.6432,
-      "rsi14": 48.2,
-      "atrPct": 3.45,
-      "ret1m": -9.28,
-      "ret3m": 5.44,
-      "pctFromHigh": -10.68,
-      "relVol": 0.92,
-      "score": 49.9,
       "scoreCoverage": 5
     },
     {
@@ -2034,6 +2034,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "SHL.DE",
+      "market": "DAX",
+      "name": "Siemens Healthineers AG       N",
+      "sector": "Healthcare",
+      "currency": "EUR",
+      "price": 34.37,
+      "prevClose": 34.84,
+      "changePct": -1.35,
+      "volume": 968330,
+      "marketCap": 38466867200,
+      "pe": 18.19,
+      "pb": 2.09,
+      "roe": 11.47,
+      "debtToEquity": 83.88,
+      "netMargin": 9.08,
+      "netIncome": 2095000064,
+      "ma50": 35.496,
+      "ma200": 41.5001,
+      "rsi14": 54.5,
+      "atrPct": 2.15,
+      "ret1m": 2.17,
+      "ret3m": -14.95,
+      "pctFromHigh": -28.94,
+      "relVol": 1.0,
+      "score": 48.6,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "AIR.DE",
       "market": "DAX",
       "name": "Airbus SE                     A",
@@ -2062,34 +2090,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "SHL.DE",
-      "market": "DAX",
-      "name": "Siemens Healthineers AG       N",
-      "sector": "Healthcare",
-      "currency": "EUR",
-      "price": 34.37,
-      "prevClose": 34.84,
-      "changePct": -1.35,
-      "volume": 968330,
-      "marketCap": 38466867200,
-      "pe": 18.19,
-      "pb": 2.09,
-      "roe": 11.47,
-      "debtToEquity": 83.88,
-      "netMargin": 9.08,
-      "netIncome": 2095000064,
-      "ma50": 35.496,
-      "ma200": 41.5001,
-      "rsi14": 54.5,
-      "atrPct": 2.15,
-      "ret1m": 2.17,
-      "ret3m": -14.95,
-      "pctFromHigh": -28.94,
-      "relVol": 1.0,
-      "score": 48.4,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "ODAS.IS",
       "market": "BIST",
       "name": "ODAS ELEKTRIK",
@@ -2114,7 +2114,7 @@ window.STOCK_DATA = {
       "ret3m": 27.65,
       "pctFromHigh": -8.45,
       "relVol": 1.36,
-      "score": 48.2,
+      "score": 48.3,
       "scoreCoverage": 5
     },
     {
@@ -2142,7 +2142,7 @@ window.STOCK_DATA = {
       "ret3m": -3.25,
       "pctFromHigh": -16.61,
       "relVol": 0.97,
-      "score": 48.1,
+      "score": 48.2,
       "scoreCoverage": 5
     },
     {
@@ -2198,7 +2198,35 @@ window.STOCK_DATA = {
       "ret3m": -13.19,
       "pctFromHigh": -16.32,
       "relVol": 0.85,
-      "score": 47.7,
+      "score": 47.8,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "EOAN.DE",
+      "market": "DAX",
+      "name": "E.ON SE                       N",
+      "sector": "Utilities",
+      "currency": "EUR",
+      "price": 18.165,
+      "prevClose": 18.275,
+      "changePct": -0.6,
+      "volume": 2767607,
+      "marketCap": 47466565632,
+      "pe": 13.87,
+      "pb": 2.17,
+      "roe": 15.36,
+      "debtToEquity": 150.02,
+      "netMargin": 4.46,
+      "netIncome": 3435000064,
+      "ma50": 18.4448,
+      "ma200": 16.75,
+      "rsi14": 45.8,
+      "atrPct": 1.79,
+      "ret1m": 1.4,
+      "ret3m": 0.3,
+      "pctFromHigh": -7.81,
+      "relVol": 0.7,
+      "score": 47.0,
       "scoreCoverage": 5
     },
     {
@@ -2230,34 +2258,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 4
     },
     {
-      "symbol": "EOAN.DE",
-      "market": "DAX",
-      "name": "E.ON SE                       N",
-      "sector": "Utilities",
-      "currency": "EUR",
-      "price": 18.165,
-      "prevClose": 18.275,
-      "changePct": -0.6,
-      "volume": 2767607,
-      "marketCap": 47466565632,
-      "pe": 13.87,
-      "pb": 2.17,
-      "roe": 15.36,
-      "debtToEquity": 150.02,
-      "netMargin": 4.46,
-      "netIncome": 3435000064,
-      "ma50": 18.4448,
-      "ma200": 16.75,
-      "rsi14": 45.8,
-      "atrPct": 1.79,
-      "ret1m": 1.4,
-      "ret3m": 0.3,
-      "pctFromHigh": -7.81,
-      "relVol": 0.7,
-      "score": 46.9,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "DHL.DE",
       "market": "DAX",
       "name": "DEUTSCHE POST AG              N",
@@ -2282,7 +2282,7 @@ window.STOCK_DATA = {
       "ret3m": 16.91,
       "pctFromHigh": -2.27,
       "relVol": 0.96,
-      "score": 45.5,
+      "score": 45.6,
       "scoreCoverage": 5
     },
     {
@@ -2310,7 +2310,7 @@ window.STOCK_DATA = {
       "ret3m": 19.22,
       "pctFromHigh": -3.84,
       "relVol": 0.92,
-      "score": 45.1,
+      "score": 45.2,
       "scoreCoverage": 5
     },
     {
@@ -2338,7 +2338,7 @@ window.STOCK_DATA = {
       "ret3m": -10.13,
       "pctFromHigh": -25.9,
       "relVol": 1.15,
-      "score": 45.0,
+      "score": 45.1,
       "scoreCoverage": 5
     },
     {
@@ -2366,36 +2366,64 @@ window.STOCK_DATA = {
       "ret3m": -23.69,
       "pctFromHigh": -34.38,
       "relVol": 0.53,
-      "score": 45.0,
+      "score": 45.1,
       "scoreCoverage": 4
     },
     {
-      "symbol": "KRDMD.IS",
+      "symbol": "CEMTS.IS",
       "market": "BIST",
-      "name": "KARDEMIR (D)",
+      "name": "CEMTAS",
       "sector": "Basic Materials",
       "currency": "TRY",
-      "price": 39.0,
-      "prevClose": 39.0,
-      "changePct": 0.0,
-      "volume": 37458438,
-      "marketCap": 44459999232,
-      "pe": 156.0,
-      "pb": 0.53,
-      "roe": 0.38,
-      "debtToEquity": 8.77,
-      "netMargin": 0.45,
-      "netIncome": 283693120,
-      "ma50": 37.5544,
-      "ma200": 30.3626,
-      "rsi14": 49.1,
-      "atrPct": 4.17,
-      "ret1m": -2.01,
-      "ret3m": 27.28,
-      "pctFromHigh": -13.18,
-      "relVol": 0.61,
-      "score": 44.4,
-      "scoreCoverage": 5
+      "price": 10.14,
+      "prevClose": 10.18,
+      "changePct": -0.39,
+      "volume": 2700435,
+      "marketCap": 5070000128,
+      "pe": null,
+      "pb": 0.78,
+      "roe": -3.01,
+      "debtToEquity": 25.85,
+      "netMargin": -3.01,
+      "netIncome": -183614592,
+      "ma50": 10.754,
+      "ma200": 11.1946,
+      "rsi14": 46.9,
+      "atrPct": 3.15,
+      "ret1m": -10.58,
+      "ret3m": -3.52,
+      "pctFromHigh": -22.65,
+      "relVol": 0.86,
+      "score": 44.3,
+      "scoreCoverage": 4
+    },
+    {
+      "symbol": "BUCIM.IS",
+      "market": "BIST",
+      "name": "BURSA CIMENTO",
+      "sector": "Basic Materials",
+      "currency": "TRY",
+      "price": 6.05,
+      "prevClose": 6.07,
+      "changePct": -0.33,
+      "volume": 4744891,
+      "marketCap": 9075000320,
+      "pe": null,
+      "pb": 0.57,
+      "roe": -4.13,
+      "debtToEquity": 36.16,
+      "netMargin": -5.48,
+      "netIncome": -660597504,
+      "ma50": 6.1286,
+      "ma200": 6.5451,
+      "rsi14": 50.5,
+      "atrPct": 2.26,
+      "ret1m": -4.87,
+      "ret3m": -3.51,
+      "pctFromHigh": -24.37,
+      "relVol": 0.75,
+      "score": 44.2,
+      "scoreCoverage": 4
     },
     {
       "symbol": "ISGYO.IS",
@@ -2424,62 +2452,6 @@ window.STOCK_DATA = {
       "relVol": 0.3,
       "score": 44.1,
       "scoreCoverage": 5
-    },
-    {
-      "symbol": "CEMTS.IS",
-      "market": "BIST",
-      "name": "CEMTAS",
-      "sector": "Basic Materials",
-      "currency": "TRY",
-      "price": 10.14,
-      "prevClose": 10.18,
-      "changePct": -0.39,
-      "volume": 2700435,
-      "marketCap": 5070000128,
-      "pe": null,
-      "pb": 0.78,
-      "roe": -3.01,
-      "debtToEquity": 25.85,
-      "netMargin": -3.01,
-      "netIncome": -183614592,
-      "ma50": 10.754,
-      "ma200": 11.1946,
-      "rsi14": 46.9,
-      "atrPct": 3.15,
-      "ret1m": -10.58,
-      "ret3m": -3.52,
-      "pctFromHigh": -22.65,
-      "relVol": 0.86,
-      "score": 44.1,
-      "scoreCoverage": 4
-    },
-    {
-      "symbol": "BUCIM.IS",
-      "market": "BIST",
-      "name": "BURSA CIMENTO",
-      "sector": "Basic Materials",
-      "currency": "TRY",
-      "price": 6.05,
-      "prevClose": 6.07,
-      "changePct": -0.33,
-      "volume": 4744891,
-      "marketCap": 9075000320,
-      "pe": null,
-      "pb": 0.57,
-      "roe": -4.13,
-      "debtToEquity": 36.16,
-      "netMargin": -5.48,
-      "netIncome": -660597504,
-      "ma50": 6.1286,
-      "ma200": 6.5451,
-      "rsi14": 50.5,
-      "atrPct": 2.26,
-      "ret1m": -4.87,
-      "ret3m": -3.51,
-      "pctFromHigh": -24.37,
-      "relVol": 0.75,
-      "score": 44.0,
-      "scoreCoverage": 4
     },
     {
       "symbol": "THYAO.IS",
@@ -2534,7 +2506,7 @@ window.STOCK_DATA = {
       "ret3m": 12.15,
       "pctFromHigh": -14.91,
       "relVol": 0.55,
-      "score": 43.5,
+      "score": 43.6,
       "scoreCoverage": 5
     },
     {
@@ -2562,7 +2534,7 @@ window.STOCK_DATA = {
       "ret3m": 24.88,
       "pctFromHigh": -11.95,
       "relVol": 0.79,
-      "score": 42.3,
+      "score": 42.5,
       "scoreCoverage": 5
     },
     {
@@ -2674,7 +2646,7 @@ window.STOCK_DATA = {
       "ret3m": -1.04,
       "pctFromHigh": -34.18,
       "relVol": 0.53,
-      "score": 40.8,
+      "score": 41.0,
       "scoreCoverage": 4
     },
     {
@@ -2702,7 +2674,7 @@ window.STOCK_DATA = {
       "ret3m": 8.26,
       "pctFromHigh": -22.7,
       "relVol": 0.96,
-      "score": 40.7,
+      "score": 40.8,
       "scoreCoverage": 5
     },
     {
@@ -2730,7 +2702,7 @@ window.STOCK_DATA = {
       "ret3m": -0.77,
       "pctFromHigh": -9.23,
       "relVol": 0.66,
-      "score": 40.5,
+      "score": 40.7,
       "scoreCoverage": 5
     },
     {
@@ -2758,7 +2730,7 @@ window.STOCK_DATA = {
       "ret3m": 2.88,
       "pctFromHigh": -11.59,
       "relVol": 1.16,
-      "score": 39.8,
+      "score": 40.0,
       "scoreCoverage": 5
     },
     {
@@ -2786,7 +2758,7 @@ window.STOCK_DATA = {
       "ret3m": 12.53,
       "pctFromHigh": -9.54,
       "relVol": 1.28,
-      "score": 39.0,
+      "score": 39.2,
       "scoreCoverage": 5
     },
     {
@@ -2814,7 +2786,7 @@ window.STOCK_DATA = {
       "ret3m": 8.51,
       "pctFromHigh": -15.75,
       "relVol": 0.84,
-      "score": 38.6,
+      "score": 38.8,
       "scoreCoverage": 5
     },
     {
@@ -2870,7 +2842,7 @@ window.STOCK_DATA = {
       "ret3m": -18.12,
       "pctFromHigh": -34.25,
       "relVol": 0.57,
-      "score": 36.9,
+      "score": 37.0,
       "scoreCoverage": 5
     },
     {
@@ -2898,7 +2870,7 @@ window.STOCK_DATA = {
       "ret3m": 22.18,
       "pctFromHigh": -16.24,
       "relVol": 2.0,
-      "score": 36.6,
+      "score": 36.7,
       "scoreCoverage": 5
     },
     {
@@ -2926,7 +2898,7 @@ window.STOCK_DATA = {
       "ret3m": 26.76,
       "pctFromHigh": -12.72,
       "relVol": 0.36,
-      "score": 36.3,
+      "score": 36.6,
       "scoreCoverage": 2
     },
     {
@@ -2982,7 +2954,7 @@ window.STOCK_DATA = {
       "ret3m": 7.22,
       "pctFromHigh": -25.99,
       "relVol": 0.86,
-      "score": 35.7,
+      "score": 35.8,
       "scoreCoverage": 5
     },
     {
@@ -3010,7 +2982,7 @@ window.STOCK_DATA = {
       "ret3m": 90.22,
       "pctFromHigh": -8.28,
       "relVol": 1.21,
-      "score": 35.3,
+      "score": 35.4,
       "scoreCoverage": 5
     },
     {
@@ -3038,6 +3010,34 @@ window.STOCK_DATA = {
       "ret3m": 7.55,
       "pctFromHigh": -3.39,
       "relVol": 1.04,
+      "score": 35.2,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "BAYN.DE",
+      "market": "DAX",
+      "name": "Bayer AG                      N",
+      "sector": "Healthcare",
+      "currency": "EUR",
+      "price": 35.69,
+      "prevClose": 36.16,
+      "changePct": -1.3,
+      "volume": 2443281,
+      "marketCap": 35062714368,
+      "pe": 7.58,
+      "pb": 1.22,
+      "roe": -6.93,
+      "debtToEquity": 134.27,
+      "netMargin": -4.76,
+      "netIncome": -2156000000,
+      "ma50": 38.3407,
+      "ma200": 35.2811,
+      "rsi14": 34.2,
+      "atrPct": 3.33,
+      "ret1m": -3.49,
+      "ret3m": -1.64,
+      "pctFromHigh": -27.42,
+      "relVol": 0.87,
       "score": 35.1,
       "scoreCoverage": 5
     },
@@ -3066,35 +3066,7 @@ window.STOCK_DATA = {
       "ret3m": -8.02,
       "pctFromHigh": -29.22,
       "relVol": 0.92,
-      "score": 34.9,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "BAYN.DE",
-      "market": "DAX",
-      "name": "Bayer AG                      N",
-      "sector": "Healthcare",
-      "currency": "EUR",
-      "price": 35.69,
-      "prevClose": 36.16,
-      "changePct": -1.3,
-      "volume": 2443281,
-      "marketCap": 35062714368,
-      "pe": 7.58,
-      "pb": 1.22,
-      "roe": -6.93,
-      "debtToEquity": 134.27,
-      "netMargin": -4.76,
-      "netIncome": -2156000000,
-      "ma50": 38.3407,
-      "ma200": 35.2811,
-      "rsi14": 34.2,
-      "atrPct": 3.33,
-      "ret1m": -3.49,
-      "ret3m": -1.64,
-      "pctFromHigh": -27.42,
-      "relVol": 0.87,
-      "score": 34.9,
+      "score": 35.0,
       "scoreCoverage": 5
     },
     {
@@ -3122,7 +3094,7 @@ window.STOCK_DATA = {
       "ret3m": 18.16,
       "pctFromHigh": -18.86,
       "relVol": 0.8,
-      "score": 34.4,
+      "score": 34.6,
       "scoreCoverage": 5
     },
     {
@@ -3150,7 +3122,7 @@ window.STOCK_DATA = {
       "ret3m": 36.95,
       "pctFromHigh": -4.14,
       "relVol": 0.77,
-      "score": 33.5,
+      "score": 33.6,
       "scoreCoverage": 5
     },
     {
@@ -3178,7 +3150,7 @@ window.STOCK_DATA = {
       "ret3m": -3.86,
       "pctFromHigh": -31.54,
       "relVol": 1.24,
-      "score": 33.2,
+      "score": 33.4,
       "scoreCoverage": 5
     },
     {
@@ -3206,7 +3178,7 @@ window.STOCK_DATA = {
       "ret3m": 25.82,
       "pctFromHigh": -9.85,
       "relVol": 0.77,
-      "score": 33.0,
+      "score": 33.1,
       "scoreCoverage": 5
     },
     {
@@ -3234,7 +3206,35 @@ window.STOCK_DATA = {
       "ret3m": -16.03,
       "pctFromHigh": -30.74,
       "relVol": 1.84,
-      "score": 31.5,
+      "score": 31.7,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "KRDMD.IS",
+      "market": "BIST",
+      "name": "KARDEMIR (D)",
+      "sector": "Basic Materials",
+      "currency": "TRY",
+      "price": 39.0,
+      "prevClose": 39.0,
+      "changePct": 0.0,
+      "volume": 37458438,
+      "marketCap": 44459999232,
+      "pe": 156.0,
+      "pb": 4.65,
+      "roe": 0.38,
+      "debtToEquity": 8.77,
+      "netMargin": 0.45,
+      "netIncome": 283693120,
+      "ma50": 37.5544,
+      "ma200": 30.3626,
+      "rsi14": 49.1,
+      "atrPct": 4.17,
+      "ret1m": -2.01,
+      "ret3m": 27.28,
+      "pctFromHigh": -13.18,
+      "relVol": 0.61,
+      "score": 30.4,
       "scoreCoverage": 5
     },
     {
@@ -3262,7 +3262,7 @@ window.STOCK_DATA = {
       "ret3m": 26.66,
       "pctFromHigh": -1.32,
       "relVol": 1.27,
-      "score": 29.6,
+      "score": 29.8,
       "scoreCoverage": 5
     },
     {
@@ -3318,7 +3318,7 @@ window.STOCK_DATA = {
       "ret3m": 42.98,
       "pctFromHigh": -17.2,
       "relVol": 0.59,
-      "score": 29.2,
+      "score": 29.3,
       "scoreCoverage": 5
     },
     {
@@ -3346,7 +3346,7 @@ window.STOCK_DATA = {
       "ret3m": 12.77,
       "pctFromHigh": -5.82,
       "relVol": 1.18,
-      "score": 28.3,
+      "score": 28.4,
       "scoreCoverage": 5
     },
     {
@@ -3374,7 +3374,7 @@ window.STOCK_DATA = {
       "ret3m": -1.71,
       "pctFromHigh": -35.93,
       "relVol": 0.81,
-      "score": 27.6,
+      "score": 27.8,
       "scoreCoverage": 4
     },
     {
@@ -3402,7 +3402,7 @@ window.STOCK_DATA = {
       "ret3m": 13.6,
       "pctFromHigh": -50.67,
       "relVol": 84.96,
-      "score": 27.4,
+      "score": 27.6,
       "scoreCoverage": 4
     },
     {
@@ -3458,7 +3458,7 @@ window.STOCK_DATA = {
       "ret3m": null,
       "pctFromHigh": null,
       "relVol": null,
-      "score": 25.3,
+      "score": 25.4,
       "scoreCoverage": 5
     },
     {
@@ -3486,7 +3486,7 @@ window.STOCK_DATA = {
       "ret3m": 59.08,
       "pctFromHigh": -1.21,
       "relVol": 1.03,
-      "score": 25.1,
+      "score": 25.2,
       "scoreCoverage": 5
     },
     {
@@ -3542,7 +3542,7 @@ window.STOCK_DATA = {
       "ret3m": -20.48,
       "pctFromHigh": -81.64,
       "relVol": 0.91,
-      "score": 23.8,
+      "score": 23.9,
       "scoreCoverage": 4
     },
     {
@@ -3570,7 +3570,7 @@ window.STOCK_DATA = {
       "ret3m": 30.67,
       "pctFromHigh": -16.91,
       "relVol": 1.23,
-      "score": 22.4,
+      "score": 22.5,
       "scoreCoverage": 4
     },
     {
@@ -3598,7 +3598,7 @@ window.STOCK_DATA = {
       "ret3m": 6.11,
       "pctFromHigh": -34.66,
       "relVol": 1.0,
-      "score": 21.7,
+      "score": 21.8,
       "scoreCoverage": 5
     },
     {
@@ -3682,7 +3682,7 @@ window.STOCK_DATA = {
       "ret3m": 44.22,
       "pctFromHigh": -15.03,
       "relVol": 0.91,
-      "score": 15.4,
+      "score": 15.6,
       "scoreCoverage": 4
     },
     {
@@ -3738,7 +3738,7 @@ window.STOCK_DATA = {
       "ret3m": 59.86,
       "pctFromHigh": -11.26,
       "relVol": 0.86,
-      "score": 13.6,
+      "score": 13.7,
       "scoreCoverage": 5
     },
     {
