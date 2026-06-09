@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-09T16:17:18+00:00",
+  "updatedAt": "2026-06-09T16:32:27+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.2901,
-    "USDTRY": 46.116
+    "EURTRY": 53.2697,
+    "USDTRY": 46.1146
   },
   "benchmarks": {
     "DAX": 0.34,
@@ -504,7 +504,7 @@ window.STOCK_DATA = {
       "changePct": 1.33,
       "volume": 146593,
       "marketCap": 27520266240,
-      "pe": 9.58,
+      "pe": 9.59,
       "pb": 1.99,
       "roe": 21.71,
       "debtToEquity": 27.86,
@@ -1082,34 +1082,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "ENKAI.IS",
-      "market": "BIST",
-      "name": "ENKA INSAAT",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 96.15,
-      "prevClose": 94.95,
-      "changePct": 1.26,
-      "volume": 10988389,
-      "marketCap": 563702792192,
-      "pe": 15.63,
-      "pb": 64.75,
-      "roe": 9.99,
-      "debtToEquity": 1.78,
-      "netMargin": 22.33,
-      "netIncome": 785043008,
-      "ma50": 100.2934,
-      "ma200": 84.3301,
-      "rsi14": 43.4,
-      "atrPct": 3.05,
-      "ret1m": -13.61,
-      "ret3m": 9.78,
-      "pctFromHigh": -13.69,
-      "relVol": 1.16,
-      "score": 59.0,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "CWENE.IS",
       "market": "BIST",
       "name": "CW ENERJI",
@@ -1135,6 +1107,34 @@ window.STOCK_DATA = {
       "pctFromHigh": -13.81,
       "relVol": 0.52,
       "score": 59.0,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "ENKAI.IS",
+      "market": "BIST",
+      "name": "ENKA INSAAT",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 96.15,
+      "prevClose": 94.95,
+      "changePct": 1.26,
+      "volume": 10988389,
+      "marketCap": 563702792192,
+      "pe": 15.63,
+      "pb": 64.75,
+      "roe": 9.99,
+      "debtToEquity": 1.78,
+      "netMargin": 22.33,
+      "netIncome": 785043008,
+      "ma50": 100.2934,
+      "ma200": 84.3301,
+      "rsi14": 43.4,
+      "atrPct": 3.05,
+      "ret1m": -13.61,
+      "ret3m": 9.78,
+      "pctFromHigh": -13.69,
+      "relVol": 1.16,
+      "score": 58.9,
       "scoreCoverage": 5
     },
     {
@@ -1344,7 +1344,7 @@ window.STOCK_DATA = {
       "changePct": 1.04,
       "volume": 271020,
       "marketCap": 30784524288,
-      "pe": 15.63,
+      "pe": 15.61,
       "pb": 1.69,
       "roe": 11.07,
       "debtToEquity": 43.45,
@@ -1358,7 +1358,7 @@ window.STOCK_DATA = {
       "ret3m": 4.09,
       "pctFromHigh": -25.51,
       "relVol": 0.75,
-      "score": 56.1,
+      "score": 56.2,
       "scoreCoverage": 5
     },
     {
