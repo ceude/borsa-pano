@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-09T01:47:05+00:00",
+  "updatedAt": "2026-06-09T02:02:55+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.2395,
-    "USDTRY": 46.1131
+    "EURTRY": 53.218,
+    "USDTRY": 46.1042
   },
   "benchmarks": {
     "DAX": 1.14,
@@ -70,7 +70,7 @@
       "ret3m": 1.54,
       "pctFromHigh": -14.95,
       "relVol": 0.55,
-      "score": 90.7,
+      "score": 90.5,
       "scoreCoverage": 4
     },
     {
@@ -294,7 +294,7 @@
       "ret3m": -6.7,
       "pctFromHigh": -17.15,
       "relVol": 1.08,
-      "score": 82.9,
+      "score": 82.8,
       "scoreCoverage": 5
     },
     {
@@ -466,6 +466,34 @@
       "scoreCoverage": 5
     },
     {
+      "symbol": "HALKB.IS",
+      "market": "BIST",
+      "name": "T. HALK BANKASI",
+      "sector": "Financial Services",
+      "currency": "TRY",
+      "price": 45.7,
+      "prevClose": 45.0,
+      "changePct": 1.56,
+      "volume": 65080462,
+      "marketCap": 328344371200,
+      "pe": 10.86,
+      "pb": 1.45,
+      "roe": 15.44,
+      "debtToEquity": null,
+      "netMargin": 17.93,
+      "netIncome": 30231869440,
+      "ma50": 39.8004,
+      "ma200": 36.4841,
+      "rsi14": 63.4,
+      "atrPct": 5.74,
+      "ret1m": 13.34,
+      "ret3m": 6.78,
+      "pctFromHigh": -9.24,
+      "relVol": 1.32,
+      "score": 70.6,
+      "scoreCoverage": 4
+    },
+    {
       "symbol": "HNR1.DE",
       "market": "DAX",
       "name": "HANNOVER RUECK SE NA O.N.",
@@ -492,34 +520,6 @@
       "relVol": 0.72,
       "score": 70.4,
       "scoreCoverage": 5
-    },
-    {
-      "symbol": "HALKB.IS",
-      "market": "BIST",
-      "name": "T. HALK BANKASI",
-      "sector": "Financial Services",
-      "currency": "TRY",
-      "price": 45.7,
-      "prevClose": 45.0,
-      "changePct": 1.56,
-      "volume": 65080462,
-      "marketCap": 328344371200,
-      "pe": 10.86,
-      "pb": 1.5,
-      "roe": 15.44,
-      "debtToEquity": null,
-      "netMargin": 17.93,
-      "netIncome": 30231869440,
-      "ma50": 39.8004,
-      "ma200": 36.4841,
-      "rsi14": 63.4,
-      "atrPct": 5.74,
-      "ret1m": 13.34,
-      "ret3m": 6.78,
-      "pctFromHigh": -9.24,
-      "relVol": 1.32,
-      "score": 70.3,
-      "scoreCoverage": 4
     },
     {
       "symbol": "OYAKC.IS",
@@ -574,7 +574,7 @@
       "ret3m": 5.07,
       "pctFromHigh": -11.8,
       "relVol": 1.69,
-      "score": 67.0,
+      "score": 66.9,
       "scoreCoverage": 5
     },
     {
@@ -718,34 +718,6 @@
       "scoreCoverage": 5
     },
     {
-      "symbol": "GWIND.IS",
-      "market": "BIST",
-      "name": "GALATA WIND ENERJI",
-      "sector": "Utilities",
-      "currency": "TRY",
-      "price": 26.48,
-      "prevClose": 26.46,
-      "changePct": 0.08,
-      "volume": 4737548,
-      "marketCap": 14299199488,
-      "pe": 17.08,
-      "pb": 0.91,
-      "roe": 6.11,
-      "debtToEquity": 20.77,
-      "netMargin": 28.74,
-      "netIncome": 834501312,
-      "ma50": 27.8684,
-      "ma200": 25.3321,
-      "rsi14": 44.4,
-      "atrPct": 3.55,
-      "ret1m": -8.88,
-      "ret3m": 7.38,
-      "pctFromHigh": -16.57,
-      "relVol": 0.59,
-      "score": 63.9,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "HEN3.DE",
       "market": "DAX",
       "name": "Henkel AG & Co. KGaA          I",
@@ -771,6 +743,34 @@
       "pctFromHigh": -17.43,
       "relVol": 0.76,
       "score": 63.9,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "GWIND.IS",
+      "market": "BIST",
+      "name": "GALATA WIND ENERJI",
+      "sector": "Utilities",
+      "currency": "TRY",
+      "price": 26.48,
+      "prevClose": 26.46,
+      "changePct": 0.08,
+      "volume": 4737548,
+      "marketCap": 14299199488,
+      "pe": 17.08,
+      "pb": 0.91,
+      "roe": 6.11,
+      "debtToEquity": 20.77,
+      "netMargin": 28.74,
+      "netIncome": 834501312,
+      "ma50": 27.8684,
+      "ma200": 25.3321,
+      "rsi14": 44.4,
+      "atrPct": 3.55,
+      "ret1m": -8.88,
+      "ret3m": 7.38,
+      "pctFromHigh": -16.57,
+      "relVol": 0.59,
+      "score": 63.7,
       "scoreCoverage": 5
     },
     {
@@ -1470,7 +1470,7 @@
       "ret3m": -2.1,
       "pctFromHigh": -15.76,
       "relVol": 0.96,
-      "score": 55.5,
+      "score": 55.4,
       "scoreCoverage": 5
     },
     {
@@ -1483,7 +1483,7 @@
       "prevClose": 56.0,
       "changePct": 0.18,
       "volume": 896587,
-      "marketCap": 40030982144,
+      "marketCap": null,
       "pe": 17.21,
       "pb": 1.13,
       "roe": 6.83,
@@ -1652,7 +1652,7 @@
       "changePct": 1.52,
       "volume": 2115814,
       "marketCap": 167167000576,
-      "pe": 29.95,
+      "pe": 29.93,
       "pb": 5.61,
       "roe": 17.23,
       "debtToEquity": 26.85,
@@ -2342,6 +2342,34 @@
       "scoreCoverage": 5
     },
     {
+      "symbol": "ECILC.IS",
+      "market": "BIST",
+      "name": "ECZACIBASI ILAC",
+      "sector": "Healthcare",
+      "currency": "TRY",
+      "price": 84.4,
+      "prevClose": 84.0,
+      "changePct": 0.48,
+      "volume": 3098781,
+      "marketCap": 57835954176,
+      "pe": null,
+      "pb": 0.87,
+      "roe": -1.45,
+      "debtToEquity": 5.88,
+      "netMargin": -8.63,
+      "netIncome": -848737024,
+      "ma50": 91.3842,
+      "ma200": 92.4806,
+      "rsi14": 50.9,
+      "atrPct": 3.45,
+      "ret1m": -3.43,
+      "ret3m": -23.69,
+      "pctFromHigh": -34.38,
+      "relVol": 0.53,
+      "score": 45.1,
+      "scoreCoverage": 4
+    },
+    {
       "symbol": "CEMTS.IS",
       "market": "BIST",
       "name": "CEMTAS",
@@ -2398,34 +2426,6 @@
       "scoreCoverage": 4
     },
     {
-      "symbol": "ECILC.IS",
-      "market": "BIST",
-      "name": "ECZACIBASI ILAC",
-      "sector": "Healthcare",
-      "currency": "TRY",
-      "price": 84.4,
-      "prevClose": 84.0,
-      "changePct": 0.48,
-      "volume": 3098781,
-      "marketCap": 57835954176,
-      "pe": null,
-      "pb": 0.95,
-      "roe": -1.45,
-      "debtToEquity": 5.88,
-      "netMargin": -8.63,
-      "netIncome": -848737024,
-      "ma50": 91.3842,
-      "ma200": 92.4806,
-      "rsi14": 50.9,
-      "atrPct": 3.45,
-      "ret1m": -3.43,
-      "ret3m": -23.69,
-      "pctFromHigh": -34.38,
-      "relVol": 0.53,
-      "score": 44.1,
-      "scoreCoverage": 4
-    },
-    {
       "symbol": "ISGYO.IS",
       "market": "BIST",
       "name": "IS GMYO",
@@ -2464,7 +2464,7 @@
       "changePct": 0.08,
       "volume": 39271281,
       "marketCap": 407911235584,
-      "pe": 30.61,
+      "pe": 30.58,
       "pb": 18.8,
       "roe": 15.56,
       "debtToEquity": 83.9,
@@ -2646,7 +2646,7 @@
       "ret3m": -1.04,
       "pctFromHigh": -34.18,
       "relVol": 0.53,
-      "score": 41.1,
+      "score": 41.0,
       "scoreCoverage": 4
     },
     {
@@ -3010,7 +3010,7 @@
       "ret3m": 4.22,
       "pctFromHigh": -4.46,
       "relVol": 1.04,
-      "score": 35.4,
+      "score": 35.2,
       "scoreCoverage": 5
     },
     {
@@ -3122,7 +3122,7 @@
       "ret3m": 36.95,
       "pctFromHigh": -4.14,
       "relVol": 0.77,
-      "score": 33.8,
+      "score": 33.6,
       "scoreCoverage": 5
     },
     {
