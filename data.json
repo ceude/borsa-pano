@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-09T05:02:55+00:00",
+  "updatedAt": "2026-06-09T05:17:05+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.2678,
-    "USDTRY": 46.1106
+    "EURTRY": 53.2386,
+    "USDTRY": 46.111
   },
   "benchmarks": {
     "DAX": 1.14,
@@ -98,7 +98,7 @@
       "ret3m": -6.25,
       "pctFromHigh": -27.24,
       "relVol": 1.04,
-      "score": 88.1,
+      "score": 88.2,
       "scoreCoverage": 5
     },
     {
@@ -1148,7 +1148,7 @@
       "changePct": 0.1,
       "volume": 188015,
       "marketCap": 16262457344,
-      "pe": 16.33,
+      "pe": 16.34,
       "pb": 3.69,
       "roe": 24.3,
       "debtToEquity": 55.51,
@@ -1330,7 +1330,7 @@
       "ret3m": 9.17,
       "pctFromHigh": -6.53,
       "relVol": 0.99,
-      "score": 56.5,
+      "score": 56.7,
       "scoreCoverage": 5
     },
     {
@@ -1358,7 +1358,7 @@
       "ret3m": 1.21,
       "pctFromHigh": -26.27,
       "relVol": 0.86,
-      "score": 56.2,
+      "score": 56.4,
       "scoreCoverage": 5
     },
     {
@@ -1722,7 +1722,7 @@
       "ret3m": 27.29,
       "pctFromHigh": -1.47,
       "relVol": 0.86,
-      "score": 52.8,
+      "score": 53.0,
       "scoreCoverage": 5
     },
     {
@@ -1750,7 +1750,63 @@
       "ret3m": -20.46,
       "pctFromHigh": -30.86,
       "relVol": 0.67,
-      "score": 51.3,
+      "score": 51.5,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "MGROS.IS",
+      "market": "BIST",
+      "name": "MIGROS TICARET",
+      "sector": "Consumer Defensive",
+      "currency": "TRY",
+      "price": 665.5,
+      "prevClose": 662.0,
+      "changePct": 0.53,
+      "volume": 1962695,
+      "marketCap": 118520299520,
+      "pe": 16.42,
+      "pb": 1.36,
+      "roe": 9.18,
+      "debtToEquity": 40.97,
+      "netMargin": 1.62,
+      "netIncome": 6780999168,
+      "ma50": 649.4372,
+      "ma200": 562.3314,
+      "rsi14": 50.4,
+      "atrPct": 2.73,
+      "ret1m": -3.46,
+      "ret3m": 11.39,
+      "pctFromHigh": -8.08,
+      "relVol": 1.0,
+      "score": 51.1,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "DOHOL.IS",
+      "market": "BIST",
+      "name": "DOGAN HOLDING",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 21.96,
+      "prevClose": 21.58,
+      "changePct": 1.76,
+      "volume": 12131942,
+      "marketCap": 56495898624,
+      "pe": 20.15,
+      "pb": 0.67,
+      "roe": 3.37,
+      "debtToEquity": 39.49,
+      "netMargin": 3.01,
+      "netIncome": 2806029056,
+      "ma50": 22.2226,
+      "ma200": 19.5752,
+      "rsi14": 47.1,
+      "atrPct": 4.68,
+      "ret1m": -10.29,
+      "ret3m": 8.82,
+      "pctFromHigh": -10.88,
+      "relVol": 1.51,
+      "score": 51.0,
       "scoreCoverage": 5
     },
     {
@@ -1810,34 +1866,6 @@
       "scoreCoverage": 5
     },
     {
-      "symbol": "MGROS.IS",
-      "market": "BIST",
-      "name": "MIGROS TICARET",
-      "sector": "Consumer Defensive",
-      "currency": "TRY",
-      "price": 665.5,
-      "prevClose": 662.0,
-      "changePct": 0.53,
-      "volume": 1962695,
-      "marketCap": 118520299520,
-      "pe": 16.42,
-      "pb": 1.36,
-      "roe": 9.18,
-      "debtToEquity": 40.97,
-      "netMargin": 1.62,
-      "netIncome": 6780999168,
-      "ma50": 649.4372,
-      "ma200": 562.3314,
-      "rsi14": 50.4,
-      "atrPct": 2.73,
-      "ret1m": -3.46,
-      "ret3m": 11.39,
-      "pctFromHigh": -8.08,
-      "relVol": 1.0,
-      "score": 50.9,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "AKSEN.IS",
       "market": "BIST",
       "name": "AKSA ENERJI",
@@ -1863,34 +1891,6 @@
       "pctFromHigh": -10.67,
       "relVol": 0.67,
       "score": 50.9,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "DOHOL.IS",
-      "market": "BIST",
-      "name": "DOGAN HOLDING",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 21.96,
-      "prevClose": 21.58,
-      "changePct": 1.76,
-      "volume": 12131942,
-      "marketCap": 56495898624,
-      "pe": 20.15,
-      "pb": 0.67,
-      "roe": 3.37,
-      "debtToEquity": 39.49,
-      "netMargin": 3.01,
-      "netIncome": 2806029056,
-      "ma50": 22.2226,
-      "ma200": 19.5752,
-      "rsi14": 47.1,
-      "atrPct": 4.68,
-      "ret1m": -10.29,
-      "ret3m": 8.82,
-      "pctFromHigh": -10.88,
-      "relVol": 1.51,
-      "score": 50.8,
       "scoreCoverage": 5
     },
     {
@@ -2314,34 +2314,6 @@
       "scoreCoverage": 5
     },
     {
-      "symbol": "EKGYO.IS",
-      "market": "BIST",
-      "name": "EMLAK KONUT GMYO",
-      "sector": "Real Estate",
-      "currency": "TRY",
-      "price": 19.43,
-      "prevClose": 19.23,
-      "changePct": 1.04,
-      "volume": 106979631,
-      "marketCap": 71135567872,
-      "pe": 242.88,
-      "pb": 0.56,
-      "roe": 2.38,
-      "debtToEquity": 38.71,
-      "netMargin": 3.3,
-      "netIncome": 3004839936,
-      "ma50": 20.253,
-      "ma200": 20.8909,
-      "rsi14": 46.4,
-      "atrPct": 3.44,
-      "ret1m": -10.46,
-      "ret3m": -10.13,
-      "pctFromHigh": -25.9,
-      "relVol": 1.15,
-      "score": 45.1,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "ECILC.IS",
       "market": "BIST",
       "name": "ECZACIBASI ILAC",
@@ -2507,6 +2479,34 @@
       "pctFromHigh": -14.91,
       "relVol": 0.55,
       "score": 43.6,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "EKGYO.IS",
+      "market": "BIST",
+      "name": "EMLAK KONUT GMYO",
+      "sector": "Real Estate",
+      "currency": "TRY",
+      "price": 19.43,
+      "prevClose": 19.23,
+      "changePct": 1.04,
+      "volume": 106979631,
+      "marketCap": 71135567872,
+      "pe": 242.88,
+      "pb": 0.56,
+      "roe": 2.38,
+      "debtToEquity": 46.02,
+      "netMargin": 3.3,
+      "netIncome": 3004839936,
+      "ma50": 20.253,
+      "ma200": 20.8909,
+      "rsi14": 46.4,
+      "atrPct": 3.44,
+      "ret1m": -10.46,
+      "ret3m": -10.13,
+      "pctFromHigh": -25.9,
+      "relVol": 1.15,
+      "score": 43.3,
       "scoreCoverage": 5
     },
     {
@@ -2856,7 +2856,7 @@
       "changePct": 0.42,
       "volume": 50518,
       "marketCap": 32371030016,
-      "pe": 439.8,
+      "pe": 431.0,
       "pb": 1.42,
       "roe": 0.35,
       "debtToEquity": 6.68,
@@ -2898,7 +2898,7 @@
       "ret3m": 22.18,
       "pctFromHigh": -16.24,
       "relVol": 2.0,
-      "score": 36.7,
+      "score": 36.9,
       "scoreCoverage": 5
     },
     {
@@ -2982,7 +2982,7 @@
       "ret3m": 90.22,
       "pctFromHigh": -8.28,
       "relVol": 1.21,
-      "score": 35.4,
+      "score": 35.6,
       "scoreCoverage": 5
     },
     {
@@ -3374,7 +3374,7 @@
       "ret3m": -1.71,
       "pctFromHigh": -35.93,
       "relVol": 0.81,
-      "score": 27.8,
+      "score": 28.0,
       "scoreCoverage": 4
     },
     {
@@ -3458,7 +3458,7 @@
       "ret3m": null,
       "pctFromHigh": null,
       "relVol": null,
-      "score": 25.3,
+      "score": 25.4,
       "scoreCoverage": 5
     },
     {
@@ -3626,7 +3626,7 @@
       "ret3m": 3.07,
       "pctFromHigh": -23.57,
       "relVol": 0.98,
-      "score": 19.5,
+      "score": 19.7,
       "scoreCoverage": 4
     },
     {
