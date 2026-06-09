@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-09T01:02:33+00:00",
+  "updatedAt": "2026-06-09T01:17:23+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.1826,
-    "USDTRY": 46.0925
+    "EURTRY": 53.1911,
+    "USDTRY": 46.0929
   },
   "benchmarks": {
     "DAX": 0.39,
@@ -70,7 +70,7 @@ window.STOCK_DATA = {
       "ret3m": 0.88,
       "pctFromHigh": -16.75,
       "relVol": 0.55,
-      "score": 90.5,
+      "score": 90.7,
       "scoreCoverage": 4
     },
     {
@@ -294,7 +294,7 @@ window.STOCK_DATA = {
       "ret3m": -5.62,
       "pctFromHigh": -15.75,
       "relVol": 1.08,
-      "score": 82.8,
+      "score": 82.9,
       "scoreCoverage": 5
     },
     {
@@ -466,34 +466,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "HALKB.IS",
-      "market": "BIST",
-      "name": "T. HALK BANKASI",
-      "sector": "Financial Services",
-      "currency": "TRY",
-      "price": 45.7,
-      "prevClose": 45.0,
-      "changePct": 1.56,
-      "volume": 65080462,
-      "marketCap": 328344371200,
-      "pe": 10.86,
-      "pb": 1.45,
-      "roe": 15.44,
-      "debtToEquity": null,
-      "netMargin": 17.93,
-      "netIncome": 30231869440,
-      "ma50": 39.6428,
-      "ma200": 36.3958,
-      "rsi14": 60.9,
-      "atrPct": 5.65,
-      "ret1m": 18.05,
-      "ret3m": 6.03,
-      "pctFromHigh": -10.63,
-      "relVol": 1.32,
-      "score": 70.6,
-      "scoreCoverage": 4
-    },
-    {
       "symbol": "HNR1.DE",
       "market": "DAX",
       "name": "HANNOVER RUECK SE NA O.N.",
@@ -520,6 +492,34 @@ window.STOCK_DATA = {
       "relVol": 0.72,
       "score": 70.4,
       "scoreCoverage": 5
+    },
+    {
+      "symbol": "HALKB.IS",
+      "market": "BIST",
+      "name": "T. HALK BANKASI",
+      "sector": "Financial Services",
+      "currency": "TRY",
+      "price": 45.7,
+      "prevClose": 45.0,
+      "changePct": 1.56,
+      "volume": 65080462,
+      "marketCap": 328344371200,
+      "pe": 10.86,
+      "pb": 1.5,
+      "roe": 15.44,
+      "debtToEquity": null,
+      "netMargin": 17.93,
+      "netIncome": 30231869440,
+      "ma50": 39.6428,
+      "ma200": 36.3958,
+      "rsi14": 60.9,
+      "atrPct": 5.65,
+      "ret1m": 18.05,
+      "ret3m": 6.03,
+      "pctFromHigh": -10.63,
+      "relVol": 1.32,
+      "score": 70.3,
+      "scoreCoverage": 4
     },
     {
       "symbol": "OYAKC.IS",
@@ -574,7 +574,7 @@ window.STOCK_DATA = {
       "ret3m": -0.24,
       "pctFromHigh": -14.54,
       "relVol": 1.69,
-      "score": 66.9,
+      "score": 67.0,
       "scoreCoverage": 5
     },
     {
@@ -718,6 +718,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "GWIND.IS",
+      "market": "BIST",
+      "name": "GALATA WIND ENERJI",
+      "sector": "Utilities",
+      "currency": "TRY",
+      "price": 26.48,
+      "prevClose": 26.46,
+      "changePct": 0.08,
+      "volume": 4737548,
+      "marketCap": 14299199488,
+      "pe": 17.08,
+      "pb": 0.91,
+      "roe": 6.11,
+      "debtToEquity": 20.77,
+      "netMargin": 28.74,
+      "netIncome": 834501312,
+      "ma50": 27.8776,
+      "ma200": 25.3351,
+      "rsi14": 39.7,
+      "atrPct": 3.67,
+      "ret1m": -7.16,
+      "ret3m": 9.34,
+      "pctFromHigh": -16.64,
+      "relVol": 0.59,
+      "score": 63.9,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "HEN3.DE",
       "market": "DAX",
       "name": "Henkel AG & Co. KGaA          I",
@@ -743,34 +771,6 @@ window.STOCK_DATA = {
       "pctFromHigh": -17.43,
       "relVol": 0.76,
       "score": 63.9,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "GWIND.IS",
-      "market": "BIST",
-      "name": "GALATA WIND ENERJI",
-      "sector": "Utilities",
-      "currency": "TRY",
-      "price": 26.48,
-      "prevClose": 26.46,
-      "changePct": 0.08,
-      "volume": 4737548,
-      "marketCap": 14299199488,
-      "pe": 17.08,
-      "pb": 0.91,
-      "roe": 6.11,
-      "debtToEquity": 20.77,
-      "netMargin": 28.74,
-      "netIncome": 834501312,
-      "ma50": 27.8776,
-      "ma200": 25.3351,
-      "rsi14": 39.7,
-      "atrPct": 3.67,
-      "ret1m": -7.16,
-      "ret3m": 9.34,
-      "pctFromHigh": -16.64,
-      "relVol": 0.59,
-      "score": 63.7,
       "scoreCoverage": 5
     },
     {
@@ -1470,7 +1470,7 @@ window.STOCK_DATA = {
       "ret3m": -5.32,
       "pctFromHigh": -17.57,
       "relVol": 0.96,
-      "score": 55.4,
+      "score": 55.5,
       "scoreCoverage": 5
     },
     {
@@ -1483,7 +1483,7 @@ window.STOCK_DATA = {
       "prevClose": 56.0,
       "changePct": 0.18,
       "volume": 896587,
-      "marketCap": null,
+      "marketCap": 40030982144,
       "pe": 17.21,
       "pb": 1.13,
       "roe": 6.83,
@@ -2342,34 +2342,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "ECILC.IS",
-      "market": "BIST",
-      "name": "ECZACIBASI ILAC",
-      "sector": "Healthcare",
-      "currency": "TRY",
-      "price": 84.4,
-      "prevClose": 84.0,
-      "changePct": 0.48,
-      "volume": 3098781,
-      "marketCap": 57835954176,
-      "pe": null,
-      "pb": 0.87,
-      "roe": -1.45,
-      "debtToEquity": 5.88,
-      "netMargin": -8.63,
-      "netIncome": -848737024,
-      "ma50": 91.9669,
-      "ma200": 92.3966,
-      "rsi14": 48.6,
-      "atrPct": 3.45,
-      "ret1m": -2.04,
-      "ret3m": -24.78,
-      "pctFromHigh": -34.69,
-      "relVol": 0.53,
-      "score": 45.1,
-      "scoreCoverage": 4
-    },
-    {
       "symbol": "CEMTS.IS",
       "market": "BIST",
       "name": "CEMTAS",
@@ -2423,6 +2395,34 @@ window.STOCK_DATA = {
       "pctFromHigh": -24.12,
       "relVol": 0.75,
       "score": 44.2,
+      "scoreCoverage": 4
+    },
+    {
+      "symbol": "ECILC.IS",
+      "market": "BIST",
+      "name": "ECZACIBASI ILAC",
+      "sector": "Healthcare",
+      "currency": "TRY",
+      "price": 84.4,
+      "prevClose": 84.0,
+      "changePct": 0.48,
+      "volume": 3098781,
+      "marketCap": 57835954176,
+      "pe": null,
+      "pb": 0.95,
+      "roe": -1.45,
+      "debtToEquity": 5.88,
+      "netMargin": -8.63,
+      "netIncome": -848737024,
+      "ma50": 91.9669,
+      "ma200": 92.3966,
+      "rsi14": 48.6,
+      "atrPct": 3.45,
+      "ret1m": -2.04,
+      "ret3m": -24.78,
+      "pctFromHigh": -34.69,
+      "relVol": 0.53,
+      "score": 44.1,
       "scoreCoverage": 4
     },
     {
@@ -2646,7 +2646,7 @@ window.STOCK_DATA = {
       "ret3m": 2.87,
       "pctFromHigh": -33.95,
       "relVol": 0.53,
-      "score": 41.0,
+      "score": 41.1,
       "scoreCoverage": 4
     },
     {
@@ -3010,7 +3010,7 @@ window.STOCK_DATA = {
       "ret3m": 4.22,
       "pctFromHigh": -4.46,
       "relVol": 1.04,
-      "score": 35.2,
+      "score": 35.4,
       "scoreCoverage": 5
     },
     {
@@ -3122,7 +3122,7 @@ window.STOCK_DATA = {
       "ret3m": 37.53,
       "pctFromHigh": -3.8,
       "relVol": 0.77,
-      "score": 33.6,
+      "score": 33.8,
       "scoreCoverage": 5
     },
     {
