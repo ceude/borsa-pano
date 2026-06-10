@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-10T18:47:31+00:00",
+  "updatedAt": "2026-06-10T19:02:31+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.323,
-    "USDTRY": 46.1333
+    "EURTRY": 53.2985,
+    "USDTRY": 46.1331
   },
   "benchmarks": {
     "DAX": 1.0,
@@ -70,7 +70,7 @@
       "ret3m": 3.74,
       "pctFromHigh": -16.32,
       "relVol": 0.63,
-      "score": 90.9,
+      "score": 91.1,
       "scoreCoverage": 4
     },
     {
@@ -574,7 +574,7 @@
       "ret3m": 3.99,
       "pctFromHigh": -15.98,
       "relVol": 1.13,
-      "score": 67.2,
+      "score": 67.4,
       "scoreCoverage": 5
     },
     {
@@ -742,7 +742,7 @@
       "ret3m": 6.37,
       "pctFromHigh": -16.89,
       "relVol": 1.16,
-      "score": 63.7,
+      "score": 63.8,
       "scoreCoverage": 5
     },
     {
@@ -838,7 +838,7 @@
       "price": 10.78,
       "prevClose": 11.03,
       "changePct": -2.27,
-      "volume": 16142513,
+      "volume": 16150504,
       "marketCap": 41880297472,
       "pe": 9.62,
       "pb": 1.24,
@@ -1118,7 +1118,7 @@
       "price": 36.7,
       "prevClose": 37.06,
       "changePct": -0.97,
-      "volume": 18758635,
+      "volume": 18761312,
       "marketCap": 39573245952,
       "pe": 15.36,
       "pb": 2.46,
@@ -1386,7 +1386,7 @@
       "ret3m": -2.15,
       "pctFromHigh": -17.96,
       "relVol": 0.78,
-      "score": 55.9,
+      "score": 56.1,
       "scoreCoverage": 5
     },
     {
@@ -1539,7 +1539,7 @@
       "prevClose": 56.04,
       "changePct": -0.79,
       "volume": 1293168,
-      "marketCap": null,
+      "marketCap": 39674200064,
       "pe": 17.06,
       "pb": 1.12,
       "roe": 6.83,
@@ -1818,7 +1818,7 @@
       "price": 12.15,
       "prevClose": 12.15,
       "changePct": 0.0,
-      "volume": 650978,
+      "volume": 651468,
       "marketCap": 3685641472,
       "pe": 17.61,
       "pb": 0.37,
@@ -1989,7 +1989,7 @@
       "volume": 142151,
       "marketCap": 55720099840,
       "pe": 53.61,
-      "pb": 10.44,
+      "pb": 11.08,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -2325,7 +2325,7 @@
       "volume": 3089529,
       "marketCap": 56602484736,
       "pe": null,
-      "pb": 0.85,
+      "pb": 0.93,
       "roe": -1.45,
       "debtToEquity": 5.88,
       "netMargin": -8.63,
@@ -2338,7 +2338,7 @@
       "ret3m": -23.62,
       "pctFromHigh": -35.78,
       "relVol": 0.71,
-      "score": 45.3,
+      "score": 44.3,
       "scoreCoverage": 4
     },
     {
@@ -2490,7 +2490,7 @@
       "price": 19.09,
       "prevClose": 19.2,
       "changePct": -0.57,
-      "volume": 86021876,
+      "volume": 86055728,
       "marketCap": 69890785280,
       "pe": 238.62,
       "pb": 0.5,
@@ -2618,7 +2618,7 @@
       "ret3m": 0.36,
       "pctFromHigh": -36.25,
       "relVol": 0.97,
-      "score": 41.3,
+      "score": 41.5,
       "scoreCoverage": 4
     },
     {
@@ -3122,7 +3122,7 @@
       "ret3m": 38.3,
       "pctFromHigh": -5.08,
       "relVol": 0.7,
-      "score": 33.8,
+      "score": 33.9,
       "scoreCoverage": 5
     },
     {
@@ -3666,7 +3666,7 @@
       "price": 26.06,
       "prevClose": 27.04,
       "changePct": -3.62,
-      "volume": 1627605,
+      "volume": 1628723,
       "marketCap": 3518099968,
       "pe": 28.33,
       "pb": 50.41,
