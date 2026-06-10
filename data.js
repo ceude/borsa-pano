@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-10T03:17:28+00:00",
+  "updatedAt": "2026-06-10T03:32:32+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.2781,
-    "USDTRY": 46.1217
+    "EURTRY": 53.2675,
+    "USDTRY": 46.109
   },
   "benchmarks": {
     "DAX": 1.14,
@@ -42,7 +42,7 @@ window.STOCK_DATA = {
       "ret3m": -1.57,
       "pctFromHigh": -19.66,
       "relVol": 1.46,
-      "score": 93.6,
+      "score": 93.8,
       "scoreCoverage": 4
     },
     {
@@ -70,36 +70,8 @@ window.STOCK_DATA = {
       "ret3m": 3.29,
       "pctFromHigh": -16.9,
       "relVol": 0.7,
-      "score": 90.9,
+      "score": 91.1,
       "scoreCoverage": 4
-    },
-    {
-      "symbol": "TMSN.IS",
-      "market": "BIST",
-      "name": "TUMOSAN MOTOR VE TRAKTOR",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 92.5,
-      "prevClose": 97.5,
-      "changePct": -5.13,
-      "volume": 1587477,
-      "marketCap": 10637500416,
-      "pe": 2.35,
-      "pb": 0.72,
-      "roe": 38.68,
-      "debtToEquity": 42.2,
-      "netMargin": 131.0,
-      "netIncome": 4525145088,
-      "ma50": 101.688,
-      "ma200": 106.756,
-      "rsi14": 35.6,
-      "atrPct": 2.81,
-      "ret1m": -11.06,
-      "ret3m": -9.58,
-      "pctFromHigh": -30.97,
-      "relVol": 2.59,
-      "score": 88.8,
-      "scoreCoverage": 5
     },
     {
       "symbol": "VAKBN.IS",
@@ -126,7 +98,35 @@ window.STOCK_DATA = {
       "ret3m": -5.18,
       "pctFromHigh": -22.83,
       "relVol": 1.06,
-      "score": 87.9,
+      "score": 88.1,
+      "scoreCoverage": 4
+    },
+    {
+      "symbol": "TMSN.IS",
+      "market": "BIST",
+      "name": "TUMOSAN MOTOR VE TRAKTOR",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 92.5,
+      "prevClose": 97.5,
+      "changePct": -5.13,
+      "volume": 1587477,
+      "marketCap": 10637500416,
+      "pe": null,
+      "pb": 0.72,
+      "roe": 38.68,
+      "debtToEquity": 42.2,
+      "netMargin": 131.0,
+      "netIncome": 4525145088,
+      "ma50": 101.688,
+      "ma200": 106.756,
+      "rsi14": 35.6,
+      "atrPct": 2.81,
+      "ret1m": -11.06,
+      "ret3m": -9.58,
+      "pctFromHigh": -30.97,
+      "relVol": 2.59,
+      "score": 86.5,
       "scoreCoverage": 4
     },
     {
@@ -154,7 +154,7 @@ window.STOCK_DATA = {
       "ret3m": 0.13,
       "pctFromHigh": -17.78,
       "relVol": 1.13,
-      "score": 86.1,
+      "score": 86.3,
       "scoreCoverage": 4
     },
     {
@@ -182,7 +182,7 @@ window.STOCK_DATA = {
       "ret3m": 1.41,
       "pctFromHigh": -20.55,
       "relVol": 1.08,
-      "score": 85.2,
+      "score": 85.4,
       "scoreCoverage": 4
     },
     {
@@ -210,7 +210,7 @@ window.STOCK_DATA = {
       "ret3m": 8.25,
       "pctFromHigh": -12.19,
       "relVol": 0.58,
-      "score": 84.9,
+      "score": 85.1,
       "scoreCoverage": 5
     },
     {
@@ -238,7 +238,7 @@ window.STOCK_DATA = {
       "ret3m": -6.41,
       "pctFromHigh": -25.44,
       "relVol": 0.91,
-      "score": 84.4,
+      "score": 84.6,
       "scoreCoverage": 4
     },
     {
@@ -266,7 +266,7 @@ window.STOCK_DATA = {
       "ret3m": 0.51,
       "pctFromHigh": -19.26,
       "relVol": 0.82,
-      "score": 83.8,
+      "score": 84.0,
       "scoreCoverage": 4
     },
     {
@@ -294,7 +294,7 @@ window.STOCK_DATA = {
       "ret3m": -5.09,
       "pctFromHigh": -17.39,
       "relVol": 1.55,
-      "score": 82.9,
+      "score": 83.1,
       "scoreCoverage": 5
     },
     {
@@ -322,7 +322,7 @@ window.STOCK_DATA = {
       "ret3m": 2.53,
       "pctFromHigh": -15.66,
       "relVol": 0.52,
-      "score": 81.4,
+      "score": 81.5,
       "scoreCoverage": 5
     },
     {
@@ -350,7 +350,7 @@ window.STOCK_DATA = {
       "ret3m": -7.64,
       "pctFromHigh": -24.6,
       "relVol": 1.15,
-      "score": 78.1,
+      "score": 78.3,
       "scoreCoverage": 4
     },
     {
@@ -378,7 +378,7 @@ window.STOCK_DATA = {
       "ret3m": 5.13,
       "pctFromHigh": -16.28,
       "relVol": 0.98,
-      "score": 74.5,
+      "score": 74.6,
       "scoreCoverage": 4
     },
     {
@@ -406,7 +406,7 @@ window.STOCK_DATA = {
       "ret3m": 31.91,
       "pctFromHigh": -1.16,
       "relVol": 0.95,
-      "score": 72.0,
+      "score": 72.1,
       "scoreCoverage": 5
     },
     {
@@ -434,7 +434,7 @@ window.STOCK_DATA = {
       "ret3m": -10.45,
       "pctFromHigh": -22.62,
       "relVol": 0.73,
-      "score": 71.4,
+      "score": 71.5,
       "scoreCoverage": 5
     },
     {
@@ -462,7 +462,7 @@ window.STOCK_DATA = {
       "ret3m": -19.11,
       "pctFromHigh": -30.96,
       "relVol": 0.76,
-      "score": 71.4,
+      "score": 71.5,
       "scoreCoverage": 5
     },
     {
@@ -490,7 +490,7 @@ window.STOCK_DATA = {
       "ret3m": -11.32,
       "pctFromHigh": -24.55,
       "relVol": 1.16,
-      "score": 71.0,
+      "score": 71.1,
       "scoreCoverage": 5
     },
     {
@@ -518,7 +518,7 @@ window.STOCK_DATA = {
       "ret3m": -4.92,
       "pctFromHigh": -14.97,
       "relVol": 0.79,
-      "score": 70.2,
+      "score": 70.3,
       "scoreCoverage": 5
     },
     {
@@ -546,7 +546,7 @@ window.STOCK_DATA = {
       "ret3m": 7.47,
       "pctFromHigh": -7.37,
       "relVol": 1.61,
-      "score": 70.1,
+      "score": 70.2,
       "scoreCoverage": 4
     },
     {
@@ -560,7 +560,7 @@ window.STOCK_DATA = {
       "changePct": -2.18,
       "volume": 48468573,
       "marketCap": 220150005760,
-      "pe": 8.24,
+      "pe": 8.23,
       "pb": 0.9,
       "roe": 13.07,
       "debtToEquity": 58.28,
@@ -574,7 +574,7 @@ window.STOCK_DATA = {
       "ret3m": 6.43,
       "pctFromHigh": -13.72,
       "relVol": 2.28,
-      "score": 67.1,
+      "score": 67.2,
       "scoreCoverage": 5
     },
     {
@@ -602,7 +602,7 @@ window.STOCK_DATA = {
       "ret3m": 25.87,
       "pctFromHigh": -10.4,
       "relVol": 1.28,
-      "score": 67.0,
+      "score": 67.1,
       "scoreCoverage": 4
     },
     {
@@ -630,7 +630,7 @@ window.STOCK_DATA = {
       "ret3m": -9.07,
       "pctFromHigh": -23.11,
       "relVol": 4.01,
-      "score": 65.4,
+      "score": 65.5,
       "scoreCoverage": 5
     },
     {
@@ -658,7 +658,7 @@ window.STOCK_DATA = {
       "ret3m": 11.85,
       "pctFromHigh": -4.77,
       "relVol": 0.83,
-      "score": 64.7,
+      "score": 64.8,
       "scoreCoverage": 5
     },
     {
@@ -686,7 +686,7 @@ window.STOCK_DATA = {
       "ret3m": -5.38,
       "pctFromHigh": -21.48,
       "relVol": 1.18,
-      "score": 64.6,
+      "score": 64.7,
       "scoreCoverage": 5
     },
     {
@@ -714,7 +714,7 @@ window.STOCK_DATA = {
       "ret3m": 5.52,
       "pctFromHigh": -22.71,
       "relVol": 0.65,
-      "score": 63.9,
+      "score": 64.0,
       "scoreCoverage": 5
     },
     {
@@ -742,7 +742,7 @@ window.STOCK_DATA = {
       "ret3m": 13.28,
       "pctFromHigh": -14.56,
       "relVol": 2.45,
-      "score": 63.3,
+      "score": 63.4,
       "scoreCoverage": 5
     },
     {
@@ -770,7 +770,7 @@ window.STOCK_DATA = {
       "ret3m": 12.58,
       "pctFromHigh": -4.32,
       "relVol": 0.8,
-      "score": 62.8,
+      "score": 62.9,
       "scoreCoverage": 4
     },
     {
@@ -798,7 +798,7 @@ window.STOCK_DATA = {
       "ret3m": -8.04,
       "pctFromHigh": -18.27,
       "relVol": 1.09,
-      "score": 62.7,
+      "score": 62.8,
       "scoreCoverage": 5
     },
     {
@@ -826,7 +826,7 @@ window.STOCK_DATA = {
       "ret3m": -17.03,
       "pctFromHigh": -41.26,
       "relVol": 0.81,
-      "score": 62.5,
+      "score": 62.6,
       "scoreCoverage": 5
     },
     {
@@ -854,7 +854,7 @@ window.STOCK_DATA = {
       "ret3m": -22.25,
       "pctFromHigh": -32.52,
       "relVol": 1.06,
-      "score": 62.3,
+      "score": 62.4,
       "scoreCoverage": 5
     },
     {
@@ -882,8 +882,36 @@ window.STOCK_DATA = {
       "ret3m": 15.56,
       "pctFromHigh": -6.25,
       "relVol": 1.11,
-      "score": 62.0,
+      "score": 62.1,
       "scoreCoverage": 5
+    },
+    {
+      "symbol": "CBK.DE",
+      "market": "DAX",
+      "name": "Commerzbank AG                I",
+      "sector": "Financial Services",
+      "currency": "EUR",
+      "price": 36.97,
+      "prevClose": 36.4,
+      "changePct": 1.57,
+      "volume": 3077168,
+      "marketCap": 40538476544,
+      "pe": 17.04,
+      "pb": 1.18,
+      "roe": 8.23,
+      "debtToEquity": null,
+      "netMargin": 23.32,
+      "netIncome": 2395000064,
+      "ma50": 34.4415,
+      "ma200": 32.7917,
+      "rsi14": 61.1,
+      "atrPct": 2.53,
+      "ret1m": 5.75,
+      "ret3m": 22.7,
+      "pctFromHigh": -2.47,
+      "relVol": 1.01,
+      "score": 61.7,
+      "scoreCoverage": 4
     },
     {
       "symbol": "AGHOL.IS",
@@ -914,34 +942,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "CBK.DE",
-      "market": "DAX",
-      "name": "Commerzbank AG                I",
-      "sector": "Financial Services",
-      "currency": "EUR",
-      "price": 36.97,
-      "prevClose": 36.4,
-      "changePct": 1.57,
-      "volume": 3077168,
-      "marketCap": 40538476544,
-      "pe": 17.04,
-      "pb": 1.18,
-      "roe": 8.23,
-      "debtToEquity": null,
-      "netMargin": 23.32,
-      "netIncome": 2395000064,
-      "ma50": 34.4415,
-      "ma200": 32.7917,
-      "rsi14": 61.1,
-      "atrPct": 2.53,
-      "ret1m": 5.75,
-      "ret3m": 22.7,
-      "pctFromHigh": -2.47,
-      "relVol": 1.01,
-      "score": 61.6,
-      "scoreCoverage": 4
-    },
-    {
       "symbol": "TUPRS.IS",
       "market": "BIST",
       "name": "TUPRAS",
@@ -966,7 +966,7 @@ window.STOCK_DATA = {
       "ret3m": -7.4,
       "pctFromHigh": -16.7,
       "relVol": 0.89,
-      "score": 61.5,
+      "score": 61.6,
       "scoreCoverage": 5
     },
     {
@@ -994,7 +994,7 @@ window.STOCK_DATA = {
       "ret3m": -15.41,
       "pctFromHigh": -28.4,
       "relVol": 0.79,
-      "score": 61.2,
+      "score": 61.3,
       "scoreCoverage": 5
     },
     {
@@ -1022,7 +1022,35 @@ window.STOCK_DATA = {
       "ret3m": 69.21,
       "pctFromHigh": -17.74,
       "relVol": 1.4,
-      "score": 60.8,
+      "score": 60.9,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "CCOLA.IS",
+      "market": "BIST",
+      "name": "COCA COLA ICECEK",
+      "sector": "Consumer Defensive",
+      "currency": "TRY",
+      "price": 78.35,
+      "prevClose": 79.9,
+      "changePct": -1.94,
+      "volume": 7875198,
+      "marketCap": 219229470720,
+      "pe": 12.42,
+      "pb": 2.63,
+      "roe": 21.99,
+      "debtToEquity": 54.13,
+      "netMargin": 9.18,
+      "netIncome": 17640767488,
+      "ma50": 76.902,
+      "ma200": 62.9405,
+      "rsi14": 40.2,
+      "atrPct": 3.53,
+      "ret1m": -8.08,
+      "ret3m": 13.14,
+      "pctFromHigh": -9.23,
+      "relVol": 1.35,
+      "score": 60.2,
       "scoreCoverage": 5
     },
     {
@@ -1054,34 +1082,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "CCOLA.IS",
-      "market": "BIST",
-      "name": "COCA COLA ICECEK",
-      "sector": "Consumer Defensive",
-      "currency": "TRY",
-      "price": 78.35,
-      "prevClose": 79.9,
-      "changePct": -1.94,
-      "volume": 7875198,
-      "marketCap": 219229470720,
-      "pe": 12.42,
-      "pb": 2.63,
-      "roe": 21.99,
-      "debtToEquity": 54.13,
-      "netMargin": 9.18,
-      "netIncome": 17640767488,
-      "ma50": 76.902,
-      "ma200": 62.9405,
-      "rsi14": 40.2,
-      "atrPct": 3.53,
-      "ret1m": -8.08,
-      "ret3m": 13.14,
-      "pctFromHigh": -9.23,
-      "relVol": 1.35,
-      "score": 60.1,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "CWENE.IS",
       "market": "BIST",
       "name": "CW ENERJI",
@@ -1106,7 +1106,7 @@ window.STOCK_DATA = {
       "ret3m": 29.58,
       "pctFromHigh": -13.81,
       "relVol": 0.52,
-      "score": 59.0,
+      "score": 59.1,
       "scoreCoverage": 5
     },
     {
@@ -1134,7 +1134,7 @@ window.STOCK_DATA = {
       "ret3m": 9.78,
       "pctFromHigh": -13.69,
       "relVol": 1.16,
-      "score": 58.9,
+      "score": 59.0,
       "scoreCoverage": 5
     },
     {
@@ -1162,7 +1162,7 @@ window.STOCK_DATA = {
       "ret3m": -6.14,
       "pctFromHigh": -25.73,
       "relVol": 0.77,
-      "score": 58.9,
+      "score": 59.0,
       "scoreCoverage": 5
     },
     {
@@ -1190,7 +1190,7 @@ window.STOCK_DATA = {
       "ret3m": -7.57,
       "pctFromHigh": -24.28,
       "relVol": 1.0,
-      "score": 58.9,
+      "score": 59.0,
       "scoreCoverage": 5
     },
     {
@@ -1218,7 +1218,7 @@ window.STOCK_DATA = {
       "ret3m": -12.94,
       "pctFromHigh": -23.99,
       "relVol": 0.97,
-      "score": 58.8,
+      "score": 58.9,
       "scoreCoverage": 5
     },
     {
@@ -1246,7 +1246,7 @@ window.STOCK_DATA = {
       "ret3m": -12.21,
       "pctFromHigh": -26.45,
       "relVol": 2.8,
-      "score": 57.9,
+      "score": 58.1,
       "scoreCoverage": 5
     },
     {
@@ -1302,7 +1302,7 @@ window.STOCK_DATA = {
       "ret3m": 21.19,
       "pctFromHigh": -6.53,
       "relVol": 0.91,
-      "score": 56.7,
+      "score": 56.8,
       "scoreCoverage": 5
     },
     {
@@ -1330,7 +1330,7 @@ window.STOCK_DATA = {
       "ret3m": 12.82,
       "pctFromHigh": -6.99,
       "relVol": 1.37,
-      "score": 56.6,
+      "score": 56.7,
       "scoreCoverage": 5
     },
     {
@@ -1358,7 +1358,7 @@ window.STOCK_DATA = {
       "ret3m": 1.21,
       "pctFromHigh": -26.27,
       "relVol": 0.75,
-      "score": 56.2,
+      "score": 56.3,
       "scoreCoverage": 5
     },
     {
@@ -1386,7 +1386,35 @@ window.STOCK_DATA = {
       "ret3m": -17.73,
       "pctFromHigh": -33.54,
       "relVol": 0.79,
-      "score": 55.9,
+      "score": 56.0,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "TCELL.IS",
+      "market": "BIST",
+      "name": "TURKCELL",
+      "sector": "Communication Services",
+      "currency": "TRY",
+      "price": 105.5,
+      "prevClose": 107.4,
+      "changePct": -1.77,
+      "volume": 24974372,
+      "marketCap": 229614698496,
+      "pe": 12.49,
+      "pb": 0.88,
+      "roe": 7.35,
+      "debtToEquity": 70.93,
+      "netMargin": 7.37,
+      "netIncome": 18392408064,
+      "ma50": 110.72,
+      "ma200": 103.9179,
+      "rsi14": 44.4,
+      "atrPct": 3.4,
+      "ret1m": -12.08,
+      "ret3m": -1.86,
+      "pctFromHigh": -17.25,
+      "relVol": 1.21,
+      "score": 55.8,
       "scoreCoverage": 5
     },
     {
@@ -1418,34 +1446,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "TCELL.IS",
-      "market": "BIST",
-      "name": "TURKCELL",
-      "sector": "Communication Services",
-      "currency": "TRY",
-      "price": 105.5,
-      "prevClose": 107.4,
-      "changePct": -1.77,
-      "volume": 24974372,
-      "marketCap": 229614698496,
-      "pe": 12.49,
-      "pb": 0.88,
-      "roe": 7.35,
-      "debtToEquity": 70.93,
-      "netMargin": 7.37,
-      "netIncome": 18392408064,
-      "ma50": 110.72,
-      "ma200": 103.9179,
-      "rsi14": 44.4,
-      "atrPct": 3.4,
-      "ret1m": -12.08,
-      "ret3m": -1.86,
-      "pctFromHigh": -17.25,
-      "relVol": 1.21,
-      "score": 55.7,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "CIMSA.IS",
       "market": "BIST",
       "name": "CIMSA",
@@ -1470,7 +1470,7 @@ window.STOCK_DATA = {
       "ret3m": 4.72,
       "pctFromHigh": -16.1,
       "relVol": 1.33,
-      "score": 55.6,
+      "score": 55.7,
       "scoreCoverage": 5
     },
     {
@@ -1498,7 +1498,7 @@ window.STOCK_DATA = {
       "ret3m": 8.31,
       "pctFromHigh": -7.7,
       "relVol": 0.79,
-      "score": 55.0,
+      "score": 55.1,
       "scoreCoverage": 5
     },
     {
@@ -1526,7 +1526,7 @@ window.STOCK_DATA = {
       "ret3m": 11.18,
       "pctFromHigh": -14.2,
       "relVol": 0.83,
-      "score": 54.9,
+      "score": 55.0,
       "scoreCoverage": 5
     },
     {
@@ -1554,7 +1554,7 @@ window.STOCK_DATA = {
       "ret3m": 2.84,
       "pctFromHigh": -10.41,
       "relVol": 0.62,
-      "score": 54.7,
+      "score": 54.8,
       "scoreCoverage": 5
     },
     {
@@ -1582,7 +1582,7 @@ window.STOCK_DATA = {
       "ret3m": -4.68,
       "pctFromHigh": -38.36,
       "relVol": 1.03,
-      "score": 54.4,
+      "score": 54.5,
       "scoreCoverage": 5
     },
     {
@@ -1610,7 +1610,7 @@ window.STOCK_DATA = {
       "ret3m": -18.79,
       "pctFromHigh": -27.19,
       "relVol": 0.83,
-      "score": 54.2,
+      "score": 54.3,
       "scoreCoverage": 5
     },
     {
@@ -1666,7 +1666,7 @@ window.STOCK_DATA = {
       "ret3m": -5.53,
       "pctFromHigh": -16.44,
       "relVol": 0.86,
-      "score": 53.4,
+      "score": 53.5,
       "scoreCoverage": 5
     },
     {
@@ -1722,7 +1722,7 @@ window.STOCK_DATA = {
       "ret3m": 27.29,
       "pctFromHigh": -1.47,
       "relVol": 0.79,
-      "score": 52.8,
+      "score": 52.9,
       "scoreCoverage": 5
     },
     {
@@ -1750,7 +1750,7 @@ window.STOCK_DATA = {
       "ret3m": 8.35,
       "pctFromHigh": -12.58,
       "relVol": 1.56,
-      "score": 51.5,
+      "score": 51.6,
       "scoreCoverage": 5
     },
     {
@@ -1778,7 +1778,7 @@ window.STOCK_DATA = {
       "ret3m": 5.38,
       "pctFromHigh": -21.36,
       "relVol": 0.41,
-      "score": 51.0,
+      "score": 51.1,
       "scoreCoverage": 5
     },
     {
@@ -1806,7 +1806,7 @@ window.STOCK_DATA = {
       "ret3m": 18.84,
       "pctFromHigh": -6.91,
       "relVol": 1.1,
-      "score": 50.9,
+      "score": 51.0,
       "scoreCoverage": 5
     },
     {
@@ -1834,7 +1834,7 @@ window.STOCK_DATA = {
       "ret3m": -18.83,
       "pctFromHigh": -30.71,
       "relVol": 0.59,
-      "score": 50.9,
+      "score": 51.0,
       "scoreCoverage": 5
     },
     {
@@ -1862,7 +1862,7 @@ window.STOCK_DATA = {
       "ret3m": 13.45,
       "pctFromHigh": -12.87,
       "relVol": 0.76,
-      "score": 50.9,
+      "score": 51.0,
       "scoreCoverage": 5
     },
     {
@@ -1890,7 +1890,7 @@ window.STOCK_DATA = {
       "ret3m": 55.5,
       "pctFromHigh": -8.3,
       "relVol": 0.56,
-      "score": 50.9,
+      "score": 51.0,
       "scoreCoverage": 5
     },
     {
@@ -1974,7 +1974,7 @@ window.STOCK_DATA = {
       "ret3m": 8.73,
       "pctFromHigh": -9.45,
       "relVol": 1.04,
-      "score": 49.7,
+      "score": 49.8,
       "scoreCoverage": 5
     },
     {
@@ -2002,7 +2002,7 @@ window.STOCK_DATA = {
       "ret3m": -23.91,
       "pctFromHigh": -39.06,
       "relVol": 0.67,
-      "score": 49.7,
+      "score": 49.8,
       "scoreCoverage": 5
     },
     {
@@ -2030,7 +2030,35 @@ window.STOCK_DATA = {
       "ret3m": -2.31,
       "pctFromHigh": -19.06,
       "relVol": 1.05,
-      "score": 49.7,
+      "score": 49.8,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "ODAS.IS",
+      "market": "BIST",
+      "name": "ODAS ELEKTRIK",
+      "sector": "Utilities",
+      "currency": "TRY",
+      "price": 7.38,
+      "prevClose": 7.48,
+      "changePct": -1.34,
+      "volume": 83681959,
+      "marketCap": 10332000256,
+      "pe": 35.14,
+      "pb": 0.66,
+      "roe": -1.11,
+      "debtToEquity": 4.5,
+      "netMargin": 3.05,
+      "netIncome": 287658464,
+      "ma50": 7.0496,
+      "ma200": 5.9663,
+      "rsi14": 53.7,
+      "atrPct": 4.07,
+      "ret1m": -9.67,
+      "ret3m": 25.72,
+      "pctFromHigh": -9.67,
+      "relVol": 1.26,
+      "score": 48.4,
       "scoreCoverage": 5
     },
     {
@@ -2062,34 +2090,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "ODAS.IS",
-      "market": "BIST",
-      "name": "ODAS ELEKTRIK",
-      "sector": "Utilities",
-      "currency": "TRY",
-      "price": 7.38,
-      "prevClose": 7.48,
-      "changePct": -1.34,
-      "volume": 83681959,
-      "marketCap": 10332000256,
-      "pe": 35.14,
-      "pb": 0.66,
-      "roe": -1.11,
-      "debtToEquity": 4.5,
-      "netMargin": 3.05,
-      "netIncome": 287658464,
-      "ma50": 7.0496,
-      "ma200": 5.9663,
-      "rsi14": 53.7,
-      "atrPct": 4.07,
-      "ret1m": -9.67,
-      "ret3m": 25.72,
-      "pctFromHigh": -9.67,
-      "relVol": 1.26,
-      "score": 48.3,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "ULKER.IS",
       "market": "BIST",
       "name": "ULKER BISKUVI",
@@ -2114,7 +2114,7 @@ window.STOCK_DATA = {
       "ret3m": -0.26,
       "pctFromHigh": -16.97,
       "relVol": 1.0,
-      "score": 48.1,
+      "score": 48.2,
       "scoreCoverage": 5
     },
     {
@@ -2142,7 +2142,7 @@ window.STOCK_DATA = {
       "ret3m": -13.19,
       "pctFromHigh": -16.32,
       "relVol": 0.76,
-      "score": 48.1,
+      "score": 48.2,
       "scoreCoverage": 5
     },
     {
@@ -2170,7 +2170,7 @@ window.STOCK_DATA = {
       "ret3m": -14.95,
       "pctFromHigh": -28.94,
       "relVol": 1.02,
-      "score": 48.1,
+      "score": 48.2,
       "scoreCoverage": 5
     },
     {
@@ -2198,7 +2198,7 @@ window.STOCK_DATA = {
       "ret3m": 17.48,
       "pctFromHigh": -21.26,
       "relVol": 0.97,
-      "score": 47.5,
+      "score": 47.6,
       "scoreCoverage": 5
     },
     {
@@ -2226,7 +2226,7 @@ window.STOCK_DATA = {
       "ret3m": 0.3,
       "pctFromHigh": -7.81,
       "relVol": 0.9,
-      "score": 47.5,
+      "score": 47.6,
       "scoreCoverage": 5
     },
     {
@@ -2282,7 +2282,7 @@ window.STOCK_DATA = {
       "ret3m": 16.91,
       "pctFromHigh": -2.27,
       "relVol": 0.79,
-      "score": 45.6,
+      "score": 45.7,
       "scoreCoverage": 5
     },
     {
@@ -2398,6 +2398,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 4
     },
     {
+      "symbol": "ISGYO.IS",
+      "market": "BIST",
+      "name": "IS GMYO",
+      "sector": "Real Estate",
+      "currency": "TRY",
+      "price": 20.4,
+      "prevClose": 20.5,
+      "changePct": -0.49,
+      "volume": 1605707,
+      "marketCap": 19558500352,
+      "pe": 47.44,
+      "pb": 0.36,
+      "roe": -0.87,
+      "debtToEquity": 2.54,
+      "netMargin": -14.62,
+      "netIncome": -420044064,
+      "ma50": 20.4537,
+      "ma200": 20.6569,
+      "rsi14": 32.8,
+      "atrPct": 3.02,
+      "ret1m": 0.49,
+      "ret3m": -5.07,
+      "pctFromHigh": -16.32,
+      "relVol": 0.54,
+      "score": 44.0,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "THYAO.IS",
       "market": "BIST",
       "name": "TURK HAVA YOLLARI",
@@ -2426,34 +2454,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "ISGYO.IS",
-      "market": "BIST",
-      "name": "IS GMYO",
-      "sector": "Real Estate",
-      "currency": "TRY",
-      "price": 20.4,
-      "prevClose": 20.5,
-      "changePct": -0.49,
-      "volume": 1605707,
-      "marketCap": 19558500352,
-      "pe": 47.44,
-      "pb": 0.36,
-      "roe": -0.87,
-      "debtToEquity": 2.54,
-      "netMargin": -14.62,
-      "netIncome": -420044064,
-      "ma50": 20.4537,
-      "ma200": 20.6569,
-      "rsi14": 32.8,
-      "atrPct": 3.02,
-      "ret1m": 0.49,
-      "ret3m": -5.07,
-      "pctFromHigh": -16.32,
-      "relVol": 0.54,
-      "score": 43.9,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "TATGD.IS",
       "market": "BIST",
       "name": "TAT GIDA",
@@ -2478,7 +2478,7 @@ window.STOCK_DATA = {
       "ret3m": 13.0,
       "pctFromHigh": -16.87,
       "relVol": 0.63,
-      "score": 43.7,
+      "score": 43.8,
       "scoreCoverage": 5
     },
     {
@@ -2534,7 +2534,7 @@ window.STOCK_DATA = {
       "ret3m": 25.4,
       "pctFromHigh": -14.74,
       "relVol": 0.41,
-      "score": 42.7,
+      "score": 42.8,
       "scoreCoverage": 5
     },
     {
@@ -2646,7 +2646,7 @@ window.STOCK_DATA = {
       "ret3m": 9.89,
       "pctFromHigh": -25.5,
       "relVol": 0.82,
-      "score": 41.1,
+      "score": 41.2,
       "scoreCoverage": 5
     },
     {
@@ -2688,7 +2688,7 @@ window.STOCK_DATA = {
       "changePct": 1.56,
       "volume": 616099,
       "marketCap": 39820992512,
-      "pe": 62.65,
+      "pe": 62.84,
       "pb": 1.59,
       "roe": 2.61,
       "debtToEquity": 16.38,
@@ -2786,7 +2786,7 @@ window.STOCK_DATA = {
       "ret3m": 6.47,
       "pctFromHigh": -16.77,
       "relVol": 1.13,
-      "score": 38.9,
+      "score": 39.0,
       "scoreCoverage": 5
     },
     {
@@ -2842,7 +2842,7 @@ window.STOCK_DATA = {
       "ret3m": -10.29,
       "pctFromHigh": -41.74,
       "relVol": 0.77,
-      "score": 37.4,
+      "score": 37.5,
       "scoreCoverage": 5
     },
     {
@@ -2954,7 +2954,7 @@ window.STOCK_DATA = {
       "ret3m": 7.22,
       "pctFromHigh": -25.99,
       "relVol": 1.65,
-      "score": 35.5,
+      "score": 35.6,
       "scoreCoverage": 5
     },
     {
@@ -2982,7 +2982,7 @@ window.STOCK_DATA = {
       "ret3m": 95.8,
       "pctFromHigh": -8.03,
       "relVol": 1.16,
-      "score": 35.4,
+      "score": 35.5,
       "scoreCoverage": 5
     },
     {
@@ -3038,7 +3038,7 @@ window.STOCK_DATA = {
       "ret3m": -5.96,
       "pctFromHigh": -29.7,
       "relVol": 0.67,
-      "score": 35.2,
+      "score": 35.3,
       "scoreCoverage": 5
     },
     {
@@ -3066,7 +3066,7 @@ window.STOCK_DATA = {
       "ret3m": -1.64,
       "pctFromHigh": -27.42,
       "relVol": 0.81,
-      "score": 34.7,
+      "score": 34.9,
       "scoreCoverage": 5
     },
     {
@@ -3150,7 +3150,7 @@ window.STOCK_DATA = {
       "ret3m": 25.82,
       "pctFromHigh": -9.85,
       "relVol": 0.76,
-      "score": 33.2,
+      "score": 33.3,
       "scoreCoverage": 5
     },
     {
@@ -3178,7 +3178,7 @@ window.STOCK_DATA = {
       "ret3m": -5.22,
       "pctFromHigh": -31.77,
       "relVol": 0.63,
-      "score": 33.0,
+      "score": 33.2,
       "scoreCoverage": 5
     },
     {
@@ -3318,7 +3318,7 @@ window.STOCK_DATA = {
       "ret3m": 50.59,
       "pctFromHigh": -15.6,
       "relVol": 0.7,
-      "score": 29.4,
+      "score": 29.5,
       "scoreCoverage": 5
     },
     {
@@ -3346,7 +3346,7 @@ window.STOCK_DATA = {
       "ret3m": 12.77,
       "pctFromHigh": -5.82,
       "relVol": 1.27,
-      "score": 28.4,
+      "score": 28.5,
       "scoreCoverage": 5
     },
     {
@@ -3598,7 +3598,7 @@ window.STOCK_DATA = {
       "ret3m": 3.53,
       "pctFromHigh": -35.14,
       "relVol": 1.34,
-      "score": 22.0,
+      "score": 22.1,
       "scoreCoverage": 5
     },
     {
@@ -3654,7 +3654,7 @@ window.STOCK_DATA = {
       "ret3m": -19.67,
       "pctFromHigh": -34.87,
       "relVol": 0.82,
-      "score": 16.3,
+      "score": 16.4,
       "scoreCoverage": 5
     },
     {
@@ -3710,7 +3710,7 @@ window.STOCK_DATA = {
       "ret3m": -1.5,
       "pctFromHigh": -37.17,
       "relVol": 1.08,
-      "score": 14.4,
+      "score": 14.5,
       "scoreCoverage": 5
     },
     {
