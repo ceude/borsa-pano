@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-10T17:17:17+00:00",
+  "updatedAt": "2026-06-10T17:32:24+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.3202,
-    "USDTRY": 46.1291
+    "EURTRY": 53.3151,
+    "USDTRY": 46.1318
   },
   "benchmarks": {
     "DAX": 1.0,
@@ -70,7 +70,7 @@
       "ret3m": 3.74,
       "pctFromHigh": -16.32,
       "relVol": 0.63,
-      "score": 91.1,
+      "score": 90.9,
       "scoreCoverage": 4
     },
     {
@@ -154,7 +154,7 @@
       "ret3m": -12.94,
       "pctFromHigh": -32.24,
       "relVol": 1.03,
-      "score": 86.6,
+      "score": 86.5,
       "scoreCoverage": 4
     },
     {
@@ -393,7 +393,7 @@
       "volume": 2087293,
       "marketCap": 98949996544,
       "pe": 11.82,
-      "pb": 0.75,
+      "pb": 0.68,
       "roe": 6.61,
       "debtToEquity": 8.27,
       "netMargin": 49.44,
@@ -406,7 +406,7 @@
       "ret3m": 34.14,
       "pctFromHigh": -2.2,
       "relVol": 0.89,
-      "score": 72.3,
+      "score": 73.1,
       "scoreCoverage": 5
     },
     {
@@ -574,7 +574,7 @@
       "ret3m": 3.99,
       "pctFromHigh": -15.98,
       "relVol": 1.13,
-      "score": 67.4,
+      "score": 67.2,
       "scoreCoverage": 5
     },
     {
@@ -686,7 +686,7 @@
       "ret3m": -3.12,
       "pctFromHigh": -21.1,
       "relVol": 1.0,
-      "score": 64.3,
+      "score": 64.2,
       "scoreCoverage": 5
     },
     {
@@ -742,7 +742,7 @@
       "ret3m": 6.37,
       "pctFromHigh": -16.89,
       "relVol": 1.16,
-      "score": 63.8,
+      "score": 63.7,
       "scoreCoverage": 5
     },
     {
@@ -838,7 +838,7 @@
       "price": 10.78,
       "prevClose": 11.03,
       "changePct": -2.27,
-      "volume": 16150504,
+      "volume": 16142513,
       "marketCap": 41880297472,
       "pe": 9.62,
       "pb": 1.24,
@@ -1118,7 +1118,7 @@
       "price": 36.7,
       "prevClose": 37.06,
       "changePct": -0.97,
-      "volume": 18761312,
+      "volume": 18758635,
       "marketCap": 39573245952,
       "pe": 15.36,
       "pb": 2.46,
@@ -1386,7 +1386,7 @@
       "ret3m": -2.15,
       "pctFromHigh": -17.96,
       "relVol": 0.78,
-      "score": 56.1,
+      "score": 55.9,
       "scoreCoverage": 5
     },
     {
@@ -1539,7 +1539,7 @@
       "prevClose": 56.04,
       "changePct": -0.79,
       "volume": 1293168,
-      "marketCap": 39674200064,
+      "marketCap": null,
       "pe": 17.06,
       "pb": 1.12,
       "roe": 6.83,
@@ -1582,7 +1582,7 @@
       "ret3m": -3.92,
       "pctFromHigh": -39.12,
       "relVol": 0.87,
-      "score": 54.5,
+      "score": 54.4,
       "scoreCoverage": 5
     },
     {
@@ -1818,7 +1818,7 @@
       "price": 12.15,
       "prevClose": 12.15,
       "changePct": 0.0,
-      "volume": 651468,
+      "volume": 650978,
       "marketCap": 3685641472,
       "pe": 17.61,
       "pb": 0.37,
@@ -1989,7 +1989,7 @@
       "volume": 142151,
       "marketCap": 55720099840,
       "pe": 53.61,
-      "pb": 11.08,
+      "pb": 10.44,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -2325,7 +2325,7 @@
       "volume": 3089529,
       "marketCap": 56602484736,
       "pe": null,
-      "pb": 0.93,
+      "pb": 0.85,
       "roe": -1.45,
       "debtToEquity": 5.88,
       "netMargin": -8.63,
@@ -2338,7 +2338,7 @@
       "ret3m": -23.62,
       "pctFromHigh": -35.78,
       "relVol": 0.71,
-      "score": 44.3,
+      "score": 45.3,
       "scoreCoverage": 4
     },
     {
@@ -2490,7 +2490,7 @@
       "price": 19.09,
       "prevClose": 19.2,
       "changePct": -0.57,
-      "volume": 86055728,
+      "volume": 86021876,
       "marketCap": 69890785280,
       "pe": 238.62,
       "pb": 0.5,
@@ -2618,36 +2618,8 @@
       "ret3m": 0.36,
       "pctFromHigh": -36.25,
       "relVol": 0.97,
-      "score": 41.5,
+      "score": 41.3,
       "scoreCoverage": 4
-    },
-    {
-      "symbol": "PETKM.IS",
-      "market": "BIST",
-      "name": "PETKIM",
-      "sector": "Basic Materials",
-      "currency": "TRY",
-      "price": 19.95,
-      "prevClose": 20.22,
-      "changePct": -1.34,
-      "volume": 73381249,
-      "marketCap": 50561282048,
-      "pe": 4.77,
-      "pb": 0.74,
-      "roe": -10.26,
-      "debtToEquity": 76.7,
-      "netMargin": -7.05,
-      "netIncome": -6556571136,
-      "ma50": 22.781,
-      "ma200": 19.1247,
-      "rsi14": 30.5,
-      "atrPct": 4.56,
-      "ret1m": -23.68,
-      "ret3m": 13.16,
-      "pctFromHigh": -26.49,
-      "relVol": 1.5,
-      "score": 41.2,
-      "scoreCoverage": 5
     },
     {
       "symbol": "GSDHO.IS",
@@ -2674,6 +2646,34 @@
       "ret3m": 34.23,
       "pctFromHigh": -8.12,
       "relVol": 4.82,
+      "score": 41.1,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "PETKM.IS",
+      "market": "BIST",
+      "name": "PETKIM",
+      "sector": "Basic Materials",
+      "currency": "TRY",
+      "price": 19.95,
+      "prevClose": 20.22,
+      "changePct": -1.34,
+      "volume": 73381249,
+      "marketCap": 50561282048,
+      "pe": 4.77,
+      "pb": 0.74,
+      "roe": -10.26,
+      "debtToEquity": 76.7,
+      "netMargin": -7.05,
+      "netIncome": -6556571136,
+      "ma50": 22.781,
+      "ma200": 19.1247,
+      "rsi14": 30.5,
+      "atrPct": 4.56,
+      "ret1m": -23.68,
+      "ret3m": 13.16,
+      "pctFromHigh": -26.49,
+      "relVol": 1.5,
       "score": 41.1,
       "scoreCoverage": 5
     },
@@ -3122,7 +3122,7 @@
       "ret3m": 38.3,
       "pctFromHigh": -5.08,
       "relVol": 0.7,
-      "score": 33.9,
+      "score": 33.8,
       "scoreCoverage": 5
     },
     {
@@ -3430,7 +3430,7 @@
       "ret3m": 14.68,
       "pctFromHigh": -52.38,
       "relVol": 58.06,
-      "score": 27.6,
+      "score": 27.4,
       "scoreCoverage": 4
     },
     {
@@ -3514,7 +3514,7 @@
       "ret3m": -25.03,
       "pctFromHigh": -83.62,
       "relVol": 0.76,
-      "score": 24.9,
+      "score": 24.8,
       "scoreCoverage": 4
     },
     {
@@ -3666,7 +3666,7 @@
       "price": 26.06,
       "prevClose": 27.04,
       "changePct": -3.62,
-      "volume": 1628723,
+      "volume": 1627605,
       "marketCap": 3518099968,
       "pe": 28.33,
       "pb": 50.41,
