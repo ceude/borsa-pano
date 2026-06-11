@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-11T19:32:21+00:00",
+  "updatedAt": "2026-06-11T19:47:21+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.5775,
-    "USDTRY": 46.1453
+    "EURTRY": 53.5595,
+    "USDTRY": 46.1455
   },
   "benchmarks": {
     "DAX": 0.3,
