@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-11T02:17:10+00:00",
+  "updatedAt": "2026-06-11T02:32:20+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.4315,
-    "USDTRY": 46.1427
+    "EURTRY": 53.4182,
+    "USDTRY": 46.146
   },
   "benchmarks": {
     "DAX": 0.34,
@@ -838,7 +838,7 @@ window.STOCK_DATA = {
       "price": 10.78,
       "prevClose": 11.03,
       "changePct": -2.27,
-      "volume": 16142513,
+      "volume": 16150504,
       "marketCap": 41880297472,
       "pe": 9.62,
       "pb": 1.24,
@@ -1118,7 +1118,7 @@ window.STOCK_DATA = {
       "price": 36.7,
       "prevClose": 37.06,
       "changePct": -0.97,
-      "volume": 18758635,
+      "volume": 18761312,
       "marketCap": 39573245952,
       "pe": 15.36,
       "pb": 2.46,
@@ -1539,7 +1539,7 @@ window.STOCK_DATA = {
       "prevClose": 56.04,
       "changePct": -0.79,
       "volume": 1293168,
-      "marketCap": null,
+      "marketCap": 39674200064,
       "pe": 17.06,
       "pb": 1.12,
       "roe": 6.83,
@@ -1818,7 +1818,7 @@ window.STOCK_DATA = {
       "price": 12.15,
       "prevClose": 12.15,
       "changePct": 0.0,
-      "volume": 650978,
+      "volume": 651468,
       "marketCap": 3685641472,
       "pe": 17.61,
       "pb": 0.37,
@@ -1989,7 +1989,7 @@ window.STOCK_DATA = {
       "volume": 142151,
       "marketCap": 55720099840,
       "pe": 53.61,
-      "pb": 10.44,
+      "pb": 11.08,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -2490,7 +2490,7 @@ window.STOCK_DATA = {
       "price": 19.09,
       "prevClose": 19.2,
       "changePct": -0.57,
-      "volume": 86021876,
+      "volume": 86055728,
       "marketCap": 69890785280,
       "pe": 238.62,
       "pb": 0.5,
@@ -3666,7 +3666,7 @@ window.STOCK_DATA = {
       "price": 26.06,
       "prevClose": 27.04,
       "changePct": -3.62,
-      "volume": 1627605,
+      "volume": 1628723,
       "marketCap": 3518099968,
       "pe": 28.33,
       "pb": 50.41,
