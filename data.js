@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-12T20:32:25+00:00",
+  "updatedAt": "2026-06-12T20:47:42+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.541,
-    "USDTRY": 46.2554
+    "EURTRY": 53.5298,
+    "USDTRY": 46.2598
   },
   "benchmarks": {
     "DAX": 0.73,
@@ -1483,7 +1483,7 @@ window.STOCK_DATA = {
       "prevClose": 57.5,
       "changePct": -0.07,
       "volume": 1298763,
-      "marketCap": 41001431040,
+      "marketCap": null,
       "pe": 17.63,
       "pb": 1.16,
       "roe": 6.83,
@@ -1558,34 +1558,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "GUBRF.IS",
-      "market": "BIST",
-      "name": "GUBRE FABRIK.",
-      "sector": "Basic Materials",
-      "currency": "TRY",
-      "price": 478.75,
-      "prevClose": 468.75,
-      "changePct": 2.13,
-      "volume": 4293170,
-      "marketCap": 159902498816,
-      "pe": 28.68,
-      "pb": 5.37,
-      "roe": 17.23,
-      "debtToEquity": 26.85,
-      "netMargin": 10.05,
-      "netIncome": 5894805504,
-      "ma50": 531.415,
-      "ma200": 414.78,
-      "rsi14": 19.2,
-      "atrPct": 4.31,
-      "ret1m": -18.92,
-      "ret3m": -8.02,
-      "pctFromHigh": -22.47,
-      "relVol": 2.48,
-      "score": 54.2,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "MBG.DE",
       "market": "DAX",
       "name": "Mercedes-Benz Group AG        N",
@@ -1611,6 +1583,34 @@ window.STOCK_DATA = {
       "pctFromHigh": -17.03,
       "relVol": 0.82,
       "score": 54.2,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "GUBRF.IS",
+      "market": "BIST",
+      "name": "GUBRE FABRIK.",
+      "sector": "Basic Materials",
+      "currency": "TRY",
+      "price": 478.75,
+      "prevClose": 468.75,
+      "changePct": 2.13,
+      "volume": 4293170,
+      "marketCap": 159902498816,
+      "pe": 28.68,
+      "pb": 5.37,
+      "roe": 17.23,
+      "debtToEquity": 26.85,
+      "netMargin": 10.05,
+      "netIncome": 5894805504,
+      "ma50": 531.415,
+      "ma200": 414.78,
+      "rsi14": 19.2,
+      "atrPct": 4.31,
+      "ret1m": -18.92,
+      "ret3m": -8.02,
+      "pctFromHigh": -22.47,
+      "relVol": 2.48,
+      "score": 54.1,
       "scoreCoverage": 5
     },
     {
@@ -1933,7 +1933,7 @@ window.STOCK_DATA = {
       "volume": 184001,
       "marketCap": 56111054848,
       "pe": 53.13,
-      "pb": 11.16,
+      "pb": 10.51,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -2114,7 +2114,7 @@ window.STOCK_DATA = {
       "ret3m": 6.2,
       "pctFromHigh": -17.11,
       "relVol": 1.17,
-      "score": 48.5,
+      "score": 48.3,
       "scoreCoverage": 5
     },
     {
@@ -2198,7 +2198,7 @@ window.STOCK_DATA = {
       "ret3m": 27.24,
       "pctFromHigh": -15.37,
       "relVol": 1.22,
-      "score": 47.5,
+      "score": 47.3,
       "scoreCoverage": 5
     },
     {
@@ -2510,6 +2510,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "EUPWR.IS",
+      "market": "BIST",
+      "name": "EUROPOWER ENERJI",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 95.1,
+      "prevClose": 95.35,
+      "changePct": -0.26,
+      "volume": 39365322,
+      "marketCap": 62765998080,
+      "pe": 79.25,
+      "pb": 5.16,
+      "roe": 8.44,
+      "debtToEquity": 22.48,
+      "netMargin": 5.28,
+      "netIncome": 792012992,
+      "ma50": 60.8764,
+      "ma200": 39.7118,
+      "rsi14": 64.3,
+      "atrPct": 6.32,
+      "ret1m": 59.56,
+      "ret3m": 159.27,
+      "pctFromHigh": -1.55,
+      "relVol": 1.09,
+      "score": 42.9,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "PETKM.IS",
       "market": "BIST",
       "name": "PETKIM",
@@ -2563,34 +2591,6 @@ window.STOCK_DATA = {
       "pctFromHigh": -32.48,
       "relVol": 0.99,
       "score": 42.5,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "EUPWR.IS",
-      "market": "BIST",
-      "name": "EUROPOWER ENERJI",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 95.1,
-      "prevClose": 95.35,
-      "changePct": -0.26,
-      "volume": 39365322,
-      "marketCap": 62765998080,
-      "pe": 79.25,
-      "pb": 5.95,
-      "roe": 8.44,
-      "debtToEquity": 22.48,
-      "netMargin": 5.28,
-      "netIncome": 792012992,
-      "ma50": 60.8764,
-      "ma200": 39.7118,
-      "rsi14": 64.3,
-      "atrPct": 6.32,
-      "ret1m": 59.56,
-      "ret3m": 159.27,
-      "pctFromHigh": -1.55,
-      "relVol": 1.09,
-      "score": 42.2,
       "scoreCoverage": 5
     },
     {
@@ -2658,7 +2658,7 @@ window.STOCK_DATA = {
       "price": 217.1,
       "prevClose": 215.0,
       "changePct": 0.98,
-      "volume": 632830,
+      "volume": 630582,
       "marketCap": 41563160576,
       "pe": 65.59,
       "pb": 1.66,
@@ -3374,7 +3374,7 @@ window.STOCK_DATA = {
       "ret3m": 7.91,
       "pctFromHigh": -12.55,
       "relVol": 0.62,
-      "score": 28.3,
+      "score": 28.1,
       "scoreCoverage": 5
     },
     {
@@ -3710,7 +3710,7 @@ window.STOCK_DATA = {
       "ret3m": -6.52,
       "pctFromHigh": -39.52,
       "relVol": 3.94,
-      "score": 15.5,
+      "score": 15.3,
       "scoreCoverage": 5
     },
     {
