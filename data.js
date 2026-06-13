@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-13T12:47:17+00:00",
+  "updatedAt": "2026-06-13T13:02:24+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
