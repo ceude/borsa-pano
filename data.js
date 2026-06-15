@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-15T02:17:27+00:00",
+  "updatedAt": "2026-06-15T02:32:28+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.6903,
-    "USDTRY": 46.2704
+    "EURTRY": 53.7034,
+    "USDTRY": 46.2688
   },
   "benchmarks": {
     "DAX": 0.73,
