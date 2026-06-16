@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-16T00:17:29+00:00",
+  "updatedAt": "2026-06-16T00:32:52+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.6594,
-    "USDTRY": 46.2877
+    "EURTRY": 53.6876,
+    "USDTRY": 46.2932
   },
   "benchmarks": {
     "DAX": 0.73,
@@ -98,7 +98,7 @@ window.STOCK_DATA = {
       "ret3m": -8.16,
       "pctFromHigh": -22.74,
       "relVol": 1.24,
-      "score": 88.3,
+      "score": 88.2,
       "scoreCoverage": 4
     },
     {
@@ -126,7 +126,7 @@ window.STOCK_DATA = {
       "ret3m": -1.07,
       "pctFromHigh": -13.37,
       "relVol": 0.87,
-      "score": 87.1,
+      "score": 87.0,
       "scoreCoverage": 5
     },
     {
@@ -154,7 +154,7 @@ window.STOCK_DATA = {
       "ret3m": 1.5,
       "pctFromHigh": -14.31,
       "relVol": 1.6,
-      "score": 85.8,
+      "score": 85.7,
       "scoreCoverage": 4
     },
     {
@@ -182,7 +182,7 @@ window.STOCK_DATA = {
       "ret3m": 2.2,
       "pctFromHigh": -17.79,
       "relVol": 1.49,
-      "score": 84.9,
+      "score": 84.8,
       "scoreCoverage": 4
     },
     {
@@ -210,7 +210,7 @@ window.STOCK_DATA = {
       "ret3m": 5.77,
       "pctFromHigh": -9.94,
       "relVol": 0.71,
-      "score": 84.4,
+      "score": 84.2,
       "scoreCoverage": 5
     },
     {
@@ -238,7 +238,7 @@ window.STOCK_DATA = {
       "ret3m": 3.98,
       "pctFromHigh": -13.45,
       "relVol": 1.2,
-      "score": 83.5,
+      "score": 83.4,
       "scoreCoverage": 4
     },
     {
@@ -266,7 +266,7 @@ window.STOCK_DATA = {
       "ret3m": -7.67,
       "pctFromHigh": -17.15,
       "relVol": 0.98,
-      "score": 83.4,
+      "score": 83.3,
       "scoreCoverage": 5
     },
     {
@@ -294,7 +294,7 @@ window.STOCK_DATA = {
       "ret3m": -3.38,
       "pctFromHigh": -19.39,
       "relVol": 1.24,
-      "score": 83.1,
+      "score": 83.0,
       "scoreCoverage": 4
     },
     {
@@ -322,7 +322,7 @@ window.STOCK_DATA = {
       "ret3m": -6.43,
       "pctFromHigh": -24.89,
       "relVol": 1.05,
-      "score": 78.7,
+      "score": 78.8,
       "scoreCoverage": 4
     },
     {
@@ -378,36 +378,8 @@ window.STOCK_DATA = {
       "ret3m": 15.89,
       "pctFromHigh": -11.89,
       "relVol": 1.78,
-      "score": 74.0,
+      "score": 74.1,
       "scoreCoverage": 4
-    },
-    {
-      "symbol": "MUV2.DE",
-      "market": "DAX",
-      "name": "MUENCHENER RUECKVERS.-GES. AG N",
-      "sector": "Financial Services",
-      "currency": "EUR",
-      "price": 462.7,
-      "prevClose": 458.9,
-      "changePct": 0.83,
-      "volume": 251979,
-      "marketCap": 59207966720,
-      "pe": 8.86,
-      "pb": 1.71,
-      "roe": 19.85,
-      "debtToEquity": 21.72,
-      "netMargin": 10.97,
-      "netIncome": 6733000192,
-      "ma50": 493.6944,
-      "ma200": 507.9384,
-      "rsi14": 37.4,
-      "atrPct": 1.75,
-      "ret1m": -1.99,
-      "ret3m": -9.86,
-      "pctFromHigh": -20.89,
-      "relVol": 0.67,
-      "score": 72.0,
-      "scoreCoverage": 5
     },
     {
       "symbol": "VNA.DE",
@@ -434,7 +406,35 @@ window.STOCK_DATA = {
       "ret3m": -10.52,
       "pctFromHigh": -28.54,
       "relVol": 0.9,
-      "score": 71.9,
+      "score": 71.8,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "MUV2.DE",
+      "market": "DAX",
+      "name": "MUENCHENER RUECKVERS.-GES. AG N",
+      "sector": "Financial Services",
+      "currency": "EUR",
+      "price": 462.7,
+      "prevClose": 458.9,
+      "changePct": 0.83,
+      "volume": 251979,
+      "marketCap": 59207966720,
+      "pe": 8.86,
+      "pb": 1.71,
+      "roe": 19.85,
+      "debtToEquity": 21.72,
+      "netMargin": 10.97,
+      "netIncome": 6733000192,
+      "ma50": 493.6944,
+      "ma200": 507.9384,
+      "rsi14": 37.4,
+      "atrPct": 1.75,
+      "ret1m": -1.99,
+      "ret3m": -9.86,
+      "pctFromHigh": -20.89,
+      "relVol": 0.67,
+      "score": 71.7,
       "scoreCoverage": 5
     },
     {
@@ -462,7 +462,7 @@ window.STOCK_DATA = {
       "ret3m": -8.37,
       "pctFromHigh": -23.1,
       "relVol": 2.13,
-      "score": 71.0,
+      "score": 70.8,
       "scoreCoverage": 5
     },
     {
@@ -490,7 +490,7 @@ window.STOCK_DATA = {
       "ret3m": -7.23,
       "pctFromHigh": -13.84,
       "relVol": 0.83,
-      "score": 70.7,
+      "score": 70.5,
       "scoreCoverage": 5
     },
     {
@@ -518,7 +518,7 @@ window.STOCK_DATA = {
       "ret3m": -2.19,
       "pctFromHigh": -9.51,
       "relVol": 1.68,
-      "score": 70.5,
+      "score": 70.2,
       "scoreCoverage": 4
     },
     {
@@ -546,7 +546,7 @@ window.STOCK_DATA = {
       "ret3m": 3.89,
       "pctFromHigh": -12.07,
       "relVol": 1.66,
-      "score": 67.5,
+      "score": 67.4,
       "scoreCoverage": 5
     },
     {
@@ -602,7 +602,7 @@ window.STOCK_DATA = {
       "ret3m": -6.51,
       "pctFromHigh": -23.33,
       "relVol": 1.1,
-      "score": 65.8,
+      "score": 65.7,
       "scoreCoverage": 5
     },
     {
@@ -630,7 +630,7 @@ window.STOCK_DATA = {
       "ret3m": 29.58,
       "pctFromHigh": -4.95,
       "relVol": 1.75,
-      "score": 65.5,
+      "score": 65.2,
       "scoreCoverage": 4
     },
     {
@@ -658,7 +658,7 @@ window.STOCK_DATA = {
       "ret3m": 14.88,
       "pctFromHigh": -2.48,
       "relVol": 1.71,
-      "score": 64.6,
+      "score": 64.5,
       "scoreCoverage": 5
     },
     {
@@ -742,34 +742,6 @@ window.STOCK_DATA = {
       "ret3m": -9.28,
       "pctFromHigh": -35.9,
       "relVol": 0.69,
-      "score": 63.8,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "HEN3.DE",
-      "market": "DAX",
-      "name": "Henkel AG & Co. KGaA          I",
-      "sector": "Consumer Defensive",
-      "currency": "EUR",
-      "price": 69.48,
-      "prevClose": 69.44,
-      "changePct": 0.06,
-      "volume": 391488,
-      "marketCap": 28129392640,
-      "pe": 14.12,
-      "pb": 1.38,
-      "roe": 9.71,
-      "debtToEquity": 18.02,
-      "netMargin": 9.93,
-      "netIncome": 2035000064,
-      "ma50": 64.7063,
-      "ma200": 68.6221,
-      "rsi14": 63.6,
-      "atrPct": 1.72,
-      "ret1m": 8.98,
-      "ret3m": 0.93,
-      "pctFromHigh": -14.55,
-      "relVol": 0.88,
       "score": 63.6,
       "scoreCoverage": 5
     },
@@ -802,6 +774,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 4
     },
     {
+      "symbol": "HEN3.DE",
+      "market": "DAX",
+      "name": "Henkel AG & Co. KGaA          I",
+      "sector": "Consumer Defensive",
+      "currency": "EUR",
+      "price": 69.48,
+      "prevClose": 69.44,
+      "changePct": 0.06,
+      "volume": 391488,
+      "marketCap": 28129392640,
+      "pe": 14.12,
+      "pb": 1.38,
+      "roe": 9.71,
+      "debtToEquity": 18.02,
+      "netMargin": 9.93,
+      "netIncome": 2035000064,
+      "ma50": 64.7063,
+      "ma200": 68.6221,
+      "rsi14": 63.6,
+      "atrPct": 1.72,
+      "ret1m": 8.98,
+      "ret3m": 0.93,
+      "pctFromHigh": -14.55,
+      "relVol": 0.88,
+      "score": 63.5,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "TRMET.IS",
       "market": "BIST",
       "name": "TR ANADOLU METAL MADENCILIK",
@@ -826,7 +826,7 @@ window.STOCK_DATA = {
       "ret3m": -29.44,
       "pctFromHigh": -36.97,
       "relVol": 1.5,
-      "score": 63.3,
+      "score": 63.4,
       "scoreCoverage": 5
     },
     {
@@ -882,7 +882,7 @@ window.STOCK_DATA = {
       "ret3m": 15.32,
       "pctFromHigh": -1.18,
       "relVol": 1.19,
-      "score": 62.8,
+      "score": 62.5,
       "scoreCoverage": 4
     },
     {
@@ -910,7 +910,7 @@ window.STOCK_DATA = {
       "ret3m": 13.12,
       "pctFromHigh": -9.57,
       "relVol": 1.2,
-      "score": 62.1,
+      "score": 62.3,
       "scoreCoverage": 5
     },
     {
@@ -966,7 +966,7 @@ window.STOCK_DATA = {
       "ret3m": 13.9,
       "pctFromHigh": -5.48,
       "relVol": 2.81,
-      "score": 61.8,
+      "score": 61.7,
       "scoreCoverage": 5
     },
     {
@@ -1050,7 +1050,7 @@ window.STOCK_DATA = {
       "ret3m": 18.12,
       "pctFromHigh": -4.43,
       "relVol": 0.95,
-      "score": 60.3,
+      "score": 60.2,
       "scoreCoverage": 5
     },
     {
@@ -1162,7 +1162,7 @@ window.STOCK_DATA = {
       "ret3m": 24.33,
       "pctFromHigh": -15.86,
       "relVol": 0.96,
-      "score": 59.0,
+      "score": 58.9,
       "scoreCoverage": 5
     },
     {
@@ -1190,7 +1190,7 @@ window.STOCK_DATA = {
       "ret3m": 14.5,
       "pctFromHigh": -7.6,
       "relVol": 2.34,
-      "score": 58.3,
+      "score": 58.4,
       "scoreCoverage": 5
     },
     {
@@ -1218,7 +1218,7 @@ window.STOCK_DATA = {
       "ret3m": -12.3,
       "pctFromHigh": -26.33,
       "relVol": 1.79,
-      "score": 58.3,
+      "score": 58.2,
       "scoreCoverage": 5
     },
     {
@@ -1246,7 +1246,7 @@ window.STOCK_DATA = {
       "ret3m": -7.64,
       "pctFromHigh": -21.5,
       "relVol": 1.21,
-      "score": 58.1,
+      "score": 58.0,
       "scoreCoverage": 5
     },
     {
@@ -1274,7 +1274,7 @@ window.STOCK_DATA = {
       "ret3m": -8.02,
       "pctFromHigh": -22.47,
       "relVol": 2.29,
-      "score": 57.7,
+      "score": 57.6,
       "scoreCoverage": 5
     },
     {
@@ -1302,7 +1302,7 @@ window.STOCK_DATA = {
       "ret3m": 17.88,
       "pctFromHigh": -6.07,
       "relVol": 1.02,
-      "score": 56.7,
+      "score": 56.8,
       "scoreCoverage": 5
     },
     {
@@ -1331,34 +1331,6 @@ window.STOCK_DATA = {
       "pctFromHigh": -31.12,
       "relVol": 0.85,
       "score": 56.5,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "HEI.DE",
-      "market": "DAX",
-      "name": "Heidelberg Materials AG       I",
-      "sector": "Basic Materials",
-      "currency": "EUR",
-      "price": 186.4,
-      "prevClose": 182.15,
-      "changePct": 2.33,
-      "volume": 401330,
-      "marketCap": 32874448896,
-      "pe": 16.69,
-      "pb": 1.81,
-      "roe": 11.07,
-      "debtToEquity": 43.45,
-      "netMargin": 9.01,
-      "netIncome": 1984999936,
-      "ma50": 180.6796,
-      "ma200": 195.5024,
-      "rsi14": 51.2,
-      "atrPct": 3.13,
-      "ret1m": -0.03,
-      "ret3m": 14.23,
-      "pctFromHigh": -22.26,
-      "relVol": 1.09,
-      "score": 56.0,
       "scoreCoverage": 5
     },
     {
@@ -1415,6 +1387,34 @@ window.STOCK_DATA = {
       "pctFromHigh": -33.23,
       "relVol": 1.07,
       "score": 55.9,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "HEI.DE",
+      "market": "DAX",
+      "name": "Heidelberg Materials AG       I",
+      "sector": "Basic Materials",
+      "currency": "EUR",
+      "price": 186.4,
+      "prevClose": 182.15,
+      "changePct": 2.33,
+      "volume": 401330,
+      "marketCap": 32874448896,
+      "pe": 16.69,
+      "pb": 1.81,
+      "roe": 11.07,
+      "debtToEquity": 43.45,
+      "netMargin": 9.01,
+      "netIncome": 1984999936,
+      "ma50": 180.6796,
+      "ma200": 195.5024,
+      "rsi14": 51.2,
+      "atrPct": 3.13,
+      "ret1m": -0.03,
+      "ret3m": 14.23,
+      "pctFromHigh": -22.26,
+      "relVol": 1.09,
+      "score": 55.8,
       "scoreCoverage": 5
     },
     {
@@ -1526,7 +1526,7 @@ window.STOCK_DATA = {
       "ret3m": 5.33,
       "pctFromHigh": -8.49,
       "relVol": 1.17,
-      "score": 55.0,
+      "score": 55.1,
       "scoreCoverage": 5
     },
     {
@@ -1558,6 +1558,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "MBG.DE",
+      "market": "DAX",
+      "name": "Mercedes-Benz Group AG        N",
+      "sector": "Consumer Cyclical",
+      "currency": "EUR",
+      "price": 49.375,
+      "prevClose": 48.015,
+      "changePct": 2.83,
+      "volume": 2283374,
+      "marketCap": 47268175872,
+      "pe": 9.7,
+      "pb": 0.51,
+      "roe": 5.28,
+      "debtToEquity": 104.52,
+      "netMargin": 3.74,
+      "netIncome": 4880999936,
+      "ma50": 50.0188,
+      "ma200": 51.9974,
+      "rsi14": 35.8,
+      "atrPct": 2.79,
+      "ret1m": -5.89,
+      "ret3m": -6.99,
+      "pctFromHigh": -17.03,
+      "relVol": 0.98,
+      "score": 54.2,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "PGSUS.IS",
       "market": "BIST",
       "name": "PEGASUS",
@@ -1586,31 +1614,31 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "MBG.DE",
+      "symbol": "MRK.DE",
       "market": "DAX",
-      "name": "Mercedes-Benz Group AG        N",
-      "sector": "Consumer Cyclical",
+      "name": "MERCK KGAA                    I",
+      "sector": "Healthcare",
       "currency": "EUR",
-      "price": 49.375,
-      "prevClose": 48.015,
-      "changePct": 2.83,
-      "volume": 2283374,
-      "marketCap": 47268175872,
-      "pe": 9.7,
-      "pb": 0.51,
-      "roe": 5.28,
-      "debtToEquity": 104.52,
-      "netMargin": 3.74,
-      "netIncome": 4880999936,
-      "ma50": 50.0188,
-      "ma200": 51.9974,
-      "rsi14": 35.8,
-      "atrPct": 2.79,
-      "ret1m": -5.89,
-      "ret3m": -6.99,
-      "pctFromHigh": -17.03,
-      "relVol": 0.98,
-      "score": 54.0,
+      "price": 132.7,
+      "prevClose": 133.25,
+      "changePct": -0.41,
+      "volume": 387322,
+      "marketCap": 57695023104,
+      "pe": 22.72,
+      "pb": 1.94,
+      "roe": 8.53,
+      "debtToEquity": 40.37,
+      "netMargin": 12.08,
+      "netIncome": 2532100096,
+      "ma50": 119.6861,
+      "ma200": 115.7623,
+      "rsi14": 57.4,
+      "atrPct": 2.32,
+      "ret1m": 10.35,
+      "ret3m": 24.19,
+      "pctFromHigh": -4.48,
+      "relVol": 1.03,
+      "score": 53.8,
       "scoreCoverage": 5
     },
     {
@@ -1638,35 +1666,7 @@ window.STOCK_DATA = {
       "ret3m": 10.57,
       "pctFromHigh": -14.46,
       "relVol": 1.41,
-      "score": 53.7,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "MRK.DE",
-      "market": "DAX",
-      "name": "MERCK KGAA                    I",
-      "sector": "Healthcare",
-      "currency": "EUR",
-      "price": 132.7,
-      "prevClose": 133.25,
-      "changePct": -0.41,
-      "volume": 387322,
-      "marketCap": 57695023104,
-      "pe": 22.72,
-      "pb": 1.94,
-      "roe": 8.53,
-      "debtToEquity": 40.37,
-      "netMargin": 12.08,
-      "netIncome": 2532100096,
-      "ma50": 119.6861,
-      "ma200": 115.7623,
-      "rsi14": 57.4,
-      "atrPct": 2.32,
-      "ret1m": 10.35,
-      "ret3m": 24.19,
-      "pctFromHigh": -4.48,
-      "relVol": 1.03,
-      "score": 53.7,
+      "score": 53.6,
       "scoreCoverage": 5
     },
     {
@@ -1694,35 +1694,7 @@ window.STOCK_DATA = {
       "ret3m": 32.82,
       "pctFromHigh": -11.07,
       "relVol": 1.46,
-      "score": 52.8,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "MAVI.IS",
-      "market": "BIST",
-      "name": "MAVI GIYIM",
-      "sector": "Consumer Cyclical",
-      "currency": "TRY",
-      "price": 42.68,
-      "prevClose": 42.04,
-      "changePct": 1.52,
-      "volume": 7104857,
-      "marketCap": 33444241408,
-      "pe": 18.16,
-      "pb": 2.44,
-      "roe": 11.07,
-      "debtToEquity": 34.62,
-      "netMargin": 3.94,
-      "netIncome": 1871083008,
-      "ma50": 42.2392,
-      "ma200": 40.7898,
-      "rsi14": 50.0,
-      "atrPct": 2.69,
-      "ret1m": -3.93,
-      "ret3m": 6.18,
-      "pctFromHigh": -12.72,
-      "relVol": 1.27,
-      "score": 51.8,
+      "score": 53.0,
       "scoreCoverage": 5
     },
     {
@@ -1750,7 +1722,7 @@ window.STOCK_DATA = {
       "ret3m": 2.14,
       "pctFromHigh": -11.04,
       "relVol": 2.95,
-      "score": 51.5,
+      "score": 51.7,
       "scoreCoverage": 5
     },
     {
@@ -1778,7 +1750,63 @@ window.STOCK_DATA = {
       "ret3m": 3.24,
       "pctFromHigh": -21.55,
       "relVol": 1.05,
-      "score": 51.5,
+      "score": 51.7,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "MGROS.IS",
+      "market": "BIST",
+      "name": "MIGROS TICARET",
+      "sector": "Consumer Defensive",
+      "currency": "TRY",
+      "price": 699.0,
+      "prevClose": 672.5,
+      "changePct": 3.94,
+      "volume": 2462141,
+      "marketCap": 124486385664,
+      "pe": 17.24,
+      "pb": 1.43,
+      "roe": 9.18,
+      "debtToEquity": 40.97,
+      "netMargin": 1.62,
+      "netIncome": 6780999168,
+      "ma50": 655.3696,
+      "ma200": 565.9964,
+      "rsi14": 45.5,
+      "atrPct": 2.0,
+      "ret1m": -3.93,
+      "ret3m": 12.28,
+      "pctFromHigh": -7.11,
+      "relVol": 1.44,
+      "score": 51.2,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "SOKM.IS",
+      "market": "BIST",
+      "name": "SOK MARKETLER TICARET",
+      "sector": "Consumer Cyclical",
+      "currency": "TRY",
+      "price": 50.95,
+      "prevClose": 49.18,
+      "changePct": 3.6,
+      "volume": 5933267,
+      "marketCap": 30228125696,
+      "pe": 4.03,
+      "pb": 0.79,
+      "roe": -6.33,
+      "debtToEquity": 41.18,
+      "netMargin": -0.77,
+      "netIncome": -2196430848,
+      "ma50": 50.6552,
+      "ma200": 50.2062,
+      "rsi14": 49.7,
+      "atrPct": 2.19,
+      "ret1m": -5.06,
+      "ret3m": -13.87,
+      "pctFromHigh": -29.74,
+      "relVol": 0.93,
+      "score": 51.2,
       "scoreCoverage": 5
     },
     {
@@ -1810,62 +1838,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "SOKM.IS",
-      "market": "BIST",
-      "name": "SOK MARKETLER TICARET",
-      "sector": "Consumer Cyclical",
-      "currency": "TRY",
-      "price": 50.95,
-      "prevClose": 49.18,
-      "changePct": 3.6,
-      "volume": 5933267,
-      "marketCap": 30228125696,
-      "pe": 4.03,
-      "pb": 0.79,
-      "roe": -6.33,
-      "debtToEquity": 41.18,
-      "netMargin": -0.77,
-      "netIncome": -2196430848,
-      "ma50": 50.6552,
-      "ma200": 50.2062,
-      "rsi14": 49.7,
-      "atrPct": 2.19,
-      "ret1m": -5.06,
-      "ret3m": -13.87,
-      "pctFromHigh": -29.74,
-      "relVol": 0.93,
-      "score": 51.1,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "MGROS.IS",
-      "market": "BIST",
-      "name": "MIGROS TICARET",
-      "sector": "Consumer Defensive",
-      "currency": "TRY",
-      "price": 699.0,
-      "prevClose": 672.5,
-      "changePct": 3.94,
-      "volume": 2462141,
-      "marketCap": 124486385664,
-      "pe": 17.24,
-      "pb": 1.43,
-      "roe": 9.18,
-      "debtToEquity": 40.97,
-      "netMargin": 1.62,
-      "netIncome": 6780999168,
-      "ma50": 655.3696,
-      "ma200": 565.9964,
-      "rsi14": 45.5,
-      "atrPct": 2.0,
-      "ret1m": -3.93,
-      "ret3m": 12.28,
-      "pctFromHigh": -7.11,
-      "relVol": 1.44,
-      "score": 51.0,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "ENR.DE",
       "market": "DAX",
       "name": "Siemens Energy AG             N",
@@ -1890,7 +1862,35 @@ window.STOCK_DATA = {
       "ret3m": 0.61,
       "pctFromHigh": -18.14,
       "relVol": 0.95,
-      "score": 51.0,
+      "score": 50.9,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "RHM.DE",
+      "market": "DAX",
+      "name": "RHEINMETALL AG                I",
+      "sector": "Industrials",
+      "currency": "EUR",
+      "price": 1150.2,
+      "prevClose": 1205.6,
+      "changePct": -4.6,
+      "volume": 221846,
+      "marketCap": 53532622848,
+      "pe": 50.74,
+      "pb": 10.03,
+      "roe": 21.8,
+      "debtToEquity": 35.86,
+      "netMargin": 7.18,
+      "netIncome": 1050000000,
+      "ma50": 1314.968,
+      "ma200": 1596.8068,
+      "rsi14": 43.2,
+      "atrPct": 3.85,
+      "ret1m": 5.46,
+      "ret3m": -21.47,
+      "pctFromHigh": -38.77,
+      "relVol": 1.04,
+      "score": 50.5,
       "scoreCoverage": 5
     },
     {
@@ -1918,34 +1918,6 @@ window.STOCK_DATA = {
       "ret3m": 10.83,
       "pctFromHigh": -9.88,
       "relVol": 0.79,
-      "score": 50.5,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "RHM.DE",
-      "market": "DAX",
-      "name": "RHEINMETALL AG                I",
-      "sector": "Industrials",
-      "currency": "EUR",
-      "price": 1150.2,
-      "prevClose": 1205.6,
-      "changePct": -4.6,
-      "volume": 221846,
-      "marketCap": 53532622848,
-      "pe": 50.74,
-      "pb": 10.65,
-      "roe": 21.8,
-      "debtToEquity": 35.86,
-      "netMargin": 7.18,
-      "netIncome": 1050000000,
-      "ma50": 1314.968,
-      "ma200": 1596.8068,
-      "rsi14": 43.2,
-      "atrPct": 3.85,
-      "ret1m": 5.46,
-      "ret3m": -21.47,
-      "pctFromHigh": -38.77,
-      "relVol": 1.04,
       "score": 50.4,
       "scoreCoverage": 5
     },
@@ -1974,7 +1946,35 @@ window.STOCK_DATA = {
       "ret3m": -4.29,
       "pctFromHigh": -18.58,
       "relVol": 1.26,
-      "score": 50.2,
+      "score": 50.3,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "ULKER.IS",
+      "market": "BIST",
+      "name": "ULKER BISKUVI",
+      "sector": "Consumer Defensive",
+      "currency": "TRY",
+      "price": 116.7,
+      "prevClose": 113.2,
+      "changePct": 3.09,
+      "volume": 7588304,
+      "marketCap": 43094507520,
+      "pe": 13.05,
+      "pb": 1.0,
+      "roe": 8.06,
+      "debtToEquity": 112.42,
+      "netMargin": 2.99,
+      "netIncome": 3301888000,
+      "ma50": 120.206,
+      "ma200": 116.351,
+      "rsi14": 35.4,
+      "atrPct": 1.74,
+      "ret1m": -10.02,
+      "ret3m": 0.71,
+      "pctFromHigh": -18.62,
+      "relVol": 1.54,
+      "score": 49.4,
       "scoreCoverage": 5
     },
     {
@@ -2006,31 +2006,31 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "ULKER.IS",
-      "market": "BIST",
-      "name": "ULKER BISKUVI",
-      "sector": "Consumer Defensive",
-      "currency": "TRY",
-      "price": 116.7,
-      "prevClose": 113.2,
-      "changePct": 3.09,
-      "volume": 7588304,
-      "marketCap": 43094507520,
-      "pe": 13.05,
-      "pb": 1.0,
-      "roe": 8.06,
-      "debtToEquity": 112.42,
-      "netMargin": 2.99,
-      "netIncome": 3301888000,
-      "ma50": 120.206,
-      "ma200": 116.351,
-      "rsi14": 35.4,
-      "atrPct": 1.74,
-      "ret1m": -10.02,
-      "ret3m": 0.71,
-      "pctFromHigh": -18.62,
-      "relVol": 1.54,
-      "score": 49.3,
+      "symbol": "SHL.DE",
+      "market": "DAX",
+      "name": "Siemens Healthineers AG       N",
+      "sector": "Healthcare",
+      "currency": "EUR",
+      "price": 34.96,
+      "prevClose": 34.63,
+      "changePct": 0.95,
+      "volume": 908586,
+      "marketCap": 39127195648,
+      "pe": 18.5,
+      "pb": 2.16,
+      "roe": 11.47,
+      "debtToEquity": 83.88,
+      "netMargin": 9.08,
+      "netIncome": 2095000064,
+      "ma50": 35.3938,
+      "ma200": 41.2658,
+      "rsi14": 46.0,
+      "atrPct": 2.31,
+      "ret1m": 1.52,
+      "ret3m": -11.27,
+      "pctFromHigh": -28.4,
+      "relVol": 0.94,
+      "score": 48.5,
       "scoreCoverage": 5
     },
     {
@@ -2058,35 +2058,7 @@ window.STOCK_DATA = {
       "ret3m": -10.86,
       "pctFromHigh": -14.23,
       "relVol": 0.9,
-      "score": 48.6,
-      "scoreCoverage": 5
-    },
-    {
-      "symbol": "SHL.DE",
-      "market": "DAX",
-      "name": "Siemens Healthineers AG       N",
-      "sector": "Healthcare",
-      "currency": "EUR",
-      "price": 34.96,
-      "prevClose": 34.63,
-      "changePct": 0.95,
-      "volume": 908586,
-      "marketCap": 39127195648,
-      "pe": 18.5,
-      "pb": 2.16,
-      "roe": 11.47,
-      "debtToEquity": 83.88,
-      "netMargin": 9.08,
-      "netIncome": 2095000064,
-      "ma50": 35.3938,
-      "ma200": 41.2658,
-      "rsi14": 46.0,
-      "atrPct": 2.31,
-      "ret1m": 1.52,
-      "ret3m": -11.27,
-      "pctFromHigh": -28.4,
-      "relVol": 0.94,
-      "score": 48.6,
+      "score": 48.4,
       "scoreCoverage": 5
     },
     {
@@ -2114,7 +2086,7 @@ window.STOCK_DATA = {
       "ret3m": 21.17,
       "pctFromHigh": -11.02,
       "relVol": 1.8,
-      "score": 48.1,
+      "score": 48.2,
       "scoreCoverage": 5
     },
     {
@@ -2142,7 +2114,7 @@ window.STOCK_DATA = {
       "ret3m": 6.2,
       "pctFromHigh": -17.11,
       "relVol": 1.15,
-      "score": 48.1,
+      "score": 48.2,
       "scoreCoverage": 5
     },
     {
@@ -2170,7 +2142,7 @@ window.STOCK_DATA = {
       "ret3m": -2.2,
       "pctFromHigh": -6.56,
       "relVol": 0.95,
-      "score": 48.0,
+      "score": 47.8,
       "scoreCoverage": 5
     },
     {
@@ -2226,7 +2198,7 @@ window.STOCK_DATA = {
       "ret3m": 1.55,
       "pctFromHigh": -13.42,
       "relVol": 1.15,
-      "score": 46.5,
+      "score": 46.7,
       "scoreCoverage": 4
     },
     {
@@ -2254,7 +2226,7 @@ window.STOCK_DATA = {
       "ret3m": 17.4,
       "pctFromHigh": -2.34,
       "relVol": 0.87,
-      "score": 46.3,
+      "score": 46.2,
       "scoreCoverage": 5
     },
     {
@@ -2338,7 +2310,7 @@ window.STOCK_DATA = {
       "ret3m": -3.24,
       "pctFromHigh": -25.25,
       "relVol": 1.03,
-      "score": 44.8,
+      "score": 44.9,
       "scoreCoverage": 4
     },
     {
@@ -2370,6 +2342,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "TATGD.IS",
+      "market": "BIST",
+      "name": "TAT GIDA",
+      "sector": "Consumer Defensive",
+      "currency": "TRY",
+      "price": 19.76,
+      "prevClose": 19.45,
+      "changePct": 1.59,
+      "volume": 1820610,
+      "marketCap": 4837248000,
+      "pe": 36.59,
+      "pb": 1.13,
+      "roe": 6.38,
+      "debtToEquity": 59.75,
+      "netMargin": 4.28,
+      "netIncome": 352829280,
+      "ma50": 18.9202,
+      "ma200": 15.1909,
+      "rsi14": 31.2,
+      "atrPct": 3.32,
+      "ret1m": -10.45,
+      "ret3m": 3.73,
+      "pctFromHigh": -15.43,
+      "relVol": 0.7,
+      "score": 44.5,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "CEMTS.IS",
       "market": "BIST",
       "name": "CEMTAS",
@@ -2396,34 +2396,6 @@ window.STOCK_DATA = {
       "relVol": 0.78,
       "score": 44.5,
       "scoreCoverage": 4
-    },
-    {
-      "symbol": "TATGD.IS",
-      "market": "BIST",
-      "name": "TAT GIDA",
-      "sector": "Consumer Defensive",
-      "currency": "TRY",
-      "price": 19.76,
-      "prevClose": 19.45,
-      "changePct": 1.59,
-      "volume": 1820610,
-      "marketCap": 4837248000,
-      "pe": 36.59,
-      "pb": 1.13,
-      "roe": 6.38,
-      "debtToEquity": 59.75,
-      "netMargin": 4.28,
-      "netIncome": 352829280,
-      "ma50": 18.9202,
-      "ma200": 15.1909,
-      "rsi14": 31.2,
-      "atrPct": 3.32,
-      "ret1m": -10.45,
-      "ret3m": 3.73,
-      "pctFromHigh": -15.43,
-      "relVol": 0.7,
-      "score": 44.4,
-      "scoreCoverage": 5
     },
     {
       "symbol": "THYAO.IS",
@@ -2478,7 +2450,7 @@ window.STOCK_DATA = {
       "ret3m": -5.37,
       "pctFromHigh": -24.07,
       "relVol": 1.26,
-      "score": 44.1,
+      "score": 44.3,
       "scoreCoverage": 5
     },
     {
@@ -2506,7 +2478,7 @@ window.STOCK_DATA = {
       "ret3m": 13.45,
       "pctFromHigh": -17.68,
       "relVol": 0.78,
-      "score": 43.1,
+      "score": 43.3,
       "scoreCoverage": 5
     },
     {
@@ -2594,6 +2566,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "GSDHO.IS",
+      "market": "BIST",
+      "name": "GSD HOLDING",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 6.2,
+      "prevClose": 6.09,
+      "changePct": 1.81,
+      "volume": 68969964,
+      "marketCap": 5433168896,
+      "pe": 62.0,
+      "pb": 0.47,
+      "roe": 1.27,
+      "debtToEquity": 54.21,
+      "netMargin": 1.79,
+      "netIncome": 93312000,
+      "ma50": 5.3002,
+      "ma200": 4.8109,
+      "rsi14": 60.2,
+      "atrPct": 6.3,
+      "ret1m": 12.78,
+      "ret3m": 30.13,
+      "pctFromHigh": -7.73,
+      "relVol": 1.42,
+      "score": 41.6,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "AGROT.IS",
       "market": "BIST",
       "name": "AGROTECH TEKNOLOJI",
@@ -2620,34 +2620,6 @@ window.STOCK_DATA = {
       "relVol": 0.77,
       "score": 41.5,
       "scoreCoverage": 4
-    },
-    {
-      "symbol": "GSDHO.IS",
-      "market": "BIST",
-      "name": "GSD HOLDING",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 6.2,
-      "prevClose": 6.09,
-      "changePct": 1.81,
-      "volume": 68969964,
-      "marketCap": 5433168896,
-      "pe": 62.0,
-      "pb": 0.47,
-      "roe": 1.27,
-      "debtToEquity": 54.21,
-      "netMargin": 1.79,
-      "netIncome": 93312000,
-      "ma50": 5.3002,
-      "ma200": 4.8109,
-      "rsi14": 60.2,
-      "atrPct": 6.3,
-      "ret1m": 12.78,
-      "ret3m": 30.13,
-      "pctFromHigh": -7.73,
-      "relVol": 1.42,
-      "score": 41.4,
-      "scoreCoverage": 5
     },
     {
       "symbol": "AKCNS.IS",
@@ -2678,34 +2650,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "BAS.DE",
-      "market": "DAX",
-      "name": "BASF SE                       N",
-      "sector": "Basic Materials",
-      "currency": "EUR",
-      "price": 49.225,
-      "prevClose": 49.5,
-      "changePct": -0.56,
-      "volume": 2248548,
-      "marketCap": 43530907648,
-      "pe": 28.96,
-      "pb": 1.26,
-      "roe": 4.41,
-      "debtToEquity": 66.72,
-      "netMargin": 2.94,
-      "netIncome": 1510000000,
-      "ma50": 51.3035,
-      "ma200": 45.3598,
-      "rsi14": 35.2,
-      "atrPct": 2.2,
-      "ret1m": -7.29,
-      "ret3m": 6.55,
-      "pctFromHigh": -8.33,
-      "relVol": 0.96,
-      "score": 40.0,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "KCHOL.IS",
       "market": "BIST",
       "name": "KOC HOLDING",
@@ -2730,7 +2674,35 @@ window.STOCK_DATA = {
       "ret3m": 1.15,
       "pctFromHigh": -13.16,
       "relVol": 1.45,
-      "score": 39.9,
+      "score": 40.1,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "BAS.DE",
+      "market": "DAX",
+      "name": "BASF SE                       N",
+      "sector": "Basic Materials",
+      "currency": "EUR",
+      "price": 49.225,
+      "prevClose": 49.5,
+      "changePct": -0.56,
+      "volume": 2248548,
+      "marketCap": 43530907648,
+      "pe": 28.96,
+      "pb": 1.26,
+      "roe": 4.41,
+      "debtToEquity": 66.72,
+      "netMargin": 2.94,
+      "netIncome": 1510000000,
+      "ma50": 51.3035,
+      "ma200": 45.3598,
+      "rsi14": 35.2,
+      "atrPct": 2.2,
+      "ret1m": -7.29,
+      "ret3m": 6.55,
+      "pctFromHigh": -8.33,
+      "relVol": 0.96,
+      "score": 40.1,
       "scoreCoverage": 5
     },
     {
@@ -2786,7 +2758,35 @@ window.STOCK_DATA = {
       "ret3m": -4.36,
       "pctFromHigh": -16.93,
       "relVol": 1.75,
-      "score": 39.3,
+      "score": 39.5,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "VESTL.IS",
+      "market": "BIST",
+      "name": "VESTEL",
+      "sector": "Consumer Cyclical",
+      "currency": "TRY",
+      "price": 25.12,
+      "prevClose": 24.46,
+      "changePct": 2.7,
+      "volume": 4454594,
+      "marketCap": 8426662400,
+      "pe": 2.69,
+      "pb": 0.31,
+      "roe": -62.54,
+      "debtToEquity": 269.55,
+      "netMargin": -21.91,
+      "netIncome": -25870673920,
+      "ma50": 27.5656,
+      "ma200": 31.0949,
+      "rsi14": 25.9,
+      "atrPct": 2.14,
+      "ret1m": -15.83,
+      "ret3m": -12.95,
+      "pctFromHigh": -43.22,
+      "relVol": 1.02,
+      "score": 37.7,
       "scoreCoverage": 5
     },
     {
@@ -2818,34 +2818,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "VESTL.IS",
-      "market": "BIST",
-      "name": "VESTEL",
-      "sector": "Consumer Cyclical",
-      "currency": "TRY",
-      "price": 25.12,
-      "prevClose": 24.46,
-      "changePct": 2.7,
-      "volume": 4454594,
-      "marketCap": 8426662400,
-      "pe": 2.69,
-      "pb": 0.31,
-      "roe": -62.54,
-      "debtToEquity": 269.55,
-      "netMargin": -21.91,
-      "netIncome": -25870673920,
-      "ma50": 27.5656,
-      "ma200": 31.0949,
-      "rsi14": 25.9,
-      "atrPct": 2.14,
-      "ret1m": -15.83,
-      "ret3m": -12.95,
-      "pctFromHigh": -43.22,
-      "relVol": 1.02,
-      "score": 37.6,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "BRSAN.IS",
       "market": "BIST",
       "name": "BORUSAN BORU SANAYI",
@@ -2870,7 +2842,7 @@ window.STOCK_DATA = {
       "ret3m": 15.84,
       "pctFromHigh": -19.23,
       "relVol": 0.97,
-      "score": 37.3,
+      "score": 37.4,
       "scoreCoverage": 5
     },
     {
@@ -2926,7 +2898,7 @@ window.STOCK_DATA = {
       "ret3m": 14.33,
       "pctFromHigh": -15.31,
       "relVol": 0.58,
-      "score": 36.2,
+      "score": 36.4,
       "scoreCoverage": 5
     },
     {
@@ -2954,7 +2926,7 @@ window.STOCK_DATA = {
       "ret3m": 98.81,
       "pctFromHigh": -9.02,
       "relVol": 0.77,
-      "score": 36.1,
+      "score": 36.2,
       "scoreCoverage": 5
     },
     {
@@ -3038,7 +3010,7 @@ window.STOCK_DATA = {
       "ret3m": 0.01,
       "pctFromHigh": -2.81,
       "relVol": 1.07,
-      "score": 35.2,
+      "score": 35.3,
       "scoreCoverage": 5
     },
     {
@@ -3066,7 +3038,7 @@ window.STOCK_DATA = {
       "ret3m": 37.76,
       "pctFromHigh": -3.31,
       "relVol": 1.53,
-      "score": 34.3,
+      "score": 34.4,
       "scoreCoverage": 5
     },
     {
@@ -3094,7 +3066,7 @@ window.STOCK_DATA = {
       "ret3m": -2.75,
       "pctFromHigh": -31.7,
       "relVol": 0.85,
-      "score": 33.8,
+      "score": 33.9,
       "scoreCoverage": 5
     },
     {
@@ -3122,7 +3094,7 @@ window.STOCK_DATA = {
       "ret3m": 18.12,
       "pctFromHigh": -7.78,
       "relVol": 0.89,
-      "score": 33.5,
+      "score": 33.6,
       "scoreCoverage": 5
     },
     {
@@ -3150,7 +3122,7 @@ window.STOCK_DATA = {
       "ret3m": 11.85,
       "pctFromHigh": -15.3,
       "relVol": 0.75,
-      "score": 33.1,
+      "score": 33.2,
       "scoreCoverage": 5
     },
     {
@@ -3206,7 +3178,7 @@ window.STOCK_DATA = {
       "ret3m": 27.23,
       "pctFromHigh": -12.42,
       "relVol": 1.0,
-      "score": 30.9,
+      "score": 31.0,
       "scoreCoverage": 5
     },
     {
@@ -3234,7 +3206,7 @@ window.STOCK_DATA = {
       "ret3m": -9.09,
       "pctFromHigh": -25.02,
       "relVol": 2.25,
-      "score": 30.5,
+      "score": 30.6,
       "scoreCoverage": 5
     },
     {
@@ -3262,7 +3234,7 @@ window.STOCK_DATA = {
       "ret3m": -2.71,
       "pctFromHigh": -32.15,
       "relVol": 0.75,
-      "score": 30.1,
+      "score": 30.2,
       "scoreCoverage": 4
     },
     {
@@ -3290,7 +3262,7 @@ window.STOCK_DATA = {
       "ret3m": 29.45,
       "pctFromHigh": 0.0,
       "relVol": 1.65,
-      "score": 30.0,
+      "score": 30.1,
       "scoreCoverage": 5
     },
     {
@@ -3318,7 +3290,7 @@ window.STOCK_DATA = {
       "ret3m": 56.89,
       "pctFromHigh": -8.63,
       "relVol": 1.56,
-      "score": 29.4,
+      "score": 29.5,
       "scoreCoverage": 5
     },
     {
@@ -3374,7 +3346,7 @@ window.STOCK_DATA = {
       "ret3m": 7.91,
       "pctFromHigh": -12.55,
       "relVol": 0.92,
-      "score": 28.4,
+      "score": 28.5,
       "scoreCoverage": 5
     },
     {
@@ -3430,7 +3402,7 @@ window.STOCK_DATA = {
       "ret3m": 18.18,
       "pctFromHigh": -50.48,
       "relVol": 69.69,
-      "score": 27.5,
+      "score": 27.6,
       "scoreCoverage": 4
     },
     {
@@ -3458,7 +3430,7 @@ window.STOCK_DATA = {
       "ret3m": null,
       "pctFromHigh": null,
       "relVol": null,
-      "score": 26.3,
+      "score": 26.4,
       "scoreCoverage": 5
     },
     {
@@ -3514,7 +3486,7 @@ window.STOCK_DATA = {
       "ret3m": 54.09,
       "pctFromHigh": -7.74,
       "relVol": 0.81,
-      "score": 25.7,
+      "score": 25.9,
       "scoreCoverage": 5
     },
     {
@@ -3542,7 +3514,7 @@ window.STOCK_DATA = {
       "ret3m": 7.26,
       "pctFromHigh": -26.32,
       "relVol": 1.04,
-      "score": 24.9,
+      "score": 25.0,
       "scoreCoverage": 4
     },
     {
@@ -3626,7 +3598,7 @@ window.STOCK_DATA = {
       "ret3m": 7.25,
       "pctFromHigh": -21.29,
       "relVol": 9.03,
-      "score": 19.9,
+      "score": 20.1,
       "scoreCoverage": 4
     },
     {
@@ -3654,7 +3626,7 @@ window.STOCK_DATA = {
       "ret3m": -20.06,
       "pctFromHigh": -36.85,
       "relVol": 0.72,
-      "score": 17.0,
+      "score": 17.1,
       "scoreCoverage": 5
     },
     {
@@ -3682,7 +3654,7 @@ window.STOCK_DATA = {
       "ret3m": 34.14,
       "pctFromHigh": -22.04,
       "relVol": 0.89,
-      "score": 16.5,
+      "score": 16.4,
       "scoreCoverage": 4
     },
     {
@@ -3738,7 +3710,7 @@ window.STOCK_DATA = {
       "ret3m": 61.21,
       "pctFromHigh": -7.4,
       "relVol": 0.76,
-      "score": 13.9,
+      "score": 14.0,
       "scoreCoverage": 5
     },
     {
@@ -3796,6 +3768,34 @@ window.STOCK_DATA = {
       "relVol": 1.12,
       "score": 5.0,
       "scoreCoverage": 4
+    },
+    {
+      "symbol": "MAVI.IS",
+      "market": "BIST",
+      "name": "MAVI.IS",
+      "sector": "-",
+      "currency": "TRY",
+      "price": 42.68,
+      "prevClose": 42.08,
+      "changePct": 1.43,
+      "volume": 7104857,
+      "marketCap": null,
+      "pe": null,
+      "pb": null,
+      "roe": null,
+      "debtToEquity": null,
+      "netMargin": null,
+      "netIncome": null,
+      "ma50": 42.2392,
+      "ma200": 40.7898,
+      "rsi14": 50.0,
+      "atrPct": 2.69,
+      "ret1m": -3.93,
+      "ret3m": 6.18,
+      "pctFromHigh": -12.72,
+      "relVol": 1.27,
+      "score": null,
+      "scoreCoverage": 0
     },
     {
       "symbol": "IPEKE.IS",
