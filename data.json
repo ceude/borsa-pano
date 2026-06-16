@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-15T23:47:12+00:00",
+  "updatedAt": "2026-06-16T00:02:52+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.6702,
-    "USDTRY": 46.2761
+    "EURTRY": 53.6749,
+    "USDTRY": 46.2601
   },
   "benchmarks": {
     "DAX": 0.73,
@@ -1933,7 +1933,7 @@
       "volume": 221846,
       "marketCap": 53532622848,
       "pe": 50.74,
-      "pb": 10.03,
+      "pb": 10.65,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
