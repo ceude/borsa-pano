@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-17T03:02:22+00:00",
+  "updatedAt": "2026-06-17T03:17:32+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.9294,
-    "USDTRY": 46.3002
+    "EURTRY": 53.9271,
+    "USDTRY": 46.3114
   },
   "benchmarks": {
     "DAX": 2.48,
@@ -718,34 +718,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "BEI.DE",
-      "market": "DAX",
-      "name": "BEIERSDORF AG                 I",
-      "sector": "Consumer Defensive",
-      "currency": "EUR",
-      "price": 70.8,
-      "prevClose": 70.64,
-      "changePct": 0.23,
-      "volume": 432486,
-      "marketCap": 15471482880,
-      "pe": 16.66,
-      "pb": 1.8,
-      "roe": 11.16,
-      "debtToEquity": 2.52,
-      "netMargin": 9.53,
-      "netIncome": 939000000,
-      "ma50": 71.8295,
-      "ma200": 86.5474,
-      "rsi14": 46.0,
-      "atrPct": 2.54,
-      "ret1m": 0.83,
-      "ret3m": -8.71,
-      "pctFromHigh": -35.81,
-      "relVol": 0.94,
-      "score": 63.6,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "HEN3.DE",
       "market": "DAX",
       "name": "Henkel AG & Co. KGaA          I",
@@ -771,6 +743,34 @@ window.STOCK_DATA = {
       "pctFromHigh": -14.5,
       "relVol": 0.79,
       "score": 63.6,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "BEI.DE",
+      "market": "DAX",
+      "name": "BEIERSDORF AG                 I",
+      "sector": "Consumer Defensive",
+      "currency": "EUR",
+      "price": 70.8,
+      "prevClose": 70.64,
+      "changePct": 0.23,
+      "volume": 432486,
+      "marketCap": 15471482880,
+      "pe": 16.66,
+      "pb": 1.8,
+      "roe": 11.16,
+      "debtToEquity": 2.52,
+      "netMargin": 9.53,
+      "netIncome": 939000000,
+      "ma50": 71.8295,
+      "ma200": 86.5474,
+      "rsi14": 46.0,
+      "atrPct": 2.54,
+      "ret1m": 0.83,
+      "ret3m": -8.71,
+      "pctFromHigh": -35.81,
+      "relVol": 0.94,
+      "score": 63.4,
       "scoreCoverage": 5
     },
     {
@@ -1148,7 +1148,7 @@ window.STOCK_DATA = {
       "changePct": 1.22,
       "volume": 21638444,
       "marketCap": 43045335040,
-      "pe": 16.7,
+      "pe": 16.63,
       "pb": 2.67,
       "roe": 19.69,
       "debtToEquity": 55.75,
@@ -1162,7 +1162,7 @@ window.STOCK_DATA = {
       "ret3m": 35.23,
       "pctFromHigh": -7.16,
       "relVol": 0.77,
-      "score": 58.7,
+      "score": 58.8,
       "scoreCoverage": 5
     },
     {
@@ -1708,7 +1708,7 @@ window.STOCK_DATA = {
       "changePct": -1.69,
       "volume": 6224517,
       "marketCap": 32880046080,
-      "pe": 17.78,
+      "pe": 17.86,
       "pb": 2.4,
       "roe": 11.07,
       "debtToEquity": 34.62,
@@ -1848,7 +1848,7 @@ window.STOCK_DATA = {
       "changePct": -2.03,
       "volume": 10742628,
       "marketCap": 457711058944,
-      "pe": 21.48,
+      "pe": 21.46,
       "pb": 2.42,
       "roe": 13.43,
       "debtToEquity": 30.44,
