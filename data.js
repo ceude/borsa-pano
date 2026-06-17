@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-17T04:47:14+00:00",
+  "updatedAt": "2026-06-17T05:02:25+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.8641,
-    "USDTRY": 46.3122
+    "EURTRY": 53.8742,
+    "USDTRY": 46.3095
   },
   "benchmarks": {
     "DAX": 2.48,
@@ -1316,7 +1316,7 @@ window.STOCK_DATA = {
       "changePct": -1.53,
       "volume": 356558,
       "marketCap": 32371810304,
-      "pe": 16.43,
+      "pe": 16.42,
       "pb": 1.78,
       "roe": 11.07,
       "debtToEquity": 43.45,
@@ -1792,7 +1792,7 @@ window.STOCK_DATA = {
       "changePct": -0.07,
       "volume": 1934155,
       "marketCap": 124397338624,
-      "pe": 17.23,
+      "pe": 17.21,
       "pb": 1.43,
       "roe": 9.18,
       "debtToEquity": 40.97,
@@ -2184,7 +2184,7 @@ window.STOCK_DATA = {
       "changePct": 0.85,
       "volume": 167471,
       "marketCap": 145889116160,
-      "pe": 29.32,
+      "pe": 29.23,
       "pb": 5.59,
       "roe": 19.75,
       "debtToEquity": 55.66,
