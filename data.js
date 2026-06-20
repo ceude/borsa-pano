@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-20T15:17:16+00:00",
+  "updatedAt": "2026-06-20T15:32:37+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -13,8 +13,8 @@ window.STOCK_DATA = {
     "USDTRY": 46.4289
   },
   "benchmarks": {
-    "DAX": 1.54,
-    "BIST": 2.55
+    "DAX": 1.0,
+    "BIST": 0.61
   },
   "stocks": [
     {
@@ -238,7 +238,7 @@ window.STOCK_DATA = {
       "ret3m": -8.31,
       "pctFromHigh": -15.05,
       "relVol": 0.63,
-      "score": 83.7,
+      "score": 83.6,
       "scoreCoverage": 5
     },
     {
@@ -462,7 +462,7 @@ window.STOCK_DATA = {
       "ret3m": -6.74,
       "pctFromHigh": -21.8,
       "relVol": 0.98,
-      "score": 71.3,
+      "score": 71.1,
       "scoreCoverage": 5
     },
     {
@@ -490,7 +490,7 @@ window.STOCK_DATA = {
       "ret3m": 20.32,
       "pctFromHigh": -5.7,
       "relVol": 1.13,
-      "score": 70.6,
+      "score": 70.5,
       "scoreCoverage": 4
     },
     {
@@ -1176,7 +1176,7 @@ window.STOCK_DATA = {
       "changePct": -4.95,
       "volume": 3262223,
       "marketCap": 163660005376,
-      "pe": 22.99,
+      "pe": 23.02,
       "pb": 5.49,
       "roe": 20.67,
       "debtToEquity": 23.21,
@@ -1399,7 +1399,7 @@ window.STOCK_DATA = {
       "prevClose": 54.58,
       "changePct": 0.95,
       "volume": 4149965,
-      "marketCap": null,
+      "marketCap": 39317413888,
       "pe": 16.9,
       "pb": 1.11,
       "roe": 6.83,
@@ -1933,7 +1933,7 @@ window.STOCK_DATA = {
       "volume": 437903,
       "marketCap": 55971426304,
       "pe": 52.91,
-      "pb": 10.48,
+      "pb": 11.13,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -2594,6 +2594,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "AKCNS.IS",
+      "market": "BIST",
+      "name": "AKCANSA",
+      "sector": "Basic Materials",
+      "currency": "TRY",
+      "price": 203.6,
+      "prevClose": 212.9,
+      "changePct": -4.37,
+      "volume": 1194343,
+      "marketCap": 38978625536,
+      "pe": 61.7,
+      "pb": 1.43,
+      "roe": 2.61,
+      "debtToEquity": 16.38,
+      "netMargin": 2.57,
+      "netIncome": 633446976,
+      "ma50": 207.7938,
+      "ma200": 172.58,
+      "rsi14": 39.6,
+      "atrPct": 4.1,
+      "ret1m": 4.53,
+      "ret3m": 1.93,
+      "pctFromHigh": -9.83,
+      "relVol": 1.91,
+      "score": 42.0,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "GSDHO.IS",
       "market": "BIST",
       "name": "GSD HOLDING",
@@ -2648,34 +2676,6 @@ window.STOCK_DATA = {
       "relVol": 1.34,
       "score": 41.5,
       "scoreCoverage": 4
-    },
-    {
-      "symbol": "AKCNS.IS",
-      "market": "BIST",
-      "name": "AKCANSA",
-      "sector": "Basic Materials",
-      "currency": "TRY",
-      "price": 203.6,
-      "prevClose": 212.9,
-      "changePct": -4.37,
-      "volume": 1194343,
-      "marketCap": 38978625536,
-      "pe": 61.7,
-      "pb": 1.56,
-      "roe": 2.61,
-      "debtToEquity": 16.38,
-      "netMargin": 2.57,
-      "netIncome": 633446976,
-      "ma50": 207.7938,
-      "ma200": 172.58,
-      "rsi14": 39.6,
-      "atrPct": 4.1,
-      "ret1m": 4.53,
-      "ret3m": 1.93,
-      "pctFromHigh": -9.83,
-      "relVol": 1.91,
-      "score": 41.0,
-      "scoreCoverage": 5
     },
     {
       "symbol": "BAS.DE",
@@ -2870,7 +2870,7 @@ window.STOCK_DATA = {
       "ret3m": 68.56,
       "pctFromHigh": -13.25,
       "relVol": 0.81,
-      "score": 37.3,
+      "score": 37.2,
       "scoreCoverage": 5
     },
     {
@@ -2898,7 +2898,7 @@ window.STOCK_DATA = {
       "ret3m": -13.56,
       "pctFromHigh": -29.98,
       "relVol": 0.71,
-      "score": 36.5,
+      "score": 36.4,
       "scoreCoverage": 5
     },
     {
@@ -3010,7 +3010,7 @@ window.STOCK_DATA = {
       "ret3m": 6.87,
       "pctFromHigh": -3.72,
       "relVol": 2.68,
-      "score": 35.7,
+      "score": 35.6,
       "scoreCoverage": 5
     },
     {
@@ -3402,7 +3402,7 @@ window.STOCK_DATA = {
       "ret3m": 9.39,
       "pctFromHigh": -30.28,
       "relVol": 3.18,
-      "score": 27.8,
+      "score": 27.7,
       "scoreCoverage": 4
     },
     {
