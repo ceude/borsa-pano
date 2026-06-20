@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-20T10:47:07+00:00",
+  "updatedAt": "2026-06-20T11:02:29+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -13,8 +13,8 @@ window.STOCK_DATA = {
     "USDTRY": 46.4289
   },
   "benchmarks": {
-    "DAX": 1.0,
-    "BIST": 0.61
+    "DAX": 1.54,
+    "BIST": 2.55
   },
   "stocks": [
     {
@@ -57,7 +57,7 @@ window.STOCK_DATA = {
       "volume": 21107349,
       "marketCap": 34719997952,
       "pe": 3.12,
-      "pb": 0.99,
+      "pb": 0.75,
       "roe": 27.0,
       "debtToEquity": null,
       "netMargin": 59.02,
@@ -70,7 +70,7 @@ window.STOCK_DATA = {
       "ret3m": 4.99,
       "pctFromHigh": -10.55,
       "relVol": 0.75,
-      "score": 90.7,
+      "score": 93.5,
       "scoreCoverage": 4
     },
     {
@@ -84,7 +84,7 @@ window.STOCK_DATA = {
       "changePct": -0.46,
       "volume": 45651753,
       "marketCap": 347057258496,
-      "pe": 4.56,
+      "pe": 4.55,
       "pb": 1.06,
       "roe": 25.11,
       "debtToEquity": null,
@@ -98,7 +98,7 @@ window.STOCK_DATA = {
       "ret3m": 7.89,
       "pctFromHigh": -17.1,
       "relVol": 0.75,
-      "score": 88.1,
+      "score": 87.9,
       "scoreCoverage": 4
     },
     {
@@ -182,7 +182,7 @@ window.STOCK_DATA = {
       "ret3m": 12.95,
       "pctFromHigh": -11.76,
       "relVol": 1.36,
-      "score": 84.6,
+      "score": 84.4,
       "scoreCoverage": 4
     },
     {
@@ -238,7 +238,7 @@ window.STOCK_DATA = {
       "ret3m": -8.31,
       "pctFromHigh": -15.05,
       "relVol": 0.63,
-      "score": 83.9,
+      "score": 83.7,
       "scoreCoverage": 5
     },
     {
@@ -378,7 +378,7 @@ window.STOCK_DATA = {
       "ret3m": 28.25,
       "pctFromHigh": -4.6,
       "relVol": 2.12,
-      "score": 73.1,
+      "score": 72.9,
       "scoreCoverage": 4
     },
     {
@@ -392,7 +392,7 @@ window.STOCK_DATA = {
       "changePct": 0.34,
       "volume": 7044434,
       "marketCap": 17477560320,
-      "pe": 4.78,
+      "pe": 4.43,
       "pb": 0.64,
       "roe": 12.6,
       "debtToEquity": 129.18,
@@ -406,7 +406,7 @@ window.STOCK_DATA = {
       "ret3m": 0.99,
       "pctFromHigh": -27.81,
       "relVol": 2.34,
-      "score": 72.1,
+      "score": 72.4,
       "scoreCoverage": 5
     },
     {
@@ -546,7 +546,7 @@ window.STOCK_DATA = {
       "ret3m": 6.5,
       "pctFromHigh": -13.44,
       "relVol": 1.12,
-      "score": 67.8,
+      "score": 67.7,
       "scoreCoverage": 5
     },
     {
@@ -602,7 +602,7 @@ window.STOCK_DATA = {
       "ret3m": 3.48,
       "pctFromHigh": -15.69,
       "relVol": 0.71,
-      "score": 64.3,
+      "score": 64.2,
       "scoreCoverage": 5
     },
     {
@@ -1399,7 +1399,7 @@ window.STOCK_DATA = {
       "prevClose": 54.58,
       "changePct": 0.95,
       "volume": 4149965,
-      "marketCap": 39317413888,
+      "marketCap": null,
       "pe": 16.9,
       "pb": 1.11,
       "roe": 6.83,
@@ -1446,34 +1446,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "TCELL.IS",
-      "market": "BIST",
-      "name": "TURKCELL",
-      "sector": "Communication Services",
-      "currency": "TRY",
-      "price": 113.4,
-      "prevClose": 116.0,
-      "changePct": -2.24,
-      "volume": 15586355,
-      "marketCap": 246808592384,
-      "pe": 13.4,
-      "pb": 0.95,
-      "roe": 7.35,
-      "debtToEquity": 70.93,
-      "netMargin": 7.37,
-      "netIncome": 18392408064,
-      "ma50": 111.568,
-      "ma200": 104.6769,
-      "rsi14": 63.9,
-      "atrPct": 3.35,
-      "ret1m": 6.98,
-      "ret3m": 4.52,
-      "pctFromHigh": -11.06,
-      "relVol": 0.75,
-      "score": 55.5,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "SISE.IS",
       "market": "BIST",
       "name": "SISE CAM",
@@ -1498,6 +1470,34 @@ window.STOCK_DATA = {
       "ret3m": 6.99,
       "pctFromHigh": -10.45,
       "relVol": 1.7,
+      "score": 55.3,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "TCELL.IS",
+      "market": "BIST",
+      "name": "TURKCELL",
+      "sector": "Communication Services",
+      "currency": "TRY",
+      "price": 113.4,
+      "prevClose": 116.0,
+      "changePct": -2.24,
+      "volume": 15586355,
+      "marketCap": 246808592384,
+      "pe": 13.42,
+      "pb": 0.95,
+      "roe": 7.35,
+      "debtToEquity": 70.93,
+      "netMargin": 7.37,
+      "netIncome": 18392408064,
+      "ma50": 111.568,
+      "ma200": 104.6769,
+      "rsi14": 63.9,
+      "atrPct": 3.35,
+      "ret1m": 6.98,
+      "ret3m": 4.52,
+      "pctFromHigh": -11.06,
+      "relVol": 0.75,
       "score": 55.3,
       "scoreCoverage": 5
     },
@@ -1558,34 +1558,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "PGSUS.IS",
-      "market": "BIST",
-      "name": "PEGASUS",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 183.7,
-      "prevClose": 184.7,
-      "changePct": -0.54,
-      "volume": 16012710,
-      "marketCap": 91849998336,
-      "pe": 10.65,
-      "pb": 0.79,
-      "roe": 8.79,
-      "debtToEquity": 206.37,
-      "netMargin": 5.28,
-      "netIncome": 8626484224,
-      "ma50": 178.804,
-      "ma200": 197.5,
-      "rsi14": 67.4,
-      "atrPct": 2.84,
-      "ret1m": 12.77,
-      "ret3m": 2.91,
-      "pctFromHigh": -32.96,
-      "relVol": 1.56,
-      "score": 54.0,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "FRE.DE",
       "market": "DAX",
       "name": "Fresenius SE & Co. KGaA       I",
@@ -1614,6 +1586,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "PGSUS.IS",
+      "market": "BIST",
+      "name": "PEGASUS",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 183.7,
+      "prevClose": 184.7,
+      "changePct": -0.54,
+      "volume": 16012710,
+      "marketCap": 91849998336,
+      "pe": 10.65,
+      "pb": 0.79,
+      "roe": 8.79,
+      "debtToEquity": 206.37,
+      "netMargin": 5.28,
+      "netIncome": 8626484224,
+      "ma50": 178.804,
+      "ma200": 197.5,
+      "rsi14": 67.4,
+      "atrPct": 2.84,
+      "ret1m": 12.77,
+      "ret3m": 2.91,
+      "pctFromHigh": -32.96,
+      "relVol": 1.56,
+      "score": 53.8,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "ASELS.IS",
       "market": "BIST",
       "name": "ASELSAN",
@@ -1624,7 +1624,7 @@ window.STOCK_DATA = {
       "changePct": -2.01,
       "volume": 19250277,
       "marketCap": 1835400036352,
-      "pe": 56.45,
+      "pe": 56.53,
       "pb": 6.53,
       "roe": 14.84,
       "debtToEquity": 18.78,
@@ -1754,34 +1754,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "SOKM.IS",
-      "market": "BIST",
-      "name": "SOK MARKETLER TICARET",
-      "sector": "Consumer Cyclical",
-      "currency": "TRY",
-      "price": 48.2,
-      "prevClose": 49.4,
-      "changePct": -2.43,
-      "volume": 5163562,
-      "marketCap": 28596578304,
-      "pe": 3.82,
-      "pb": 0.75,
-      "roe": -6.33,
-      "debtToEquity": 41.18,
-      "netMargin": -0.77,
-      "netIncome": -2196430848,
-      "ma50": 50.4346,
-      "ma200": 50.452,
-      "rsi14": 50.9,
-      "atrPct": 3.09,
-      "ret1m": 1.13,
-      "ret3m": -9.57,
-      "pctFromHigh": -31.14,
-      "relVol": 0.89,
-      "score": 51.8,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "PETUN.IS",
       "market": "BIST",
       "name": "PINAR ET VE UN",
@@ -1807,6 +1779,34 @@ window.STOCK_DATA = {
       "pctFromHigh": -20.52,
       "relVol": 0.77,
       "score": 51.7,
+      "scoreCoverage": 5
+    },
+    {
+      "symbol": "SOKM.IS",
+      "market": "BIST",
+      "name": "SOK MARKETLER TICARET",
+      "sector": "Consumer Cyclical",
+      "currency": "TRY",
+      "price": 48.2,
+      "prevClose": 49.4,
+      "changePct": -2.43,
+      "volume": 5163562,
+      "marketCap": 28596578304,
+      "pe": 3.82,
+      "pb": 0.75,
+      "roe": -6.33,
+      "debtToEquity": 41.18,
+      "netMargin": -0.77,
+      "netIncome": -2196430848,
+      "ma50": 50.4346,
+      "ma200": 50.452,
+      "rsi14": 50.9,
+      "atrPct": 3.09,
+      "ret1m": 1.13,
+      "ret3m": -9.57,
+      "pctFromHigh": -31.14,
+      "relVol": 0.89,
+      "score": 51.6,
       "scoreCoverage": 5
     },
     {
@@ -1933,7 +1933,7 @@ window.STOCK_DATA = {
       "volume": 437903,
       "marketCap": 55971426304,
       "pe": 52.91,
-      "pb": 11.13,
+      "pb": 10.48,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -1974,7 +1974,7 @@ window.STOCK_DATA = {
       "ret3m": 2.9,
       "pctFromHigh": -17.0,
       "relVol": 1.24,
-      "score": 50.0,
+      "score": 49.9,
       "scoreCoverage": 5
     },
     {
@@ -2198,7 +2198,7 @@ window.STOCK_DATA = {
       "ret3m": 53.08,
       "pctFromHigh": 0.0,
       "relVol": 3.22,
-      "score": 47.1,
+      "score": 46.9,
       "scoreCoverage": 5
     },
     {
@@ -2282,7 +2282,7 @@ window.STOCK_DATA = {
       "ret3m": -30.52,
       "pctFromHigh": -35.97,
       "relVol": 0.78,
-      "score": 46.1,
+      "score": 45.9,
       "scoreCoverage": 4
     },
     {
@@ -2394,7 +2394,7 @@ window.STOCK_DATA = {
       "ret3m": 0.77,
       "pctFromHigh": -20.21,
       "relVol": 1.08,
-      "score": 44.7,
+      "score": 44.5,
       "scoreCoverage": 4
     },
     {
@@ -2562,7 +2562,7 @@ window.STOCK_DATA = {
       "ret3m": -0.59,
       "pctFromHigh": -25.87,
       "relVol": 1.0,
-      "score": 42.6,
+      "score": 42.5,
       "scoreCoverage": 5
     },
     {
@@ -2594,34 +2594,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "AGROT.IS",
-      "market": "BIST",
-      "name": "AGROTECH TEKNOLOJI",
-      "sector": "Industrials",
-      "currency": "TRY",
-      "price": 2.78,
-      "prevClose": 2.81,
-      "changePct": -1.07,
-      "volume": 32836438,
-      "marketCap": 6672000000,
-      "pe": null,
-      "pb": 0.91,
-      "roe": -9.6,
-      "debtToEquity": 3.37,
-      "netMargin": -30.7,
-      "netIncome": -684608320,
-      "ma50": 3.0064,
-      "ma200": 3.3191,
-      "rsi14": 33.3,
-      "atrPct": 2.72,
-      "ret1m": 0.0,
-      "ret3m": -7.95,
-      "pctFromHigh": -36.02,
-      "relVol": 1.34,
-      "score": 41.7,
-      "scoreCoverage": 4
-    },
-    {
       "symbol": "GSDHO.IS",
       "market": "BIST",
       "name": "GSD HOLDING",
@@ -2650,6 +2622,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "AGROT.IS",
+      "market": "BIST",
+      "name": "AGROTECH TEKNOLOJI",
+      "sector": "Industrials",
+      "currency": "TRY",
+      "price": 2.78,
+      "prevClose": 2.81,
+      "changePct": -1.07,
+      "volume": 32836438,
+      "marketCap": 6672000000,
+      "pe": null,
+      "pb": 0.91,
+      "roe": -9.6,
+      "debtToEquity": 3.37,
+      "netMargin": -30.7,
+      "netIncome": -684608320,
+      "ma50": 3.0064,
+      "ma200": 3.3191,
+      "rsi14": 33.3,
+      "atrPct": 2.72,
+      "ret1m": 0.0,
+      "ret3m": -7.95,
+      "pctFromHigh": -36.02,
+      "relVol": 1.34,
+      "score": 41.5,
+      "scoreCoverage": 4
+    },
+    {
       "symbol": "AKCNS.IS",
       "market": "BIST",
       "name": "AKCANSA",
@@ -2660,7 +2660,7 @@ window.STOCK_DATA = {
       "changePct": -4.37,
       "volume": 1194343,
       "marketCap": 38978625536,
-      "pe": 61.33,
+      "pe": 61.7,
       "pb": 1.56,
       "roe": 2.61,
       "debtToEquity": 16.38,
@@ -2884,7 +2884,7 @@ window.STOCK_DATA = {
       "changePct": 1.5,
       "volume": 50089,
       "marketCap": 34474020864,
-      "pe": 459.0,
+      "pe": 478.12,
       "pb": 1.51,
       "roe": 0.35,
       "debtToEquity": 6.68,
@@ -2982,7 +2982,7 @@ window.STOCK_DATA = {
       "ret3m": -8.41,
       "pctFromHigh": -29.01,
       "relVol": 2.52,
-      "score": 35.9,
+      "score": 35.8,
       "scoreCoverage": 5
     },
     {
@@ -3094,7 +3094,7 @@ window.STOCK_DATA = {
       "ret3m": 43.44,
       "pctFromHigh": -1.69,
       "relVol": 0.97,
-      "score": 34.1,
+      "score": 34.0,
       "scoreCoverage": 5
     },
     {
@@ -3318,7 +3318,7 @@ window.STOCK_DATA = {
       "ret3m": 35.69,
       "pctFromHigh": -14.56,
       "relVol": 5.3,
-      "score": 30.1,
+      "score": 30.0,
       "scoreCoverage": 5
     },
     {
@@ -3360,7 +3360,7 @@ window.STOCK_DATA = {
       "changePct": -1.89,
       "volume": 214399,
       "marketCap": 14708136960,
-      "pe": 90.64,
+      "pe": 91.03,
       "pb": 5.43,
       "roe": 6.18,
       "debtToEquity": 110.54,
@@ -3430,7 +3430,7 @@ window.STOCK_DATA = {
       "ret3m": 13.28,
       "pctFromHigh": -48.0,
       "relVol": 23.73,
-      "score": 27.5,
+      "score": 27.4,
       "scoreCoverage": 4
     },
     {
