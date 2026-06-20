@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-20T10:17:07+00:00",
+  "updatedAt": "2026-06-20T10:32:15+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -13,8 +13,8 @@ window.STOCK_DATA = {
     "USDTRY": 46.4289
   },
   "benchmarks": {
-    "DAX": 1.54,
-    "BIST": 2.55
+    "DAX": 1.0,
+    "BIST": 0.61
   },
   "stocks": [
     {
@@ -1399,7 +1399,7 @@ window.STOCK_DATA = {
       "prevClose": 54.58,
       "changePct": 0.95,
       "volume": 4149965,
-      "marketCap": null,
+      "marketCap": 39317413888,
       "pe": 16.9,
       "pb": 1.11,
       "roe": 6.83,
@@ -1726,6 +1726,34 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "MAVI.IS",
+      "market": "BIST",
+      "name": "MAVI GIYIM",
+      "sector": "Consumer Cyclical",
+      "currency": "TRY",
+      "price": 42.0,
+      "prevClose": 42.0,
+      "changePct": 0.0,
+      "volume": 9573487,
+      "marketCap": 32911390720,
+      "pe": 17.8,
+      "pb": 2.4,
+      "roe": 11.07,
+      "debtToEquity": 34.62,
+      "netMargin": 3.94,
+      "netIncome": 1871083008,
+      "ma50": 42.4239,
+      "ma200": 40.7825,
+      "rsi14": 54.2,
+      "atrPct": 3.27,
+      "ret1m": 6.22,
+      "ret3m": -1.71,
+      "pctFromHigh": -12.8,
+      "relVol": 1.63,
+      "score": 51.9,
+      "scoreCoverage": 5
+    },
+    {
       "symbol": "SOKM.IS",
       "market": "BIST",
       "name": "SOK MARKETLER TICARET",
@@ -1754,34 +1782,6 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
-      "symbol": "MAVI.IS",
-      "market": "BIST",
-      "name": "MAVI GIYIM",
-      "sector": "Consumer Cyclical",
-      "currency": "TRY",
-      "price": 42.0,
-      "prevClose": 42.0,
-      "changePct": 0.0,
-      "volume": 9573487,
-      "marketCap": 32911390720,
-      "pe": 17.87,
-      "pb": 2.4,
-      "roe": 11.07,
-      "debtToEquity": 34.62,
-      "netMargin": 3.94,
-      "netIncome": 1871083008,
-      "ma50": 42.4239,
-      "ma200": 40.7825,
-      "rsi14": 54.2,
-      "atrPct": 3.27,
-      "ret1m": 6.22,
-      "ret3m": -1.71,
-      "pctFromHigh": -12.8,
-      "relVol": 1.63,
-      "score": 51.8,
-      "scoreCoverage": 5
-    },
-    {
       "symbol": "PETUN.IS",
       "market": "BIST",
       "name": "PINAR ET VE UN",
@@ -1806,7 +1806,7 @@ window.STOCK_DATA = {
       "ret3m": 8.67,
       "pctFromHigh": -20.52,
       "relVol": 0.77,
-      "score": 51.8,
+      "score": 51.7,
       "scoreCoverage": 5
     },
     {
@@ -1933,7 +1933,7 @@ window.STOCK_DATA = {
       "volume": 437903,
       "marketCap": 55971426304,
       "pe": 52.91,
-      "pb": 10.48,
+      "pb": 11.13,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
