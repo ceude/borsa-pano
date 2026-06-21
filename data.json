@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-21T10:17:09+00:00",
+  "updatedAt": "2026-06-21T10:32:16+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -1399,7 +1399,7 @@
       "prevClose": 54.58,
       "changePct": 0.95,
       "volume": 4149985,
-      "marketCap": null,
+      "marketCap": 39317413888,
       "pe": 16.9,
       "pb": 1.11,
       "roe": 6.83,
@@ -1933,7 +1933,7 @@
       "volume": 438000,
       "marketCap": 55971426304,
       "pe": 52.91,
-      "pb": 10.48,
+      "pb": 11.13,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -2831,7 +2831,7 @@
       "pe": 2.6,
       "pb": 0.3,
       "roe": -62.54,
-      "debtToEquity": 269.55,
+      "debtToEquity": 290.14,
       "netMargin": -21.91,
       "netIncome": -25870673920,
       "ma50": 27.1992,
