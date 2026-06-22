@@ -36,6 +36,8 @@
   .tpfield>label{display:block; font-size:12px; font-weight:600; color:var(--ink); margin-bottom:5px}
   .tpfield .fld, .tpfield select{width:100%}
   .tphelp{font-size:11px; color:var(--faint); margin-top:4px; line-height:1.45}
+  .botbar{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:14px 0}
+  .bottag{font-size:11px; color:var(--brand); background:rgba(124,92,255,.12); border-radius:6px; padding:1px 6px; margin-left:4px}
   .pmark{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:0; flex:none}
   .pmark.sim{background:#7c5cff}
   .pmark.real{background:#ec4899}
@@ -355,6 +357,14 @@
         <div><div class="k">Toplam</div><div class="v" id="totV">—</div></div>
         <div><div class="k">Toplam K/Z</div><div class="v" id="pnlV">—</div></div>
       </div>
+      <div class="botbar">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+          <button class="ghost" id="botBtn">🤖 Oto-trader: kapalı</button>
+          <span class="hint" id="botStatus"></span>
+        </div>
+        <div class="hint" style="margin-top:6px">Kurallar (sabit): Gün İçi Skor ≥ 70 · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · piyasa başına en çok 5 pozisyon · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
+      </div>
+      <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
       <div class="simgrid">
         <div class="trade">
           <h3>İşlem</h3>
@@ -652,6 +662,8 @@ function load(){ try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){r
 var S = load();
 S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.simHist = S.simHist || {}; S.realHist = S.realHist || {};
+S.botPos = S.botPos || {BIST:{}, DAX:{}}; S.botCool = S.botCool || {BIST:{}, DAX:{}};
+if(S.botEnabled===undefined) S.botEnabled=false;
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
 function simFor(m){
   var start=(m==='BIST'?100000:10000);
@@ -1149,7 +1161,8 @@ function renderSim(){
   $('simLog').innerHTML = sim.log.length? sim.log.map(function(e){
     var d=new Date(e.t); var sc=e.side==='buy'?'up':'down'; var st=e.side==='buy'?'AL':'SAT';
     var eur=(e.rate?' · ≈€'+fmt(eurOf(e.px*e.qty,e.rate)):'');
-    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
+    var bot=e.bot?' <span class="bottag">🤖'+(e.reason?' '+e.reason:'')+'</span>':'';
+    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
   }).join(''):'<div class="empty">işlem yok</div>';
 }
 
@@ -1319,6 +1332,81 @@ function renderMovers(){
 }
 
 /* ---------- render all ---------- */
+/* ===== OTO-TRADER (yalnız simülasyon; tarayıcı açıkken çalışır) ===== */
+var BOT = { scoreMin:70, riskPct:1.0, atrMult:1.5, targetR:2.0, maxPos:5, maxPosPct:25, regimeMin:-0.5, coolMs:3*3600*1000 };
+var botTimer=null;
+function bySym(list,sym){ for(var i=0;i<list.length;i++) if(list[i].symbol===sym) return list[i]; return null; }
+function botEquity(sim,list){ var v=sim.cash; Object.keys(sim.holdings).forEach(function(sym){ var s=bySym(list,sym); if(s&&s.price!=null) v+=s.price*sim.holdings[sym].qty; }); return v; }
+function botBuy(m,sym,qty,px,stop,target){
+  var sim=simFor(m); var cost=px*qty; if(qty<1||cost>sim.cash) return false;
+  var rate=(m==='BIST'?EURTRY:null);
+  sim.cash-=cost; var h=sim.holdings[sym]||{qty:0,cost:0,eurCost:0};
+  h.cost+=cost; h.qty+=qty; if(m==='BIST') h.eurCost=(h.eurCost||0)+(rate?cost/rate:0); sim.holdings[sym]=h;
+  sim.log.unshift({t:Date.now(),side:'buy',sym:sym,qty:qty,px:px,rate:rate,bot:true,reason:'oto giriş'});
+  S.botPos[m][sym]={qty:qty,entry:px,stop:stop,target:target,t:Date.now()};
+  return true;
+}
+function botSell(m,sym,px,reason){
+  var sim=simFor(m); var h=sim.holdings[sym]; var bp=S.botPos[m][sym];
+  if(!h||!bp||px==null){ delete S.botPos[m][sym]; return; }
+  var q=Math.min(bp.qty,h.qty); if(q<1){ delete S.botPos[m][sym]; return; }
+  var avg=h.cost/h.qty; h.cost-=avg*q; if(m==='BIST'){var ea=(h.eurCost||0)/h.qty; h.eurCost=(h.eurCost||0)-ea*q;} h.qty-=q;
+  var rate=(m==='BIST'?EURTRY:null); sim.cash+=px*q; if(h.qty<=0) delete sim.holdings[sym];
+  sim.log.unshift({t:Date.now(),side:'sell',sym:sym,qty:q,px:px,rate:rate,bot:true,reason:reason});
+  delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs;
+}
+function botTick(){
+  if(!S.botEnabled) return; var acted=false, now=Date.now();
+  ['BIST','DAX'].forEach(function(m){
+    var list=(STOCKS||[]).filter(function(s){return s.market===m;}); if(!list.length) return;
+    var sim=simFor(m);
+    // 1) açık pozisyonların çıkışları (stop / hedef / trend kırılması)
+    Object.keys(S.botPos[m]).forEach(function(sym){
+      var bp=S.botPos[m][sym]; if(!sim.holdings[sym]){ delete S.botPos[m][sym]; return; }
+      var s=bySym(list,sym); if(!s||s.price==null) return; var px=s.price;
+      if(px<=bp.stop) { botSell(m,sym,px,'stop'); acted=true; }
+      else if(px>=bp.target) { botSell(m,sym,px,'hedef (2R)'); acted=true; }
+      else if(s.ma50!=null && px<s.ma50) { botSell(m,sym,px,'trend kırıldı'); acted=true; }
+    });
+    // 2) piyasa rejimi: kırmızı günde yeni alım yok
+    var withCh=list.filter(function(s){return typeof s.changePct==='number';});
+    var avgCh=withCh.length? withCh.reduce(function(a,s){return a+s.changePct;},0)/withCh.length : 0;
+    if(avgCh<BOT.regimeMin) return;
+    var openCount=Object.keys(S.botPos[m]).length; if(openCount>=BOT.maxPos) return;
+    // 3) aday giriş: Gün İçi Skor yüksek olanlar
+    var cands=list.map(function(s){ s._gi=gunIciSkoru(s,avgCh); return s; })
+      .filter(function(s){ return s._gi!=null && s._gi>=BOT.scoreMin && s.changePct>0 && s.price!=null && s.atrPct!=null
+        && !S.botPos[m][s.symbol] && !sim.holdings[s.symbol]
+        && !(S.botCool[m][s.symbol] && S.botCool[m][s.symbol]>now); })
+      .sort(function(a,b){return b._gi-a._gi;});
+    for(var i=0;i<cands.length && openCount<BOT.maxPos;i++){
+      var s=cands[i], px=s.price; var stopDist=BOT.atrMult*s.atrPct;
+      var stopPrice=px*(1-stopDist/100); var perShare=px-stopPrice; if(perShare<=0) continue;
+      var equity=botEquity(sim,list); var riskAmt=equity*BOT.riskPct/100;
+      var shares=Math.min(Math.floor(riskAmt/perShare), Math.floor((equity*BOT.maxPosPct/100)/px), Math.floor(sim.cash/px));
+      if(shares<1) continue;
+      if(botBuy(m,s.symbol,shares,px,stopPrice,px+BOT.targetR*perShare)){ openCount++; acted=true; }
+    }
+  });
+  S.botLastTick=now; save();
+  if(acted && MK){ renderSim(); renderSimChart(); renderScreen(); renderAllList(); renderTrade(); }
+  updateBotBtn();
+}
+function updateBotBtn(){
+  var b=$('botBtn'); if(!b) return;
+  var open=(S.botPos.BIST?Object.keys(S.botPos.BIST).length:0)+(S.botPos.DAX?Object.keys(S.botPos.DAX).length:0);
+  if(S.botEnabled){ b.textContent='🤖 Oto-trader: AÇIK'; b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
+  else { b.textContent='🤖 Oto-trader: kapalı'; b.style.color=''; b.style.borderColor=''; }
+  var st=$('botStatus'); if(st){ st.innerHTML = S.botEnabled
+    ? ('çalışıyor · '+open+' açık oto-pozisyon'+(S.botLastTick?(' · son kontrol '+new Date(S.botLastTick).toLocaleTimeString('tr-TR')):''))
+    : 'kapalı — açarsan bu sekme açık kaldığı sürece kurallara göre kendi al-sat yapar.'; }
+}
+function setBot(on){
+  S.botEnabled=on; save();
+  if(botTimer){ clearInterval(botTimer); botTimer=null; }
+  if(on){ botTick(); botTimer=setInterval(botTick, 60*1000); }
+  updateBotBtn();
+}
 function renderAll(){
   syncSwitch(); renderMeta(); renderTicker(); fillSimSelect(); fillSymList();
   renderGunun(); renderScreen(); renderAllList(); renderMovers(); updateSimPx(); renderSim(); renderSimChart(); renderReal(); renderRealChart();
@@ -1336,6 +1424,7 @@ function refreshData(){
     RATES = (DATA&&DATA.rates)?DATA.rates:RATES;
     EURTRY = RATES.EURTRY;
     if(MK) renderAll();
+    if(S.botEnabled) botTick();
     if(s.parentNode) s.parentNode.removeChild(s);
   };
   s.onerror=function(){ if(s.parentNode) s.parentNode.removeChild(s); };
@@ -1355,6 +1444,8 @@ function setAuto(on){
 $('autoBtn').onclick=function(){ setAuto(!S.auto); };
 if(S.auto===undefined) S.auto=true;   // varsayilan: acik
 setAuto(S.auto);
+$('botBtn').onclick=function(){ setBot(!S.botEnabled); };
+setBot(S.botEnabled);
 
 /* ---------- boot ---------- */
 if(MK){ syncSwitch(); showApp(); } else { showGate(); }
