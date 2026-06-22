@@ -372,12 +372,19 @@
         <div><div class="k">Toplam K/Z</div><div class="v" id="pnlV">—</div></div>
       </div>
       <div class="botbar">
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
-          <button class="ghost" id="botBtn">🤖 Oto-trader: kapalı</button>
-          <label class="hint" style="display:flex; align-items:center; gap:6px">Skor eşiği <input id="botScore" class="fld" type="number" min="0" max="100" step="5" style="width:66px"></label>
-          <span class="hint" id="botStatus"></span>
+        <div class="hint" style="margin-bottom:8px"><b>🤖 Oto-trader</b> — her piyasa ayrı açılır/kapanır, ayrı eşik:</div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center">
+          <div style="display:flex; align-items:center; gap:8px">
+            <button class="ghost" id="botBtnBIST">BIST: kapalı</button>
+            <label class="hint" style="display:flex; align-items:center; gap:6px">eşik <input id="botThrBIST" class="fld" type="number" min="0" max="100" step="5" style="width:62px"></label>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px">
+            <button class="ghost" id="botBtnDAX">DAX: kapalı</button>
+            <label class="hint" style="display:flex; align-items:center; gap:6px">eşik <input id="botThrDAX" class="fld" type="number" min="0" max="100" step="5" style="width:62px"></label>
+          </div>
         </div>
-        <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> (yandaki kutudan ayarla; varsayılan 70) · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · tek pozisyon en çok özkaynağın %25'i · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
+        <span class="hint" id="botStatus" style="display:block; margin-top:8px"></span>
+        <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · tek pozisyon en çok özkaynağın %25'i · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
       </div>
       <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
       <div class="simgrid">
@@ -782,8 +789,10 @@ var S = load();
 S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.simHist = S.simHist || {}; S.realHist = S.realHist || {};
 S.botPos = S.botPos || {BIST:{}, DAX:{}}; S.botCool = S.botCool || {BIST:{}, DAX:{}};
-if(S.botEnabled===undefined) S.botEnabled=false;
-if(S.botScoreMin===undefined) S.botScoreMin=70;
+S.botOn = S.botOn || {BIST:false, DAX:false};
+S.botThr = S.botThr || {BIST:70, DAX:70};
+if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
+if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
 function simFor(m){
   var start=(m==='BIST'?100000:10000);
@@ -1478,9 +1487,10 @@ function botSell(m,sym,px,reason){
   delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs;
 }
 function botTick(){
-  if(!S.botEnabled) return; var acted=false, now=Date.now();
-  var thr=(S.botScoreMin!=null?S.botScoreMin:BOT.scoreMin);
+  if(!(S.botOn.BIST||S.botOn.DAX)) return; var acted=false, now=Date.now();
   ['BIST','DAX'].forEach(function(m){
+    if(!S.botOn[m]) return;
+    var thr=(S.botThr[m]!=null?S.botThr[m]:BOT.scoreMin);
     var list=(STOCKS||[]).filter(function(s){return s.market===m;}); if(!list.length) return;
     var sim=simFor(m);
     // 1) açık pozisyonların çıkışları (stop / hedef / trend kırılması)
@@ -1516,18 +1526,23 @@ function botTick(){
   updateBotBtn();
 }
 function updateBotBtn(){
-  var b=$('botBtn'); if(!b) return;
-  var open=(S.botPos.BIST?Object.keys(S.botPos.BIST).length:0)+(S.botPos.DAX?Object.keys(S.botPos.DAX).length:0);
-  if(S.botEnabled){ b.textContent='🤖 Oto-trader: AÇIK'; b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
-  else { b.textContent='🤖 Oto-trader: kapalı'; b.style.color=''; b.style.borderColor=''; }
-  var st=$('botStatus'); if(st){ st.innerHTML = S.botEnabled
-    ? ('çalışıyor · '+open+' açık oto-pozisyon'+(S.botLastTick?(' · son kontrol '+new Date(S.botLastTick).toLocaleTimeString('tr-TR')):''))
-    : 'kapalı — açarsan bu sekme açık kaldığı sürece kurallara göre kendi al-sat yapar.'; }
+  ['BIST','DAX'].forEach(function(m){
+    var b=$('botBtn'+m); if(!b) return;
+    if(S.botOn[m]){ b.textContent=m+': AÇIK'; b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
+    else { b.textContent=m+': kapalı'; b.style.color=''; b.style.borderColor=''; }
+  });
+  var st=$('botStatus'); if(!st) return;
+  var ob=S.botPos.BIST?Object.keys(S.botPos.BIST).length:0, od=S.botPos.DAX?Object.keys(S.botPos.DAX).length:0;
+  var parts=[];
+  if(S.botOn.BIST) parts.push('BIST açık ('+ob+' poz)');
+  if(S.botOn.DAX) parts.push('DAX açık ('+od+' poz)');
+  st.innerHTML = parts.length ? (parts.join(' · ')+(S.botLastTick?(' · son kontrol '+new Date(S.botLastTick).toLocaleTimeString('tr-TR')):''))
+    : 'İkisi de kapalı — açtığın piyasada, bu sekme açık kaldığı sürece kurallara göre al-sat yapar.';
 }
-function setBot(on){
-  S.botEnabled=on; save();
+function setBot(m,on){
+  S.botOn[m]=on; save();
   if(botTimer){ clearInterval(botTimer); botTimer=null; }
-  if(on){ botTick(); botTimer=setInterval(botTick, 60*1000); }
+  if(S.botOn.BIST||S.botOn.DAX){ botTick(); botTimer=setInterval(botTick, 60*1000); }
   updateBotBtn();
 }
 function renderAll(){
@@ -1547,7 +1562,7 @@ function refreshData(){
     RATES = (DATA&&DATA.rates)?DATA.rates:RATES;
     EURTRY = RATES.EURTRY;
     if(MK) renderAll();
-    if(S.botEnabled) botTick();
+    if(S.botOn.BIST||S.botOn.DAX) botTick();
     if(s.parentNode) s.parentNode.removeChild(s);
   };
   s.onerror=function(){ if(s.parentNode) s.parentNode.removeChild(s); };
@@ -1567,14 +1582,17 @@ function setAuto(on){
 $('autoBtn').onclick=function(){ setAuto(!S.auto); };
 if(S.auto===undefined) S.auto=true;   // varsayilan: acik
 setAuto(S.auto);
-$('botBtn').onclick=function(){ setBot(!S.botEnabled); };
-$('botScore').value=(S.botScoreMin!=null?S.botScoreMin:70);
+['BIST','DAX'].forEach(function(m){
+  $('botBtn'+m).onclick=function(){ setBot(m, !S.botOn[m]); };
+  var inp=$('botThr'+m); inp.value=(S.botThr[m]!=null?S.botThr[m]:70);
+  inp.onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botThr[m]=Math.max(0,Math.min(100,v)); this.value=S.botThr[m]; save(); if(S.botOn[m]) botTick(); updateBotBtn(); };
+});
 $('docBtn').onclick=function(){ $('docOv').classList.add('open'); };
 $('docClose').onclick=function(){ $('docOv').classList.remove('open'); };
 $('docOv').onclick=function(e){ if(e.target===this) this.classList.remove('open'); };
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('docOv').classList.remove('open'); });
-$('botScore').onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botScoreMin=Math.max(0,Math.min(100,v)); this.value=S.botScoreMin; save(); if(S.botEnabled) botTick(); updateBotBtn(); };
-setBot(S.botEnabled);
+updateBotBtn();
+if(S.botOn.BIST||S.botOn.DAX){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
 
 /* ---------- boot ---------- */
 if(MK){ syncSwitch(); showApp(); } else { showGate(); }
