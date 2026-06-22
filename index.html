@@ -574,7 +574,7 @@ function fSetup(s, bench){
   if(s.ret1m!=null){ var rs=s.ret1m-(bench!=null?bench:0); p.rs=clampN((rs+10)/20*100,0,100); } else p.rs=null;
   // Momentum: pozitif ama aşırı uzamamış
   if(s.ret1m!=null){ var r=s.ret1m;
-    p.mom = r<=0 ? clampN(40+r*4,0,40) : (r<=12 ? 70+(r/12)*30 : clampN(100-(r-12)*3,30,100));
+    p.mom = r<=0 ? clampN(40+r*4,0,40) : (r<=12 ? clampN(40+(r/12)*60,40,100) : clampN(100-(r-12)*3,30,100));
   } else p.mom=null;
   // RSI: 55-70 ideal, >78 aşırı alım
   if(s.rsi14!=null){ var q=s.rsi14;
@@ -886,6 +886,7 @@ function tpCalc(){
   var riskAmt=acct*riskPct/100;
   var shares=perShare>0? Math.floor(riskAmt/perShare):0;
   var posVal=shares*entry;
+  var tp15=entry+1.5*perShare, tp2=entry+2*perShare;   // R-katı kâr hedefleri
   var notes=[];
   if(shares<1) notes.push('Risk bütçen bu stop mesafesi için 1 adet bile almıyor — ya risk %\'ni artır ya stop\'u daralt (daha düşük ATR×).');
   if(posVal>acct) notes.push('Pozisyon değeri hesabından büyük — bu işlem kaldıraç gerektirir; dikkat.');
@@ -893,12 +894,14 @@ function tpCalc(){
   out.innerHTML='<div class="metrics">'+
     '<div class="metric"><div class="k">Stop fiyatı</div><div class="v">'+c+fmt(stopPrice)+'</div></div>'+
     '<div class="metric"><div class="k">Stop mesafesi</div><div class="v">'+fmt(stopDistPct,1)+'%</div></div>'+
-    '<div class="metric"><div class="k">Riske ettiğin</div><div class="v">'+c+fmt(riskAmt)+'</div></div>'+
+    '<div class="metric"><div class="k">Riske ettiğin (1R)</div><div class="v">'+c+fmt(riskAmt)+'</div></div>'+
     '<div class="metric"><div class="k">Adet</div><div class="v">'+shares+'</div></div>'+
     '<div class="metric"><div class="k">Pozisyon değeri</div><div class="v">'+c+fmt(posVal)+'</div></div>'+
+    '<div class="metric"><div class="k">Hedef 1.5R</div><div class="v up">'+c+fmt(tp15)+'</div></div>'+
+    '<div class="metric"><div class="k">Hedef 2R</div><div class="v up">'+c+fmt(tp2)+'</div></div>'+
     '</div>'+
     (notes.length?'<div class="hint down" style="margin-top:8px">'+notes.join('<br>')+'</div>':'')+
-    '<div class="hint" style="margin-top:8px">Mantık: stop'+'\'a düşersen kaybın ≈ '+c+fmt(riskAmt)+' (hesabının %'+fmt(riskPct,1)+'\'i). Kâr hedefini en az riskin 1.5–2 katı koy; zaman çıkışını (örn. gün sonu) önceden belirle.</div>';
+    '<div class="hint" style="margin-top:8px">1R = riske ettiğin tutar ('+c+fmt(riskAmt)+'). Stop\'a düşersen ~1R kaybeder, <b>Hedef 2R</b>\'ye ulaşırsan ~'+c+fmt(riskAmt*2)+' kazanırsın. Kazanan/kaybeden oranın düşükse bile 2R hedefle artıda kalabilirsin. Zaman çıkışını (örn. gün sonu) önceden belirle. Yatırım tavsiyesi değildir.</div>';
 }
 function renderGunun(){
   var bench = (DATA && DATA.benchmarks) ? DATA.benchmarks[MK] : null;
