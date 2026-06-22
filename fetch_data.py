@@ -242,10 +242,20 @@ def percentile_rank(values):
 
 
 def compute_scores(rows):
+    # Skoru HER PIYASA KENDI ICINDE yuzdelik sirala (BIST ve DAX farkli
+    # valuasyon rejimleri; birlikte siralarsak BIST hep "ucuz" cikar).
+    groups = {}
+    for r in rows:
+        groups.setdefault(r.get("market"), []).append(r)
+    for grp in groups.values():
+        _score_group(grp)
+
+
+def _score_group(rows):
     pe = [r["pe"] if (r["pe"] is not None and r["pe"] > 0) else None for r in rows]
     pb = [r["pb"] if (r["pb"] is not None and r["pb"] > 0) else None for r in rows]
     roe = [r["roe"] for r in rows]
-    de = [r["debtToEquity"] for r in rows]
+    de = [r["debtToEquity"] if (r["debtToEquity"] is not None and r["debtToEquity"] >= 0) else None for r in rows]
     margin = [r["netMargin"] for r in rows]
 
     # yuzdelikler
