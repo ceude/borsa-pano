@@ -38,6 +38,17 @@
   .tphelp{font-size:11px; color:var(--faint); margin-top:4px; line-height:1.45}
   .botbar{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:14px 0}
   .bottag{font-size:11px; color:var(--brand); background:rgba(124,92,255,.12); border-radius:6px; padding:1px 6px; margin-left:4px}
+  .docov{position:fixed; inset:0; background:rgba(15,18,28,.55); display:none; z-index:200; padding:20px; overflow:auto}
+  .docov.open{display:block}
+  .doccard{background:var(--surface); border:1px solid var(--line); border-radius:16px; max-width:820px; margin:0 auto; padding:24px 28px; box-shadow:0 24px 70px rgba(0,0,0,.28)}
+  .docclose{float:right; cursor:pointer; border:1px solid var(--line); background:var(--bg); border-radius:10px; padding:6px 12px; font:inherit; color:var(--ink)}
+  .doc h1{font-size:21px; margin:0 0 6px} .doc h2{font-size:16px; margin:22px 0 8px; color:var(--brand)} .doc h3{font-size:14px; margin:15px 0 5px}
+  .doc p,.doc li{font-size:13px; line-height:1.6; color:var(--ink)} .doc ul{margin:6px 0 6px 18px; padding:0}
+  .doc table{width:100%; border-collapse:collapse; margin:8px 0; font-size:12px}
+  .doc th,.doc td{border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top}
+  .doc th{background:var(--bg)} .doc code{background:var(--bg); padding:1px 5px; border-radius:5px}
+  .doc pre{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:12px; overflow:auto; font-size:12px; line-height:1.5; white-space:pre}
+  .doc .warn{background:var(--down-bg); border:1px solid var(--down); color:#7a2530; border-radius:10px; padding:10px 12px; margin:10px 0; font-size:13px}
   .pmark{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:0; flex:none}
   .pmark.sim{background:#7c5cff}
   .pmark.real{background:#ec4899}
@@ -282,6 +293,9 @@
 
   <main>
     <section class="view card" id="v-trade">
+      <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
+        <button class="ghost" id="docBtn">📄 Bu sayfa nasıl çalışır?</button>
+      </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
         <b>Önce oku.</b> Bu modül ~15 dk <b>gecikmeli</b> ve günde yalnız birkaç kez güncellenen veriyle çalışır → gerçek-zamanlı scalp/gün-içi icra için <b>uygun değildir</b>. Burası "bugün ne hareketli, hacim nerede, piyasayı kim yeniyor" diye bakılan <b>gecikmeli bir izleme listesi</b> ve bir <b>risk hesaplayıcıdır</b>. Hiçbir satır "al" sinyali değildir; gün içi yön güvenilir tahmin edilemez. Gerçek paradan önce Simülatörde dene, <b>her işleme stop koy</b>. Yatırım tavsiyesi değildir.
       </div>
@@ -515,6 +529,110 @@
           <div class="rng">Eşikler sektöre göre değişir; bunlar genel pusuladır, kesin kural değil. Yatırım tavsiyesi değildir.</div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="docov" id="docOv">
+  <div class="doccard">
+    <button class="docclose" id="docClose">✕ Kapat</button>
+    <div class="doc">
+      <h1>Günlük Trade — nasıl çalışır?</h1>
+      <p>Bu sayfadaki listenin nasıl oluştuğu: verinin kaynağı, gecikmesi, güncelleme sıklığı, her sütunun anlamı ve özellikle Gün İçi Skor ile Trend'in matematiği. Tüm formüller koddan birebir.</p>
+      <div class="warn"><b>Önce oku:</b> Veri ~15 dk gecikmeli ve seyrek güncellenir → gerçek zamanlı işlem için uygun değildir; bir izleme/aday aracıdır. Hiçbir satır "al" sinyali değildir. Yatırım tavsiyesi değildir.</div>
+
+      <h2>1. Veri kaynağı ve gecikme</h2>
+      <table><tr><th>Konu</th><th>Değer</th></tr>
+        <tr><td>Kaynak</td><td>Yahoo Finance (Python <code>yfinance</code>)</td></tr>
+        <tr><td>DAX sembolü</td><td><code>.DE</code> (Deutsche Börse XETRA), örn. <code>IFX.DE</code></td></tr>
+        <tr><td><b>Gecikme</b></td><td><b>15 dakika</b> — Yahoo'nun resmî tablosuna göre XETRA (.DE) 15 dk; BIST (.IS) de 15 dk. İkisi de anlık DEĞİL.</td></tr>
+      </table>
+
+      <h2>2. Güncelleme sıklığı</h2>
+      <ul>
+        <li><b>Sunucu:</b> cron-job.org her 15 dk (borsa saatlerinde) → GitHub Actions → <code>fetch_data.py</code> → <code>data.js</code>.</li>
+        <li><b>Tarayıcı:</b> pano açıkken <code>data.js</code>'i 10 dk'da bir yeniden indirir.</li>
+      </ul>
+      <p>Net: gördüğün fiyat ≈ 15 dk kaynak gecikmesi + son çekimden bu yana ~15 dk = <b>yaklaşık 30 dk'ya kadar</b> eski olabilir (DAX ve BIST için aynı).</p>
+
+      <h2>3. Ham veriler nasıl elde ediliyor</h2>
+      <h3>Anlık alanlar (info / fast_info)</h3>
+      <ul>
+        <li><b>price:</b> currentPrice → regularMarketPrice → (yedek) önceki kapanış / fast_info / geçmiş.</li>
+        <li><b>prevClose:</b> regularMarketPreviousClose → previousClose.</li>
+        <li><b>volume:</b> regularMarketVolume → volume → averageVolume.</li>
+        <li><b>Gün % (changePct):</b> <code>(price − prevClose) / prevClose × 100</code>.</li>
+      </ul>
+      <h3>Teknikler (1 yıllık günlük geçmişten)</h3>
+      <table><tr><th>Alan</th><th>Formül</th></tr>
+        <tr><td>ma50 / ma200</td><td>Son 50 / 200 günün kapanış ortalaması</td></tr>
+        <tr><td>relVol</td><td>bugünkü hacim ÷ önceki 20 günün ortalama hacmi</td></tr>
+        <tr><td>atrPct</td><td>14 günlük ATR ÷ fiyat × 100</td></tr>
+        <tr><td>rsi14 / ret1m / ret3m / pctFromHigh</td><td>(Günlük Trade skorunda kullanılmaz; Kısa Vade'de kullanılır)</td></tr>
+      </table>
+      <p><b>ATR:</b> son 14 günün "gerçek aralığı" ortalaması; gerçek aralık = <code>max(yüksek−düşük, |yüksek−önceki kapanış|, |düşük−önceki kapanış|)</code>. Hissenin günlük tipik dalgalanması.</p>
+      <p><b>Önemli:</b> teknikler günlük çubuklardan gelir (gün içi değil). Sadece price/prevClose/volume/changePct "bugünkü" (15 dk gecikmeli) anlık değerlerdir.</p>
+
+      <h2>4. Liste nasıl oluşuyor</h2>
+      <ul>
+        <li>Seçili piyasanın hisseleri → yalnız <b>bugün yükselenler</b> (Gün % &gt; 0).</li>
+        <li><b>Gün İçi Skor</b>'a göre büyükten küçüğe sıralanır, <b>ilk 12</b> gösterilir.</li>
+        <li><b>Piyasa ortalaması (mktAvg):</b> o piyasadaki tüm hisselerin Gün % ortalaması (üstteki "Piyasa: %X" satırı).</li>
+      </ul>
+
+      <h2>5. Sütun tanımları</h2>
+      <table><tr><th>Sütun</th><th>Anlamı</th><th>Kaynak</th></tr>
+        <tr><td>Hisse</td><td>Kod + ad. Önündeki nokta: mor=Simülatörde, pembe=Gerçek portföyde var.</td><td>symbol/name</td></tr>
+        <tr><td>Gün İçi Skor</td><td>0–100 "bugün dikkat çekme" puanı. AL sinyali değil.</td><td>Bölüm 6</td></tr>
+        <tr><td>Gün %</td><td>Bugünkü değişim (önceki kapanışa göre).</td><td>changePct</td></tr>
+        <tr><td>Rel.Hacim</td><td>Bugünkü hacim ÷ 20 gün ort. 1.0×=normal, yüksek=konviksiyon.</td><td>relVol</td></tr>
+        <tr><td>Rel.Güç</td><td>Gün % − piyasa ortalaması. Pozitifse piyasayı yeniyor.</td><td>changePct−mktAvg</td></tr>
+        <tr><td>Trend</td><td>Fiyatın ortalamalara göre yönü (↑↑/↑/↓).</td><td>Bölüm 7</td></tr>
+        <tr><td>ATR%</td><td>Ortalama günlük dalgalanma (fiyat %'si).</td><td>atrPct</td></tr>
+        <tr><td>Fiyat</td><td>Güncel fiyat (~15 dk gecikmeli).</td><td>price</td></tr>
+      </table>
+
+      <h2>6. Gün İçi Skor (0–100)</h2>
+      <p>Dört bileşenin toplamı. <code>ch</code>=Gün %, <code>mktAvg</code>=piyasa ortalaması.</p>
+      <h3>Bileşen 1 — Yön + güç (en fazla 35)</h3>
+      <ul><li><code>0 &lt; ch ≤ 3.5</code> → <code>(ch/3.5)×35</code></li>
+      <li><code>ch &gt; 3.5</code> → <code>max(10, 35−(ch−3.5)×5)</code> — parabolik hareket cezalı (taban 10).</li></ul>
+      <h3>Bileşen 2 — Relatif hacim (en fazla 30)</h3>
+      <p><code>clamp((relVol−0.8)×30, 0, 30)</code>. relVol 0.8→0, 1.8→30.</p>
+      <h3>Bileşen 3 — Piyasaya göre güç (en fazla 20)</h3>
+      <p><code>clamp((ch−mktAvg)×8, 0, 20)</code>. Piyasayı %2.5 geçince tavan.</p>
+      <h3>Bileşen 4 — Trend uyumu (en fazla 15)</h3>
+      <p>price&gt;ma50 ve ma50&gt;ma200 → 15; sadece price&gt;ma50 → 9; aksi halde 0.</p>
+      <p><b>Toplam:</b> <code>yuvarla(clamp(B1+B2+B3+B4, 0, 100))</code>.</p>
+
+      <h2>7. TREND sütunu (detaylı)</h2>
+      <table><tr><th>Koşul</th><th>Gösterim</th><th>Anlam</th></tr>
+        <tr><td>ma50 veya price yok</td><td>—</td><td>Yeterli geçmiş yok</td></tr>
+        <tr><td>price &gt; ma50 <b>ve</b> ma50 &gt; ma200</td><td>↑↑</td><td>Güçlü yükseliş dizilimi (boğa)</td></tr>
+        <tr><td>price &gt; ma50 (ma200 koşulu yok)</td><td>↑</td><td>Yukarı; uzun vade dizilimi henüz tam değil</td></tr>
+        <tr><td>price ≤ ma50</td><td>↓</td><td>Zayıf; 50 günlüğün altında</td></tr>
+      </table>
+      <p><b>Kullandığı veriler:</b> price (anlık, 15 dk gecikmeli); ma50/ma200 (1 yıllık günlük geçmişten). ↑↑ için ≥200 günlük geçmiş gerekir; yoksa en fazla ↑ çıkar. Gün İçi Skor'daki Trend uyumu da aynı mantığı kullanır (↑↑=15, ↑=9, ↓=0).</p>
+
+      <h2>8. Özet akış</h2>
+      <pre>yfinance (Yahoo, XETRA .DE, 15 dk gecikmeli)
+   │  cron-job.org 15 dk → GitHub Actions → fetch_data.py
+   ▼
+ data.js  ──(tarayıcı 10 dk'da indirir)──►  Pano
+   │  Anlık: price, prevClose, volume, changePct
+   │  Teknik (1y): ma50, ma200, atrPct, relVol …
+   ▼
+ renderTrade(): piyasa → changePct&gt;0 → skora göre sırala → ilk 12
+   ▼
+ Hisse | Gün İçi Skor | Gün % | Rel.Hacim | Rel.Güç | Trend | ATR% | Fiyat</pre>
+
+      <h2>9. Sınırlar</h2>
+      <ul>
+        <li>Veri 15 dk gecikmeli, ~30 dk'ya kadar eski olabilir → gerçek gün içi icra için uygun değil.</li>
+        <li>Skor bir <b>dikkat/aday</b> puanıdır; fiyatın yükseleceğini tahmin etmez.</li>
+        <li>Ağırlıklar deneysel ve <b>geriye dönük test edilmemiştir</b>.</li>
+        <li><b>Yatırım tavsiyesi değildir.</b> Gerçek paradan önce Simülatörde dene, stop koy.</li>
+      </ul>
     </div>
   </div>
 </div>
@@ -1451,6 +1569,10 @@ if(S.auto===undefined) S.auto=true;   // varsayilan: acik
 setAuto(S.auto);
 $('botBtn').onclick=function(){ setBot(!S.botEnabled); };
 $('botScore').value=(S.botScoreMin!=null?S.botScoreMin:70);
+$('docBtn').onclick=function(){ $('docOv').classList.add('open'); };
+$('docClose').onclick=function(){ $('docOv').classList.remove('open'); };
+$('docOv').onclick=function(e){ if(e.target===this) this.classList.remove('open'); };
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('docOv').classList.remove('open'); });
 $('botScore').onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botScoreMin=Math.max(0,Math.min(100,v)); this.value=S.botScoreMin; save(); if(S.botEnabled) botTick(); updateBotBtn(); };
 setBot(S.botEnabled);
 
