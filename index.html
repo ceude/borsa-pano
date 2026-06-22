@@ -1132,7 +1132,10 @@ function renderSim(){
   $('simHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Fiyat</th><th>Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>')
     :'<div class="empty">pozisyon yok — bir hisse seç ve AL</div>';
   $('simHold').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
-  $('simHold').querySelectorAll('[data-trade]').forEach(function(b){b.onclick=function(){ selectInSim(b.dataset.trade); };});
+  $('simHold').querySelectorAll('[data-trade]').forEach(function(b){b.onclick=function(){
+    var sym=b.dataset.trade; selectInSim(sym);
+    var h=simFor(MK).holdings[sym]; if(h){ $('simQty').value=h.qty; recalcCost(); }
+  };});
   $('simHold').querySelectorAll('[data-real]').forEach(function(b){b.onclick=function(){
     var sym=b.dataset.real, hh=simFor(MK).holdings[sym]; if(!hh)return;
     realFor(MK).log.push({t:Date.now(),side:'buy',sym:sym,qty:hh.qty,px:hh.cost/hh.qty,rate:(MK==='BIST'?EURTRY:null)});
@@ -1254,7 +1257,7 @@ function renderReal(){
 /* ---------- line chart (sim + gerçek portföy) ---------- */
 function lineChart(points, color){
   if(!points.length) return '<div class="empty">veri yok — aşağıdan içe aktar</div>';
-  var W=760,H=280,Pl=58,Pr=18,Pt=18,Pb=36;
+  var W=760,H=280,Pl=68,Pr=18,Pt=18,Pb=36;
   var ys=points.map(function(p){return p.y;});
   var lo=Math.min.apply(null,ys), hi=Math.max.apply(null,ys); var pad=(hi-lo)*0.08||1; lo-=pad; hi+=pad;
   function px(i){return Pl+(i/((points.length-1)||1))*(W-Pl-Pr);}
@@ -1262,13 +1265,18 @@ function lineChart(points, color){
   var d=points.map(function(p,i){return (i?'L':'M')+px(i).toFixed(1)+' '+py(p.y).toFixed(1);}).join(' ');
   var area=d+' L '+px(points.length-1).toFixed(1)+' '+(H-Pb)+' L '+px(0).toFixed(1)+' '+(H-Pb)+' Z';
   var grid='',ticks=4;
-  for(var i=0;i<=ticks;i++){var v=lo+(hi-lo)*i/ticks; var y=py(v); grid+='<line class="grid" x1="'+Pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-Pr)+'" y2="'+y.toFixed(1)+'"/><text class="ylab" x="'+(Pl-8)+'" y="'+(y+4).toFixed(1)+'">'+shortNum(v)+'</text>';}
+  for(var i=0;i<=ticks;i++){var v=lo+(hi-lo)*i/ticks; var y=py(v); grid+='<line class="grid" x1="'+Pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-Pr)+'" y2="'+y.toFixed(1)+'"/><text class="ylab" x="'+(Pl-8)+'" y="'+(y+4).toFixed(1)+'">'+fmt(v,0)+'</text>';}
   var xl='';[0,Math.floor(points.length/2),points.length-1].forEach(function(i){ if(points[i]) xl+='<text class="xlab" x="'+px(i).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle">'+points[i].label+'</text>'; });
-  var last=points[points.length-1];
+  var dots=points.map(function(p,i){
+    var cx=px(i).toFixed(1), cy=py(p.y).toFixed(1);
+    var tip=(p.label?p.label+'  ':'')+ccySym(MK)+fmt(p.y);
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="transparent" style="cursor:pointer"><title>'+tip+'</title></circle>'+
+           '<circle cx="'+cx+'" cy="'+cy+'" r="3.5" fill="'+color+'"/>';
+  }).join('');
   return '<svg viewBox="0 0 '+W+' '+H+'" class="chart">'+grid+
     '<path d="'+area+'" fill="'+color+'" opacity="0.10"/>'+
     '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'+
-    '<circle cx="'+px(points.length-1).toFixed(1)+'" cy="'+py(last.y).toFixed(1)+'" r="4" fill="'+color+'"/>'+xl+'</svg>';
+    dots+xl+'</svg>';
 }
 
 /* ---------- notes ---------- */
