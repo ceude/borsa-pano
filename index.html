@@ -363,7 +363,7 @@
           <label class="hint" style="display:flex; align-items:center; gap:6px">Skor eşiği <input id="botScore" class="fld" type="number" min="0" max="100" step="5" style="width:66px"></label>
           <span class="hint" id="botStatus"></span>
         </div>
-        <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> (yandaki kutudan ayarla; varsayılan 70) · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · piyasa başına en çok 5 pozisyon · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
+        <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> (yandaki kutudan ayarla; varsayılan 70) · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · tek pozisyon en çok özkaynağın %25'i · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
       </div>
       <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
       <div class="simgrid">
@@ -388,7 +388,7 @@
             </div>
           </div>
           <div class="scroll" id="simHold"></div>
-          <h3 style="font-size:16px; margin:20px 0 8px">İşlem Geçmişi</h3>
+          <h3 style="font-size:16px; margin:20px 0 8px">İşlem Geçmişi <span class="cov" id="simLogCount" style="font-weight:400"></span></h3>
           <div class="log scroll" id="simLog" style="max-height:230px"></div>
         </div>
       </div>
@@ -1166,6 +1166,8 @@ function renderSim(){
     var bot=e.bot?' <span class="bottag">🤖'+(e.reason?' '+e.reason:'')+'</span>':'';
     return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
   }).join(''):'<div class="empty">işlem yok</div>';
+  var buys=sim.log.filter(function(e){return e.side==='buy';}).length, sells=sim.log.length-buys;
+  $('simLogCount').innerHTML = sim.log.length ? ('· '+buys+' alış · '+sells+' satış · toplam '+sim.log.length) : '';
 }
 
 /* ---------- real portfolio ---------- */
@@ -1335,7 +1337,7 @@ function renderMovers(){
 
 /* ---------- render all ---------- */
 /* ===== OTO-TRADER (yalnız simülasyon; tarayıcı açıkken çalışır) ===== */
-var BOT = { scoreMin:70, riskPct:1.0, atrMult:1.5, targetR:2.0, maxPos:5, maxPosPct:25, regimeMin:-0.5, coolMs:3*3600*1000 };
+var BOT = { scoreMin:70, riskPct:1.0, atrMult:1.5, targetR:2.0, maxPos:Infinity, maxPosPct:25, regimeMin:-0.5, coolMs:3*3600*1000 };
 var botTimer=null;
 function bySym(list,sym){ for(var i=0;i<list.length;i++) if(list[i].symbol===sym) return list[i]; return null; }
 function botEquity(sim,list){ var v=sim.cash; Object.keys(sim.holdings).forEach(function(sym){ var s=bySym(list,sym); if(s&&s.price!=null) v+=s.price*sim.holdings[sym].qty; }); return v; }
