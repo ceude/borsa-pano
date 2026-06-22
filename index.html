@@ -360,9 +360,10 @@
       <div class="botbar">
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
           <button class="ghost" id="botBtn">🤖 Oto-trader: kapalı</button>
+          <label class="hint" style="display:flex; align-items:center; gap:6px">Skor eşiği <input id="botScore" class="fld" type="number" min="0" max="100" step="5" style="width:66px"></label>
           <span class="hint" id="botStatus"></span>
         </div>
-        <div class="hint" style="margin-top:6px">Kurallar (sabit): Gün İçi Skor ≥ 70 · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · piyasa başına en çok 5 pozisyon · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
+        <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> (yandaki kutudan ayarla; varsayılan 70) · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · piyasa başına en çok 5 pozisyon · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
       </div>
       <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
       <div class="simgrid">
@@ -664,6 +665,7 @@ S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.simHist = S.simHist || {}; S.realHist = S.realHist || {};
 S.botPos = S.botPos || {BIST:{}, DAX:{}}; S.botCool = S.botCool || {BIST:{}, DAX:{}};
 if(S.botEnabled===undefined) S.botEnabled=false;
+if(S.botScoreMin===undefined) S.botScoreMin=70;
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
 function simFor(m){
   var start=(m==='BIST'?100000:10000);
@@ -1357,6 +1359,7 @@ function botSell(m,sym,px,reason){
 }
 function botTick(){
   if(!S.botEnabled) return; var acted=false, now=Date.now();
+  var thr=(S.botScoreMin!=null?S.botScoreMin:BOT.scoreMin);
   ['BIST','DAX'].forEach(function(m){
     var list=(STOCKS||[]).filter(function(s){return s.market===m;}); if(!list.length) return;
     var sim=simFor(m);
@@ -1375,7 +1378,7 @@ function botTick(){
     var openCount=Object.keys(S.botPos[m]).length; if(openCount>=BOT.maxPos) return;
     // 3) aday giriş: Gün İçi Skor yüksek olanlar
     var cands=list.map(function(s){ s._gi=gunIciSkoru(s,avgCh); return s; })
-      .filter(function(s){ return s._gi!=null && s._gi>=BOT.scoreMin && s.changePct>0 && s.price!=null && s.atrPct!=null
+      .filter(function(s){ return s._gi!=null && s._gi>=thr && s.changePct>0 && s.price!=null && s.atrPct!=null
         && !S.botPos[m][s.symbol] && !sim.holdings[s.symbol]
         && !(S.botCool[m][s.symbol] && S.botCool[m][s.symbol]>now); })
       .sort(function(a,b){return b._gi-a._gi;});
@@ -1445,6 +1448,8 @@ $('autoBtn').onclick=function(){ setAuto(!S.auto); };
 if(S.auto===undefined) S.auto=true;   // varsayilan: acik
 setAuto(S.auto);
 $('botBtn').onclick=function(){ setBot(!S.botEnabled); };
+$('botScore').value=(S.botScoreMin!=null?S.botScoreMin:70);
+$('botScore').onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botScoreMin=Math.max(0,Math.min(100,v)); this.value=S.botScoreMin; save(); if(S.botEnabled) botTick(); updateBotBtn(); };
 setBot(S.botEnabled);
 
 /* ---------- boot ---------- */
