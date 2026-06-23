@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-23T06:32:00+00:00",
+  "updatedAt": "2026-06-23T06:44:30+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.1331,
-    "USDTRY": 46.475
+    "EURTRY": 53.1172,
+    "USDTRY": 46.4749
   },
   "benchmarks": {
     "DAX": 1.01,
@@ -1386,7 +1386,7 @@ window.STOCK_DATA = {
       "ret1m": -6.12,
       "ret3m": -10.93,
       "pctFromHigh": -17.64,
-      "relVol": 0.88,
+      "relVol": 1.11,
       "score": 63.3,
       "scoreCoverage": 5
     },
@@ -1848,7 +1848,7 @@ window.STOCK_DATA = {
       "prevClose": 55.1,
       "changePct": 0.91,
       "volume": 1090659,
-      "marketCap": null,
+      "marketCap": 39674200064,
       "pe": 17.06,
       "pb": 1.12,
       "roe": 6.83,
@@ -2114,7 +2114,7 @@ window.STOCK_DATA = {
       "ret1m": -7.11,
       "ret3m": -4.39,
       "pctFromHigh": -20.65,
-      "relVol": 1.38,
+      "relVol": 1.53,
       "score": 57.2,
       "scoreCoverage": 5
     },
@@ -2646,7 +2646,7 @@ window.STOCK_DATA = {
       "ret1m": 0.04,
       "ret3m": 3.97,
       "pctFromHigh": -15.66,
-      "relVol": 1.42,
+      "relVol": 1.36,
       "score": 55.0,
       "scoreCoverage": 5
     },
@@ -3247,7 +3247,7 @@ window.STOCK_DATA = {
       "price": 85.63,
       "prevClose": 86.84,
       "changePct": -1.39,
-      "volume": 10506108,
+      "volume": 10510168,
       "marketCap": 70962872320,
       "pe": 27.89,
       "pb": -66.79,
@@ -4423,7 +4423,7 @@ window.STOCK_DATA = {
       "price": 78.81,
       "prevClose": 77.41,
       "changePct": 1.81,
-      "volume": 4624176,
+      "volume": 4631843,
       "marketCap": 49198682112,
       "pe": 22.71,
       "pb": 2.08,
@@ -5502,7 +5502,7 @@ window.STOCK_DATA = {
       "ret1m": 8.8,
       "ret3m": 35.3,
       "pctFromHigh": -9.22,
-      "relVol": 0.95,
+      "relVol": 1.06,
       "score": 33.5,
       "scoreCoverage": 5
     },
@@ -5530,7 +5530,7 @@ window.STOCK_DATA = {
       "ret1m": 21.32,
       "ret3m": 1.54,
       "pctFromHigh": -19.02,
-      "relVol": 1.01,
+      "relVol": 1.38,
       "score": 33.4,
       "scoreCoverage": 5
     },
