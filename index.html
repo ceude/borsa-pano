@@ -1303,10 +1303,10 @@ function renderSim(){
   $('pnlV').innerHTML=(pnl>0?'+':'')+amt(MK,pnl); $('pnlV').className='v '+pnlCls(pnl);
   $('simLog').innerHTML = sim.log.length? sim.log.map(function(e){
     var d=new Date(e.t); var sc=e.side==='buy'?'up':'down'; var st=e.side==='buy'?'AL':'SAT';
-    var eur=(e.rate?' · ≈€'+fmt(eurOf(e.px*e.qty,e.rate)):'');
+    var tot=' = '+ccySym(MK)+fmt(e.px*e.qty);
     var bot=e.bot?' <span class="bottag">🤖'+(e.reason?' '+e.reason:'')+'</span>':'';
     var pl=(e.side==='sell' && e.pnl!=null) ? ' <b class="'+(e.pnl>=0?'up':'down')+'">'+(e.pnl>0?'+':'')+ccySym(MK)+fmt(e.pnl)+' ('+(e.pnlPct>0?'+':'')+fmt(e.pnlPct,2)+'%)</b>' : '';
-    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+pl+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
+    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+tot+pl+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
   }).join(''):'<div class="empty">işlem yok</div>';
   var buys=sim.log.filter(function(e){return e.side==='buy';}).length, sells=sim.log.length-buys;
   var swp=sim.log.filter(function(e){return e.side==='sell' && e.pnl!=null;}), wins=swp.filter(function(e){return e.pnl>0;}).length;
