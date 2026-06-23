@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-23T04:32:20+00:00",
+  "updatedAt": "2026-06-23T04:47:37+00:00",
   "count": 137,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.1244,
-    "USDTRY": 46.472
+    "EURTRY": 53.098,
+    "USDTRY": 46.473
   },
   "benchmarks": {
     "DAX": 1.01,
@@ -252,7 +252,7 @@ window.STOCK_DATA = {
       "changePct": 1.49,
       "volume": 391876,
       "marketCap": 61165780992,
-      "pe": 9.15,
+      "pe": 9.16,
       "pb": 1.77,
       "roe": 19.85,
       "debtToEquity": 21.72,
@@ -420,7 +420,7 @@ window.STOCK_DATA = {
       "changePct": 1.26,
       "volume": 2143420,
       "marketCap": 17698150400,
-      "pe": 4.49,
+      "pe": 5.25,
       "pb": 0.64,
       "roe": 12.6,
       "debtToEquity": 129.18,
@@ -700,7 +700,7 @@ window.STOCK_DATA = {
       "changePct": 1.19,
       "volume": 28916484,
       "marketCap": 223474991104,
-      "pe": 8.26,
+      "pe": 8.36,
       "pb": 0.92,
       "roe": 13.07,
       "debtToEquity": 58.28,
@@ -1736,7 +1736,7 @@ window.STOCK_DATA = {
       "changePct": -1.93,
       "volume": 15420109,
       "marketCap": 1800060010496,
-      "pe": 56.47,
+      "pe": 55.29,
       "pb": 6.4,
       "roe": 14.84,
       "debtToEquity": 18.78,
@@ -2520,7 +2520,7 @@ window.STOCK_DATA = {
       "changePct": -3.44,
       "volume": 393610,
       "marketCap": 37638496256,
-      "pe": 61.82,
+      "pe": 59.58,
       "pb": 1.38,
       "roe": 2.61,
       "debtToEquity": 16.38,
@@ -2828,7 +2828,7 @@ window.STOCK_DATA = {
       "changePct": -1.53,
       "volume": 56667,
       "marketCap": 33948272640,
-      "pe": 470.83,
+      "pe": 452.0,
       "pb": 1.49,
       "roe": 0.35,
       "debtToEquity": 6.68,
