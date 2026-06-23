@@ -862,7 +862,7 @@ function marketStocks(){ return STOCKS.filter(function(s){return s.market===MK;}
 
 /* gate */
 function showGate(){ $('gate').style.display='flex'; $('app').style.display='none'; }
-function showApp(){ $('gate').style.display='none'; $('app').style.display='block'; renderAll(); }
+function showApp(){ $('gate').style.display='none'; $('app').style.display='block'; renderAll(); goView('trade'); }
 document.querySelectorAll('.gate-opt').forEach(function(o){
   o.onclick=function(){ MK=o.dataset.m; S.lastMarket=MK; save(); syncSwitch(); showApp(); };
 });
@@ -872,7 +872,7 @@ function syncSwitch(){
   });
 }
 $('mktSwitch').querySelectorAll('button').forEach(function(b){
-  b.onclick=function(){ MK=b.dataset.m; S.lastMarket=MK; save(); syncSwitch(); renderAll(); goView('screen'); };
+  b.onclick=function(){ MK=b.dataset.m; S.lastMarket=MK; save(); syncSwitch(); renderAll(); goView('trade'); };
 });
 
 /* header meta */
