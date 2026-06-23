@@ -199,7 +199,7 @@ def fetch_one(symbol, market):
     mcap = safe(info, "marketCap")
     name = info.get("shortName") or info.get("longName") or symbol
     sector = info.get("sector") or info.get("industry") or "-"
-    currency = info.get("currency") or ("TRY" if market == "BIST" else "EUR")
+    currency = info.get("currency") or ("TRY" if market == "BIST" else "USD" if market == "NASDAQ" else "EUR")
 
     return {
         "symbol": symbol,
@@ -308,6 +308,7 @@ def main():
     tickers = []
     tickers += read_tickers(os.path.join(HERE, "bist_tickers.txt"), "BIST")
     tickers += read_tickers(os.path.join(HERE, "dax_tickers.txt"), "DAX")
+    tickers += read_tickers(os.path.join(HERE, "nasdaq_tickers.txt"), "NASDAQ")
 
     if not tickers:
         print("HATA: hic ticker bulunamadi.")
@@ -339,8 +340,9 @@ def main():
     benchmarks = {
         "DAX": fetch_index_ret1m("^GDAXI"),
         "BIST": fetch_index_ret1m("XU100.IS"),
+        "NASDAQ": fetch_index_ret1m("^NDX"),
     }
-    print(f"  DAX 1A={benchmarks['DAX']}  BIST 1A={benchmarks['BIST']}")
+    print(f"  DAX 1A={benchmarks['DAX']}  BIST 1A={benchmarks['BIST']}  NASDAQ 1A={benchmarks['NASDAQ']}")
 
     payload = {
         "updatedAt": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
