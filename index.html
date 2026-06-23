@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Borsa Pano</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='42' fill='%230bbfa6'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='50' r='34' fill='%230bbfa6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -878,7 +880,17 @@ $('mktSwitch').querySelectorAll('button').forEach(function(b){
 /* header meta */
 function renderMeta(){
   if(window.__DATA_ERR || !DATA){ $('updTxt').textContent='⚠ data.js yok — Colab betiğini çalıştır'; $('rateBox').textContent=''; return; }
-  $('updTxt').textContent = 'güncellendi: ' + new Date(DATA.updatedAt).toLocaleString('tr-TR') + ' · ' + MK + ' ' + marketStocks().length + ' hisse';
+  var tzInfo={BIST:['Europe/Istanbul','İstanbul'], DAX:['Europe/Berlin','Frankfurt'], NASDAQ:['America/New_York','New York']};
+  var mt=(DATA.marketTimes && DATA.marketTimes[MK]) ? DATA.marketTimes[MK] : null;
+  var txt;
+  if(mt){
+    var ti=tzInfo[MK]||['Europe/Istanbul',''];
+    var s=new Date(mt*1000).toLocaleString('tr-TR',{timeZone:ti[0],day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    txt='son veri: '+s+(ti[1]?(' ('+ti[1]+' saati)'):'');
+  } else {
+    txt='güncellendi: '+new Date(DATA.updatedAt).toLocaleString('tr-TR');
+  }
+  $('updTxt').textContent = txt + ' · ' + MK + ' ' + marketStocks().length + ' hisse';
   $('rateBox').textContent = 'EUR/TRY ' + fmt(RATES.EURTRY) + ' · USD/TRY ' + fmt(RATES.USDTRY);
 }
 
