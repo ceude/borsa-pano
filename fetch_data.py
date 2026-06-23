@@ -200,6 +200,7 @@ def fetch_one(symbol, market):
     name = info.get("shortName") or info.get("longName") or symbol
     sector = info.get("sector") or info.get("industry") or "-"
     currency = info.get("currency") or ("TRY" if market == "BIST" else "USD" if market == "NASDAQ" else "EUR")
+    mkt_time = info.get("regularMarketTime")  # son fiyat zamani (epoch saniye) veya None
 
     return {
         "symbol": symbol,
@@ -207,6 +208,7 @@ def fetch_one(symbol, market):
         "name": name,
         "sector": sector,
         "currency": currency,
+        "priceTime": int(mkt_time) if mkt_time else None,
         "price": round(price, 4) if price is not None else None,
         "prevClose": round(prev, 4) if prev is not None else None,
         "changePct": round(change_pct, 2) if change_pct is not None else None,
@@ -344,12 +346,23 @@ def main():
     }
     print(f"  DAX 1A={benchmarks['DAX']}  BIST 1A={benchmarks['BIST']}  NASDAQ 1A={benchmarks['NASDAQ']}")
 
+    # Piyasa basina en son veri zamani (epoch) = o piyasadaki hisselerin en yeni priceTime'i
+    market_times = {}
+    for r in rows:
+        pt = r.get("priceTime")
+        if pt:
+            m = r["market"]
+            if market_times.get(m) is None or pt > market_times[m]:
+                market_times[m] = pt
+    print(f"  Son veri zamanlari (epoch): {market_times}")
+
     payload = {
         "updatedAt": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
         "count": len(rows),
         "weights": WEIGHTS,
         "rates": rates,
         "benchmarks": benchmarks,
+        "marketTimes": market_times,
         "stocks": rows,
     }
 
