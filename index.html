@@ -93,13 +93,13 @@
   .gate-card h1{font-size:40px; margin:0 0 6px; font-weight:800}
   .gate-card h1 .dot{color:var(--brand)}
   .gate-card p{color:var(--dim); margin:0 0 30px; font-size:15px}
-  .gate-opts{display:grid; grid-template-columns:1fr 1fr; gap:16px}
-  @media(max-width:520px){.gate-opts{grid-template-columns:1fr}}
+  .gate-opts{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+  @media(max-width:620px){.gate-opts{grid-template-columns:1fr}}
   .gate-opt{background:var(--surface); border:1px solid var(--line); border-radius:20px;
     padding:30px 22px; cursor:pointer; box-shadow:var(--shadow); transition:.18s; text-align:left}
   .gate-opt:hover{transform:translateY(-3px); border-color:var(--brand)}
   .gate-opt .tag{font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase}
-  .gate-opt.bist .tag{color:var(--bist)} .gate-opt.dax .tag{color:var(--dax)}
+  .gate-opt.bist .tag{color:var(--bist)} .gate-opt.dax .tag{color:var(--dax)} .gate-opt.nasdaq .tag{color:#0a84ff}
   .gate-opt h2{font-size:26px; margin:10px 0 4px}
   .gate-opt .cur{color:var(--faint); font-size:13px; font-family:"Plus Jakarta Sans"}
 
@@ -124,7 +124,7 @@
   .switch button{border:none; background:transparent; padding:7px 16px; border-radius:999px;
     font-weight:700; font-size:13px; color:var(--dim); cursor:pointer}
   .switch button.on{color:#fff}
-  .switch button.on.bist{background:var(--bist)} .switch button.on.dax{background:var(--dax)}
+  .switch button.on.bist{background:var(--bist)} .switch button.on.dax{background:var(--dax)} .switch button.on.nasdaq{background:#0a84ff}
   .ratebox{background:var(--surface); border:1px solid var(--line); border-radius:10px;
     padding:6px 11px; color:var(--dim); font-family:"Plus Jakarta Sans"}
   .upd{color:var(--faint)}
@@ -248,6 +248,11 @@
         <h2>DAX</h2>
         <div class="cur">€ EUR</div>
       </div>
+      <div class="gate-opt nasdaq" data-m="NASDAQ">
+        <div class="tag">NASDAQ-100</div>
+        <h2>NASDAQ</h2>
+        <div class="cur">$ USD</div>
+      </div>
     </div>
   </div>
 </div>
@@ -274,6 +279,7 @@
       <div class="switch" id="mktSwitch">
         <button data-m="BIST">BIST</button>
         <button data-m="DAX">DAX</button>
+        <button data-m="NASDAQ">NASDAQ</button>
       </div>
       <span class="ratebox" id="rateBox"></span>
       <button class="ghost" id="autoBtn" title="10 dakikada bir verileri tazeler"></button>
@@ -381,6 +387,10 @@
           <div style="display:flex; align-items:center; gap:8px">
             <button class="ghost" id="botBtnDAX">DAX: kapalı</button>
             <label class="hint" style="display:flex; align-items:center; gap:6px">eşik <input id="botThrDAX" class="fld" type="number" min="0" max="100" step="5" style="width:62px"></label>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px">
+            <button class="ghost" id="botBtnNASDAQ">NASDAQ: kapalı</button>
+            <label class="hint" style="display:flex; align-items:center; gap:6px">eşik <input id="botThrNASDAQ" class="fld" type="number" min="0" max="100" step="5" style="width:62px"></label>
           </div>
         </div>
         <span class="hint" id="botStatus" style="display:block; margin-top:8px"></span>
@@ -657,8 +667,8 @@ var $ = function(id){return document.getElementById(id);};
 function fmt(n,d){ d=(d==null?2:d); return (n==null||isNaN(n))?'—':Number(n).toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
 function fmtInt(n){ return n==null?'—':Number(n).toLocaleString('tr-TR'); }
 function clean(sym){ return sym.replace(/\.(IS|DE)$/,''); }
-function ccySym(m){ return m==='BIST'?'₺':'€'; }
-function ccyCode(m){ return m==='BIST'?'TRY':'EUR'; }
+function ccySym(m){ return m==='BIST'?'₺':m==='NASDAQ'?'$':'€'; }
+function ccyCode(m){ return m==='BIST'?'TRY':m==='NASDAQ'?'USD':'EUR'; }
 function pnlCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
 function chCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
 function find(sym){ for(var i=0;i<STOCKS.length;i++) if(STOCKS[i].symbol===sym) return STOCKS[i]; return null; }
@@ -788,9 +798,12 @@ function load(){ try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){r
 var S = load();
 S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.simHist = S.simHist || {}; S.realHist = S.realHist || {};
-S.botPos = S.botPos || {BIST:{}, DAX:{}}; S.botCool = S.botCool || {BIST:{}, DAX:{}};
-S.botOn = S.botOn || {BIST:false, DAX:false};
-S.botThr = S.botThr || {BIST:70, DAX:70};
+S.botPos = S.botPos || {}; S.botCool = S.botCool || {}; S.botOn = S.botOn || {}; S.botThr = S.botThr || {};
+['BIST','DAX','NASDAQ'].forEach(function(m){
+  S.botPos[m]=S.botPos[m]||{}; S.botCool[m]=S.botCool[m]||{};
+  if(S.botOn[m]===undefined) S.botOn[m]=false;
+  if(S.botThr[m]===undefined) S.botThr[m]=70;
+});
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
@@ -855,7 +868,7 @@ document.querySelectorAll('.gate-opt').forEach(function(o){
 });
 function syncSwitch(){
   $('mktSwitch').querySelectorAll('button').forEach(function(b){
-    var on=b.dataset.m===MK; b.className = on ? ('on '+(MK==='BIST'?'bist':'dax')) : '';
+    var on=b.dataset.m===MK; b.className = on ? ('on '+(MK==='BIST'?'bist':MK==='NASDAQ'?'nasdaq':'dax')) : '';
   });
 }
 $('mktSwitch').querySelectorAll('button').forEach(function(b){
@@ -1206,17 +1219,18 @@ $('simQty').oninput=recalcCost;
 function trade(side){
   var s=find($('simSel').value); var q=parseInt($('simQty').value,10);
   if(!s||!s.price||!q||q<1) return;
-  var sim=simFor(MK); var cost=s.price*q; var rate=(MK==='BIST'?EURTRY:null);
+  var sim=simFor(MK); var cost=s.price*q; var rate=(MK==='BIST'?EURTRY:null); var pnl=null, pnlPct=null;
   if(side==='buy'){
     if(cost>sim.cash){ alert('Yetersiz nakit. Gerekli '+ccySym(MK)+fmt(cost)+' / Mevcut '+ccySym(MK)+fmt(sim.cash)); return; }
     sim.cash-=cost; var h=sim.holdings[s.symbol]||{qty:0,cost:0,eurCost:0};
     h.cost+=cost; h.qty+=q; if(MK==='BIST') h.eurCost=(h.eurCost||0)+(rate?cost/rate:0); sim.holdings[s.symbol]=h;
   } else {
     var h2=sim.holdings[s.symbol]; if(!h2||h2.qty<q){ alert('Yeterli pozisyon yok.'); return; }
-    var avg=h2.cost/h2.qty; h2.cost-=avg*q; if(MK==='BIST'){var ea=(h2.eurCost||0)/h2.qty; h2.eurCost=(h2.eurCost||0)-ea*q;} h2.qty-=q; sim.cash+=cost;
+    var avg=h2.cost/h2.qty; pnl=(s.price-avg)*q; pnlPct=avg>0?(s.price/avg-1)*100:0;
+    h2.cost-=avg*q; if(MK==='BIST'){var ea=(h2.eurCost||0)/h2.qty; h2.eurCost=(h2.eurCost||0)-ea*q;} h2.qty-=q; sim.cash+=cost;
     if(h2.qty<=0) delete sim.holdings[s.symbol];
   }
-  sim.log.unshift({t:Date.now(), side:side, sym:s.symbol, qty:q, px:s.price, rate:rate});
+  sim.log.unshift({t:Date.now(), side:side, sym:s.symbol, qty:q, px:s.price, rate:rate, pnl:pnl, pnlPct:pnlPct});
   save(); renderSim(); renderScreen(); renderAllList();
 }
 $('simBuy').onclick=function(){trade('buy');};
@@ -1291,10 +1305,13 @@ function renderSim(){
     var d=new Date(e.t); var sc=e.side==='buy'?'up':'down'; var st=e.side==='buy'?'AL':'SAT';
     var eur=(e.rate?' · ≈€'+fmt(eurOf(e.px*e.qty,e.rate)):'');
     var bot=e.bot?' <span class="bottag">🤖'+(e.reason?' '+e.reason:'')+'</span>':'';
-    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
+    var pl=(e.side==='sell' && e.pnl!=null) ? ' <b class="'+(e.pnl>=0?'up':'down')+'">'+(e.pnl>0?'+':'')+ccySym(MK)+fmt(e.pnl)+' ('+(e.pnlPct>0?'+':'')+fmt(e.pnlPct,2)+'%)</b>' : '';
+    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+eur+pl+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
   }).join(''):'<div class="empty">işlem yok</div>';
   var buys=sim.log.filter(function(e){return e.side==='buy';}).length, sells=sim.log.length-buys;
-  $('simLogCount').innerHTML = sim.log.length ? ('· '+buys+' alış · '+sells+' satış · toplam '+sim.log.length) : '';
+  var swp=sim.log.filter(function(e){return e.side==='sell' && e.pnl!=null;}), wins=swp.filter(function(e){return e.pnl>0;}).length;
+  var winTxt=swp.length?(' · '+wins+'/'+swp.length+' kârlı (%'+Math.round(wins/swp.length*100)+')'):'';
+  $('simLogCount').innerHTML = sim.log.length ? ('· '+buys+' alış · '+sells+' satış · toplam '+sim.log.length+winTxt) : '';
 }
 
 /* ---------- real portfolio ---------- */
@@ -1465,6 +1482,8 @@ function renderMovers(){
 /* ---------- render all ---------- */
 /* ===== OTO-TRADER (yalnız simülasyon; tarayıcı açıkken çalışır) ===== */
 var BOT = { scoreMin:70, riskPct:1.0, atrMult:1.5, targetR:2.0, maxPos:Infinity, maxPosPct:25, regimeMin:-0.5, coolMs:3*3600*1000 };
+var MARKETS = ['BIST','DAX','NASDAQ'];
+function anyBot(){ return MARKETS.some(function(m){return S.botOn[m];}); }
 var botTimer=null;
 function bySym(list,sym){ for(var i=0;i<list.length;i++) if(list[i].symbol===sym) return list[i]; return null; }
 function botEquity(sim,list){ var v=sim.cash; Object.keys(sim.holdings).forEach(function(sym){ var s=bySym(list,sym); if(s&&s.price!=null) v+=s.price*sim.holdings[sym].qty; }); return v; }
@@ -1483,12 +1502,12 @@ function botSell(m,sym,px,reason){
   var q=Math.min(bp.qty,h.qty); if(q<1){ delete S.botPos[m][sym]; return; }
   var avg=h.cost/h.qty; h.cost-=avg*q; if(m==='BIST'){var ea=(h.eurCost||0)/h.qty; h.eurCost=(h.eurCost||0)-ea*q;} h.qty-=q;
   var rate=(m==='BIST'?EURTRY:null); sim.cash+=px*q; if(h.qty<=0) delete sim.holdings[sym];
-  sim.log.unshift({t:Date.now(),side:'sell',sym:sym,qty:q,px:px,rate:rate,bot:true,reason:reason});
+  sim.log.unshift({t:Date.now(),side:'sell',sym:sym,qty:q,px:px,rate:rate,bot:true,reason:reason,pnl:(px-avg)*q,pnlPct:avg>0?(px/avg-1)*100:0});
   delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs;
 }
 function botTick(){
-  if(!(S.botOn.BIST||S.botOn.DAX)) return; var acted=false, now=Date.now();
-  ['BIST','DAX'].forEach(function(m){
+  if(!anyBot()) return; var acted=false, now=Date.now();
+  MARKETS.forEach(function(m){
     if(!S.botOn[m]) return;
     var thr=(S.botThr[m]!=null?S.botThr[m]:BOT.scoreMin);
     var list=(STOCKS||[]).filter(function(s){return s.market===m;}); if(!list.length) return;
@@ -1526,23 +1545,21 @@ function botTick(){
   updateBotBtn();
 }
 function updateBotBtn(){
-  ['BIST','DAX'].forEach(function(m){
+  MARKETS.forEach(function(m){
     var b=$('botBtn'+m); if(!b) return;
     if(S.botOn[m]){ b.textContent=m+': AÇIK'; b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
     else { b.textContent=m+': kapalı'; b.style.color=''; b.style.borderColor=''; }
   });
   var st=$('botStatus'); if(!st) return;
-  var ob=S.botPos.BIST?Object.keys(S.botPos.BIST).length:0, od=S.botPos.DAX?Object.keys(S.botPos.DAX).length:0;
   var parts=[];
-  if(S.botOn.BIST) parts.push('BIST açık ('+ob+' poz)');
-  if(S.botOn.DAX) parts.push('DAX açık ('+od+' poz)');
+  MARKETS.forEach(function(m){ if(S.botOn[m]){ var n=S.botPos[m]?Object.keys(S.botPos[m]).length:0; parts.push(m+' açık ('+n+' poz)'); } });
   st.innerHTML = parts.length ? (parts.join(' · ')+(S.botLastTick?(' · son kontrol '+new Date(S.botLastTick).toLocaleTimeString('tr-TR')):''))
     : 'İkisi de kapalı — açtığın piyasada, bu sekme açık kaldığı sürece kurallara göre al-sat yapar.';
 }
 function setBot(m,on){
   S.botOn[m]=on; save();
   if(botTimer){ clearInterval(botTimer); botTimer=null; }
-  if(S.botOn.BIST||S.botOn.DAX){ botTick(); botTimer=setInterval(botTick, 60*1000); }
+  if(anyBot()){ botTick(); botTimer=setInterval(botTick, 60*1000); }
   updateBotBtn();
 }
 function renderAll(){
@@ -1562,7 +1579,7 @@ function refreshData(){
     RATES = (DATA&&DATA.rates)?DATA.rates:RATES;
     EURTRY = RATES.EURTRY;
     if(MK) renderAll();
-    if(S.botOn.BIST||S.botOn.DAX) botTick();
+    if(anyBot()) botTick();
     if(s.parentNode) s.parentNode.removeChild(s);
   };
   s.onerror=function(){ if(s.parentNode) s.parentNode.removeChild(s); };
@@ -1582,7 +1599,7 @@ function setAuto(on){
 $('autoBtn').onclick=function(){ setAuto(!S.auto); };
 if(S.auto===undefined) S.auto=true;   // varsayilan: acik
 setAuto(S.auto);
-['BIST','DAX'].forEach(function(m){
+MARKETS.forEach(function(m){
   $('botBtn'+m).onclick=function(){ setBot(m, !S.botOn[m]); };
   var inp=$('botThr'+m); inp.value=(S.botThr[m]!=null?S.botThr[m]:70);
   inp.onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botThr[m]=Math.max(0,Math.min(100,v)); this.value=S.botThr[m]; save(); if(S.botOn[m]) botTick(); updateBotBtn(); };
@@ -1592,7 +1609,7 @@ $('docClose').onclick=function(){ $('docOv').classList.remove('open'); };
 $('docOv').onclick=function(e){ if(e.target===this) this.classList.remove('open'); };
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('docOv').classList.remove('open'); });
 updateBotBtn();
-if(S.botOn.BIST||S.botOn.DAX){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
+if(anyBot()){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
 
 /* ---------- boot ---------- */
 if(MK){ syncSwitch(); showApp(); } else { showGate(); }
