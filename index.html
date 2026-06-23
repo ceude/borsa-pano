@@ -301,7 +301,8 @@
 
   <main>
     <section class="view card" id="v-trade">
-      <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap">
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
         <button class="ghost" id="docBtn">📄 Bu sayfa nasıl çalışır?</button>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
@@ -345,13 +346,17 @@
     </section>
 
     <section class="view card" id="v-gunun">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap">
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
+        <button class="ghost" id="docBtnShort">📄 Bu sayfa nasıl çalışır?</button>
+      </div>
       <div class="hint" id="gununInfo" style="margin-bottom:14px"></div>
       <div class="scroll" id="gununBody"></div>
       <div class="disclaimer"><b>Strateji (swing / kısa-orta vade):</b> Yalnız yeşil günde, yükselen trendde (fiyat&gt;MA50, tercihen MA50&gt;MA200), endekse göre güçlü (göreli güç), sağlıklı RSI ve canlı ama aşırı olmayan volatilitedeki hisseleri seçer; çöp almamak için değer/kalite skoru küçük ağırlıkla katılır. "Setup Skoru" bu etkenlerin şeffaf 0-100 bileşimidir. <b>Çıkış fikri:</b> birkaç gün–hafta tut, takip eden zarar-kes (trailing stop) koy, kırmızı günlerde pozisyon açma. <b>Uyarı:</b> Veriler ~15 dk gecikmeli ve günlüktür → gerçek <b>gün içi</b> işlem için yeterli değildir; bu liste aday/araştırma üretir. Momentum stratejilerinin sert düşüş dönemleri olur. Yatırım tavsiyesi değildir — <b>önce Simülatörde test et.</b></div>
     </section>
 
     <section class="view active card" id="v-screen">
-      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
+      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span><button class="ghost" id="docBtnMid">📄 Bu sayfa nasıl çalışır?</button></div>
       <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr><tr id="screenFilterRow"></tr></thead><tbody id="screenBody"></tbody></table></div>
       <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir (5 = tam).</div>
     </section>
@@ -543,10 +548,6 @@
           <p>Her 100 TL satıştan geriye kalan net kâr. Yüksek marj = fiyatlama gücü ve verimlilik.</p>
           <div class="rng"><span class="g">●</span> &gt;%15 iyi &nbsp; <span class="m">●</span> %5–15 orta &nbsp; <span class="b">●</span> &lt;%5 zayıf</div>
         </div>
-        <div class="eduitem"><b>Skor (0–100)</b>
-          <p>Yukarıdaki beş oranı birleştiren değer/kalite puanı. "Ucuz ve sağlam mı"yı özetler — fiyatın yükseleceği anlamına gelmez.</p>
-          <div class="rng">Eşikler sektöre göre değişir; bunlar genel pusuladır, kesin kural değil. Yatırım tavsiyesi değildir.</div>
-        </div>
       </div>
     </div>
   </div>
@@ -651,6 +652,120 @@
         <li>Skor bir <b>dikkat/aday</b> puanıdır; fiyatın yükseleceğini tahmin etmez.</li>
         <li>Ağırlıklar deneysel ve <b>geriye dönük test edilmemiştir</b>.</li>
         <li><b>Yatırım tavsiyesi değildir.</b> Gerçek paradan önce Simülatörde dene, stop koy.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="docov" id="docOvShort">
+  <div class="doccard">
+    <button class="docclose">✕ Kapat</button>
+    <div class="doc">
+      <h1>Kısa Vade Adayları — nasıl çalışır?</h1>
+      <p>Bu sayfa <b>swing / kısa-orta vade</b> (birkaç gün–hafta) için aday üretir: yükselen trendde, piyasayı yenen, sağlıklı momentumlu hisseleri bir "Kısa Vade Skor"u ile sıralar. Aşağıda filtre, skor ve her sütun açıklanıyor.</p>
+      <div class="warn"><b>Önce oku:</b> Bu bir <b>aday/araştırma listesidir</b>, "al" listesi değil. Veri ~15 dk gecikmeli ve günlüktür → gerçek <b>gün içi</b> işleme uygun değildir. Momentum stratejilerinin sert düşüş dönemleri olur. Yatırım tavsiyesi değildir; önce Simülatörde test et.</div>
+
+      <h2>1. Veri & gecikme & güncelleme</h2>
+      <ul>
+        <li>Kaynak: Yahoo Finance (<code>yfinance</code>). Fiyat ~<b>15 dk gecikmeli</b> (BIST/DAX/NASDAQ hepsi).</li>
+        <li>Güncelleme: cron-job.org her ~15 dk → <code>fetch_data.py</code> → <code>data.js</code>; tarayıcı 10 dk'da bir indirir.</li>
+        <li>Teknikler (trend, momentum, RSI, ATR, hacim) 1 yıllık <b>günlük</b> geçmişten hesaplanır.</li>
+      </ul>
+
+      <h2>2. Bir hisse listeye nasıl giriyor (filtre)</h2>
+      <ul>
+        <li>Yükselen trend: <b>fiyat &gt; MA50</b> (tercihen MA50 &gt; MA200).</li>
+        <li>Endekse göre güçlü olması (göreli güç pozitif eğilim).</li>
+        <li>Sağlıklı RSI ve <b>canlı ama aşırı olmayan</b> volatilite (ATR ideal bantta).</li>
+        <li>Yeterli likidite (işlem görüyor olması).</li>
+        <li>Çeşitlilik için <b>sektör başına en fazla 2</b> hisse.</li>
+      </ul>
+      <p>Aday çoksa son seçim sana bırakılır (üstte uyarı çıkar).</p>
+
+      <h2>3. Kısa Vade Skor (0–100)</h2>
+      <p>Aşağıdaki etkenlerin <b>şeffaf bir bileşimidir</b> (yüksek = kısa vadeli kurulum daha güçlü görünüyor — <b>kâr garantisi değil</b>):</p>
+      <ul>
+        <li><b>Trend uyumu:</b> fiyat &gt; MA50 &gt; MA200 ise en yüksek katkı.</li>
+        <li><b>Göreli güç:</b> endekse göre daha iyi performans.</li>
+        <li><b>Momentum:</b> son ~1 ay yukarı, ama aşırı uzamamış (parabolik değil).</li>
+        <li><b>RSI:</b> 55–70 sağlıklı yükseliş bandı tercih edilir.</li>
+        <li><b>Volatilite (ATR%):</b> ne ölü ne aşırı — orta bant.</li>
+        <li><b>52 hafta zirvesine yakınlık.</b></li>
+        <li>Küçük ağırlıkla <b>değer/kalite</b> (çöp filtrelemek için).</li>
+      </ul>
+
+      <h2>4. Sütun tanımları</h2>
+      <table><tr><th>Sütun</th><th>Anlamı</th></tr>
+        <tr><td>Hisse</td><td>Kod + ad. Önündeki nokta: mor=Simülatörde, pembe=Gerçek portföyde var.</td></tr>
+        <tr><td>Sektör</td><td>Faaliyet alanı. Aynı sektörden en fazla 2 hisse.</td></tr>
+        <tr><td>Kısa Vade Skor</td><td>Yukarıdaki 0–100 bileşim.</td></tr>
+        <tr><td>Trend</td><td>↑↑ fiyat&gt;MA50&gt;MA200 · ↑ fiyat&gt;MA50 · ↓ fiyat≤MA50.</td></tr>
+        <tr><td>Göreli Güç</td><td>Hissenin son 1 ay getirisi − endeksin getirisi. Pozitif = piyasayı yeniyor.</td></tr>
+        <tr><td>1A %</td><td>Son ~1 aylık (21 işlem günü) fiyat değişimi (momentum).</td></tr>
+        <tr><td>RSI</td><td>0–100. 55–70 sağlıklı; &gt;70 aşırı alım; &lt;30 aşırı satım.</td></tr>
+        <tr><td>ATR%</td><td>Ortalama günlük dalgalanma (fiyatın %si). %1.5–4 ideal.</td></tr>
+        <tr><td>Fiyat</td><td>Güncel fiyat (~15 dk gecikmeli).</td></tr>
+      </table>
+      <p><b>Sıralama:</b> herhangi bir sütun başlığına tıklayarak o sütuna göre sırala; tekrar tıkla yön değişir.</p>
+
+      <h2>5. Sınırlar</h2>
+      <ul>
+        <li>Veri 15 dk gecikmeli ve günlük → gün içi icra için değil.</li>
+        <li>Skor ağırlıkları deneysel ve <b>geriye dönük test edilmemiştir</b>.</li>
+        <li>Yatırım tavsiyesi değildir. Önce Simülatör, her işleme stop.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="docov" id="docOvMid">
+  <div class="doccard">
+    <button class="docclose">✕ Kapat</button>
+    <div class="doc">
+      <h1>Orta/Uzun Vade Adayları — nasıl çalışır?</h1>
+      <p>Bu sayfa bir <b>değer/kalite taramasıdır</b>: "hisse ucuz ve şirket sağlam mı?" sorusunu, temel oranları birleştiren 0–100 bir skorla yanıtlar. <b>"Yükselir mi"yi ölçmez</b> — ucuzluğu ve bilanço sağlamlığını ölçer.</p>
+      <div class="warn"><b>Önce oku:</b> Bu bir araştırma/tarama aracıdır, "al" listesi değil. Temel oranlar gecikmeli/eksik olabilir. Yatırım tavsiyesi değildir.</div>
+
+      <h2>1. Veri & güncelleme</h2>
+      <ul>
+        <li>Kaynak: Yahoo Finance (<code>yfinance</code>). Fiyat ve Gün % ~<b>15 dk gecikmeli</b>.</li>
+        <li><b>Temel oranlar</b> (F/K, P/D, ROE, borç, marj) şirket finansallarından gelir; bunlar gün içinde değişmez, <b>çeyreklik</b> güncellenir ve bazı şirketlerde eksik olabilir.</li>
+        <li>Güncelleme ritmi diğer sekmelerle aynı (cron-job.org ~15 dk → <code>fetch_data.py</code> → <code>data.js</code>).</li>
+      </ul>
+
+      <h2>2. Skor (0–100) nasıl hesaplanıyor</h2>
+      <p>Beş metrik <b>her piyasa kendi içinde</b> (BIST'i BIST'le, NASDAQ'ı NASDAQ'la) karşılaştırılır; her biri piyasa-içi <b>yüzdelik sıraya</b> göre puanlanıp ağırlıklı birleştirilir:</p>
+      <table><tr><th>Metrik</th><th>Skoru yükselten</th></tr>
+        <tr><td>F/K (Fiyat/Kazanç)</td><td>Düşük (kârına göre ucuz)</td></tr>
+        <tr><td>P/D (Piyasa/Defter)</td><td>Düşük (özsermayeye göre ucuz)</td></tr>
+        <tr><td>ROE (Özsermaye kârlılığı)</td><td>Yüksek</td></tr>
+        <tr><td>Borç/Özsermaye</td><td>Düşük (negatif değerler dışlanır)</td></tr>
+        <tr><td>Net Marj</td><td>Yüksek</td></tr>
+      </table>
+      <p><b>Veri</b> sütunu skorun kaç metrikten çıktığını gösterir (5 = tam). Düşükse skora temkinli yaklaş.</p>
+
+      <h2>3. Renk noktaları</h2>
+      <p>Her hücredeki nokta o metriğin kabaca durumunu gösterir: <b class="up">●</b> iyi · <b style="color:#d99a00">●</b> orta · <b class="down">●</b> zayıf. Eşikler sektöre göre değişir; yön gösterir, kesin kural değildir.</p>
+
+      <h2>4. Sütun tanımları</h2>
+      <table><tr><th>Sütun</th><th>Anlamı</th></tr>
+        <tr><td>Hisse</td><td>Kod + ad. Nokta: mor=Simülatörde, pembe=Gerçek portföyde var.</td></tr>
+        <tr><td>Skor</td><td>Yukarıdaki 0–100 değer/kalite puanı.</td></tr>
+        <tr><td>Fiyat / Gün %</td><td>Güncel fiyat (~15 dk gecikmeli) ve bugünkü değişim.</td></tr>
+        <tr><td>F/K</td><td>Fiyat/Kazanç. &lt;10 ucuz · 10–20 makul · &gt;20 pahalı · negatif = zarar.</td></tr>
+        <tr><td>P/D</td><td>Piyasa/Defter. &lt;1,5 ucuz · 1,5–3 normal · &gt;3 pahalı.</td></tr>
+        <tr><td>Özsr.K %</td><td>ROE. &gt;%20 güçlü · %10–20 orta · &lt;%10 zayıf.</td></tr>
+        <tr><td>Borç/Özsr</td><td>Borcun özsermayeye oranı. Düşük = sağlam.</td></tr>
+        <tr><td>Marj %</td><td>Net kâr marjı. &gt;%15 iyi · %5–15 orta · &lt;%5 zayıf.</td></tr>
+        <tr><td>Veri</td><td>Skorun kaç metrikten çıktığı (5 = tam).</td></tr>
+      </table>
+      <p><b>Arama & filtre & sıralama:</b> üstten sembol/şirket ara; her sütunun altındaki filtre satırına koşul yaz (örn. <code>&lt;10</code>); başlığa tıklayarak sırala.</p>
+
+      <h2>5. Sınırlar</h2>
+      <ul>
+        <li>Skor "ucuz & sağlam mı"yı ölçer; fiyatın yükseleceğini <b>söylemez</b>.</li>
+        <li>Temel veriler eksik/eski olabilir; "Veri" sütununa bak.</li>
+        <li>Eşikler sektöre göre değişir. Yatırım tavsiyesi değildir.</li>
       </ul>
     </div>
   </div>
@@ -990,6 +1105,42 @@ function gunIciSkoru(s, mktAvg){
   if(s.ma50!=null && s.price!=null){ if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200) sc+=15; else if(s.price>s.ma50) sc+=9; }
   return Math.round(Math.max(0,Math.min(100,sc)));
 }
+/* --- tıklanabilir sütun sıralaması (Günlük Trade + Kısa Vade) --- */
+var sortKT='_gi', sortDirT=-1, sortKG='_setup', sortDirG=-1;
+function trendRank(s){ if(s.ma50==null||s.price==null) return null; if(s.price>s.ma50){ return (s.ma200!=null && s.ma50>s.ma200)?2:1; } return 0; }
+function cmpVal(a,b,k,dir,getter){ var va=getter(a,k), vb=getter(b,k);
+  if(typeof va==='string'||typeof vb==='string') return dir*String(va==null?'':va).localeCompare(String(vb==null?'':vb));
+  if(va==null&&vb==null)return 0; if(va==null)return 1; if(vb==null)return -1; return dir*(va-vb); }
+function sortHeadHtml(cols, sk, dir){ return cols.map(function(c){
+  var arr=c.k===sk?' <span class="arr">'+(dir<0?'▼':'▲')+'</span>':'';
+  var click=(c.k&&c.k!=='act')?(' data-sk="'+c.k+'" style="cursor:pointer"'):'';
+  var tip=c.tip?(' title="'+c.tip.replace(/"/g,'&quot;')+'"'):'';
+  return '<th class="'+(c.l?'l':'')+'"'+click+tip+'>'+c.t+arr+'</th>'; }).join(''); }
+var TCOLS=[
+  {k:'symbol',t:'Hisse',l:true,tip:'Hisse kodu ve şirket.'},
+  {k:'_gi',t:'Gün İçi Skor',tip:'0–100 gün içi ilgi puanı: bugünkü hareketin gücü + relatif hacim + piyasaya göre güç + trend uyumu. Yüksek = bugün dikkat çeken. AL sinyali DEĞİL.'},
+  {k:'changePct',t:'Gün %',tip:'Bugünkü yüzde değişim (önceki kapanışa göre, ~15 dk gecikmeli).'},
+  {k:'relVol',t:'Rel.Hacim',tip:'Relatif hacim: bugünkü hacim ÷ son 20 günün ortalaması. 1.0 üstü = normalden hareketli.'},
+  {k:'_rg',t:'Rel.Güç',tip:'Hissenin bugünkü getirisi eksi piyasanın ortalaması. Pozitifse bugün piyasayı yeniyor.'},
+  {k:'_tr',t:'Trend',tip:'Fiyatın 50/200 günlük ortalamaya göre yönü (↑↑ / ↑ / ↓).'},
+  {k:'atrPct',t:'ATR%',tip:'Ortalama günlük dalgalanma (fiyatın %si).'},
+  {k:'price',t:'Fiyat',tip:'Güncel fiyat (~15 dk gecikmeli).'},
+  {k:'act',t:''}
+];
+function valT(s,k){ if(k==='_tr')return trendRank(s); if(k==='_rg')return s._rg; if(k==='_gi')return s._gi; if(k==='symbol')return s.symbol; return s[k]; }
+var GCOLS=[
+  {k:'symbol',t:'Hisse',l:true,tip:'Hisse senedinin kodu ve şirketin adı.'},
+  {k:'sector',t:'Sektör',l:true,tip:'Şirketin faaliyet alanı. Aynı sektörden listeye en fazla 2 hisse alınır.'},
+  {k:'_setup',t:'Kısa Vade Skor',tip:'0–100 kısa vade puanı. Trend, momentum, piyasaya göre güç, RSI, volatilite ve hacmi birleştirir. Kâr garantisi DEĞİL.'},
+  {k:'_tr',t:'Trend',tip:'Fiyatın ortalamalarına göre yönü. Fiyat hem 50 hem 200 günlük ortalamanın üstündeyse güçlü.'},
+  {k:'_rs',t:'Göreli Güç',tip:'Hissenin son 1 aydaki getirisi eksi endeksin getirisi. Pozitifse piyasayı yeniyor.'},
+  {k:'ret1m',t:'1A %',tip:'Son ~1 aylık (21 işlem günü) fiyat değişimi.'},
+  {k:'rsi14',t:'RSI',tip:'Göreli Güç Endeksi (0–100). 55–70 sağlıklı; >70 aşırı alım; <30 aşırı satım.'},
+  {k:'atrPct',t:'ATR%',tip:'Ortalama günlük dalgalanma (fiyatın %si). %1.5–4 ideal.'},
+  {k:'price',t:'Fiyat',tip:'Hissenin güncel fiyatı (~15 dk gecikmeli).'},
+  {k:'act',t:''}
+];
+function valG(s,k){ if(k==='_tr')return trendRank(s); if(k==='_rs')return s._rs; if(k==='_setup')return s._setup; if(k==='symbol')return s.symbol; if(k==='sector')return sektorTR(s.sector); return s[k]; }
 function renderTrade(){
   var ms=marketStocks();
   var withCh=ms.filter(function(s){return typeof s.changePct==='number';});
@@ -1000,9 +1151,10 @@ function renderTrade(){
     '<b class="up">'+up+'</b> yükselen / <b class="down">'+down+'</b> düşen. '+
     (mktAvg>=0?'Yeşil zemin — gün içi long aramak daha mantıklı.':'<b class="down">Kırmızı zemin</b> — gün içi long riskli, temkinli ol.');
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
-  var list=ms.map(function(s){ s._gi=gunIciSkoru(s,mktAvg); return s; })
-    .filter(function(s){ return s._gi!=null && s.changePct>0; })
-    .sort(function(a,b){return b._gi-a._gi;}).slice(0,12);
+  var cand=ms.map(function(s){ s._gi=gunIciSkoru(s,mktAvg); s._rg=(mktAvg!=null?s.changePct-mktAvg:null); return s; })
+    .filter(function(s){ return s._gi!=null && s.changePct>0; });
+  cand.sort(function(a,b){return cmpVal(a,b,sortKT,sortDirT,valT);});
+  var list=cand.slice(0,12);
   if(!list.length){ $('tradeBody').innerHTML='<div class="empty">Bugün yukarı yönlü hareketli hisse görünmüyor (gecikmeli veri).</div>'; }
   else {
     var rows=list.map(function(s){
@@ -1016,16 +1168,9 @@ function renderTrade(){
         '<td>'+fmt(s.price)+'</td>'+
         '<td style="white-space:nowrap"><button class="miniact" data-plan="'+s.symbol+'">Plan</button> <button class="miniact" data-tradesim="'+s.symbol+'">Sim</button></td></tr>';
     }).join('');
-    $('tradeBody').innerHTML='<table><thead><tr>'+
-      '<th class="l" title="Hisse kodu ve şirket.">Hisse</th>'+
-      '<th title="0–100 gün içi ilgi puanı: bugünkü hareketin gücü + relatif hacim + piyasaya göre güç + trend uyumu. Yüksek = bugün dikkat çeken. AL sinyali DEĞİL.">Gün İçi Skor</th>'+
-      '<th title="Bugünkü yüzde değişim (önceki kapanışa göre, ~15 dk gecikmeli).">Gün %</th>'+
-      '<th title="Relatif hacim: bugünkü hacim ÷ son 20 günün ortalaması. 1.0 üstü = normalden hareketli; yüksek = konviksiyon.">Rel.Hacim</th>'+
-      '<th title="Hissenin bugünkü getirisi eksi piyasanın ortalaması. Pozitifse bugün piyasayı yeniyor.">Rel.Güç</th>'+
-      '<th title="Fiyatın 50/200 günlük ortalamaya göre yönü.">Trend</th>'+
-      '<th title="Ortalama günlük dalgalanma. Stop mesafesi ve hareket beklentisi için kullanılır.">ATR%</th>'+
-      '<th title="Güncel fiyat (~15 dk gecikmeli).">Fiyat</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $('tradeBody').innerHTML='<table><thead><tr>'+sortHeadHtml(TCOLS,sortKT,sortDirT)+'</tr></thead><tbody>'+rows+'</tbody></table>';
     $('tradeBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+    $('tradeBody').querySelectorAll('th[data-sk]').forEach(function(th){ th.onclick=function(){ var k=th.dataset.sk; if(sortKT===k)sortDirT*=-1; else {sortKT=k; sortDirT=(k==='symbol')?1:-1;} renderTrade(); }; });
     $('tradeBody').querySelectorAll('[data-plan]').forEach(function(b){b.onclick=function(){
       var sym=b.dataset.plan, s=find(sym);
       $('tpSym').value=sym; if(s&&s.price!=null) $('tpEntry').value=s.price; tpCalc();
@@ -1083,6 +1228,7 @@ function renderGunun(){
     (res.manual?' <b class="down">Aday çok — son seçimi sen yap.</b>':'');
   if(!res.stocks.length){ box.innerHTML='<div class="empty">Bugün setup kriterlerine uyan hisse yok (yükselen trendde, hareketli ve göreli güçlü hisse bulunamadı).</div>'; return; }
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
+  res.stocks.sort(function(a,b){return cmpVal(a,b,sortKG,sortDirG,valG);});
   var rows=res.stocks.map(function(s){
     var rs=s._rs, rsCls=chCls(rs);
     return '<tr><td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,24)+'</div></td>'+
@@ -1096,19 +1242,10 @@ function renderGunun(){
       '<td>'+fmt(s.price)+'</td>'+
       '<td><button class="miniact" data-sym="'+s.symbol+'">Sim</button></td></tr>';
   }).join('');
-  box.innerHTML='<table><thead><tr>'+
-    '<th class="l" title="Hisse senedinin kodu ve şirketin adı.">Hisse</th>'+
-    '<th class="l" title="Şirketin faaliyet alanı (banka, otomotiv, teknoloji…). Aynı sektörden listeye en fazla 2 hisse alınır.">Sektör</th>'+
-    '<th title="0–100 arası kısa vade puanı. Trend, momentum, piyasaya göre güç, RSI, volatilite ve hacmi birleştirir. Yüksek = kısa vadeli kurulum daha güçlü görünüyor. Kâr garantisi DEĞİLDİR.">Kısa Vade Skor</th>'+
-    '<th title="Fiyatın ortalamalarına göre yönü. Fiyat hem 50 hem 200 günlük ortalamanın üstündeyse güçlü yükseliş; altındaysa zayıf demektir.">Trend</th>'+
-    '<th title="Hissenin son 1 aydaki getirisi eksi endeksin getirisi. Pozitifse hisse piyasanın geri kalanından daha iyi performans göstermiş (relatif güç).">Göreli Güç</th>'+
-    '<th title="Son ~1 aylık (21 işlem günü) fiyat değişimi. Kısa vadeli momentumu, yani işlerin gidişatını gösterir.">1A %</th>'+
-    '<th title="Göreli Güç Endeksi (0–100). 55–70 sağlıklı yükseliş; 70 üstü aşırı alım (geri çekilme riski); 30 altı aşırı satım.">RSI</th>'+
-    '<th title="Ortalama günlük dalgalanma, fiyatın yüzdesi olarak. %1.5–4 ideal; çok düşükse hareket yok (makas tuzağı), çok yüksekse riskli.">ATR%</th>'+
-    '<th title="Hissenin güncel fiyatı (yaklaşık 15 dakika gecikmeli).">Fiyat</th>'+
-    '<th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+  box.innerHTML='<table><thead><tr>'+sortHeadHtml(GCOLS,sortKG,sortDirG)+'</tr></thead><tbody>'+rows+'</tbody></table>';
   box.querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
   box.querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
+  box.querySelectorAll('th[data-sk]').forEach(function(th){ th.onclick=function(){ var k=th.dataset.sk; if(sortKG===k)sortDirG*=-1; else {sortKG=k; sortDirG=(k==='symbol'||k==='sector')?1:-1;} renderGunun(); }; });
 }
 function renderScreen(){
   buildHead();
@@ -1616,10 +1753,9 @@ MARKETS.forEach(function(m){
   var inp=$('botThr'+m); inp.value=(S.botThr[m]!=null?S.botThr[m]:70);
   inp.onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botThr[m]=Math.max(0,Math.min(100,v)); this.value=S.botThr[m]; save(); if(S.botOn[m]) botTick(); updateBotBtn(); };
 });
-$('docBtn').onclick=function(){ $('docOv').classList.add('open'); };
-$('docClose').onclick=function(){ $('docOv').classList.remove('open'); };
-$('docOv').onclick=function(e){ if(e.target===this) this.classList.remove('open'); };
-document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('docOv').classList.remove('open'); });
+function wireDoc(btnId, ovId){ var ov=$(ovId); if(!ov) return; var b=$(btnId); if(b) b.onclick=function(){ ov.classList.add('open'); }; var c=ov.querySelector('.docclose'); if(c) c.onclick=function(){ ov.classList.remove('open'); }; ov.onclick=function(e){ if(e.target===ov) ov.classList.remove('open'); }; }
+wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnMid','docOvMid');
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
 updateBotBtn();
 if(anyBot()){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
 
