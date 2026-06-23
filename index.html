@@ -55,7 +55,7 @@
   .pmark.sim{background:#7c5cff}
   .pmark.real{background:#ec4899}
   .pmark.both{background:linear-gradient(135deg,#7c5cff 0 50%,#ec4899 50% 100%)}
-  .pmleg{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--faint)}
+  .pmleg{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--faint); margin-left:auto}
   .pmleg .pmark{margin:0 2px 0 8px}
   .adbanner{display:flex; align-items:center; gap:14px; padding:9px 18px; text-decoration:none;
     background:linear-gradient(100deg,#0c8f6b,#13b585 55%,#1ecb9b); color:#fff}
@@ -301,9 +301,9 @@
 
   <main>
     <section class="view card" id="v-trade">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap">
-        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap">
         <button class="ghost" id="docBtn">📄 Bu sayfa nasıl çalışır?</button>
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
         <b>Önce oku.</b> Bu modül ~15 dk <b>gecikmeli</b> ve günde yalnız birkaç kez güncellenen veriyle çalışır → gerçek-zamanlı scalp/gün-içi icra için <b>uygun değildir</b>. Burası "bugün ne hareketli, hacim nerede, piyasayı kim yeniyor" diye bakılan <b>gecikmeli bir izleme listesi</b> ve bir <b>risk hesaplayıcıdır</b>. Hiçbir satır "al" sinyali değildir; gün içi yön güvenilir tahmin edilemez. Gerçek paradan önce Simülatörde dene, <b>her işleme stop koy</b>. Yatırım tavsiyesi değildir.
@@ -346,9 +346,9 @@
     </section>
 
     <section class="view card" id="v-gunun">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap">
-        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap">
         <button class="ghost" id="docBtnShort">📄 Bu sayfa nasıl çalışır?</button>
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="hint" id="gununInfo" style="margin-bottom:14px"></div>
       <div class="scroll" id="gununBody"></div>
@@ -356,7 +356,7 @@
     </section>
 
     <section class="view active card" id="v-screen">
-      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span><button class="ghost" id="docBtnMid">📄 Bu sayfa nasıl çalışır?</button></div>
+      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><button class="ghost" id="docBtnMid">📄 Bu sayfa nasıl çalışır?</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr><tr id="screenFilterRow"></tr></thead><tbody id="screenBody"></tbody></table></div>
       <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir (5 = tam).</div>
     </section>
@@ -682,17 +682,39 @@
       </ul>
       <p>Aday çoksa son seçim sana bırakılır (üstte uyarı çıkar).</p>
 
-      <h2>3. Kısa Vade Skor (0–100)</h2>
-      <p>Aşağıdaki etkenlerin <b>şeffaf bir bileşimidir</b> (yüksek = kısa vadeli kurulum daha güçlü görünüyor — <b>kâr garantisi değil</b>):</p>
-      <ul>
-        <li><b>Trend uyumu:</b> fiyat &gt; MA50 &gt; MA200 ise en yüksek katkı.</li>
-        <li><b>Göreli güç:</b> endekse göre daha iyi performans.</li>
-        <li><b>Momentum:</b> son ~1 ay yukarı, ama aşırı uzamamış (parabolik değil).</li>
-        <li><b>RSI:</b> 55–70 sağlıklı yükseliş bandı tercih edilir.</li>
-        <li><b>Volatilite (ATR%):</b> ne ölü ne aşırı — orta bant.</li>
-        <li><b>52 hafta zirvesine yakınlık.</b></li>
-        <li>Küçük ağırlıkla <b>değer/kalite</b> (çöp filtrelemek için).</li>
-      </ul>
+      <h2>3. Kısa Vade Skor (0–100) — tam hesap</h2>
+      <p>Yedi bileşenin <b>ağırlıklı ortalamasıdır</b>. Her bileşen ayrı ayrı 0–100 puanlanır, sonra ağırlıklarıyla birleşir. Veri yoksa o bileşen ağırlıktan düşülür. Kendin de hesaplayabilirsin:</p>
+
+      <h3>Bileşen puanları (her biri 0–100)</h3>
+      <table><tr><th>Bileşen</th><th>Kural</th></tr>
+        <tr><td>Trend</td><td>fiyat&gt;MA50&gt;MA200 → 100 · fiyat&gt;MA50 → 65 · fiyat&gt;MA200 → 40 · diğer → 10</td></tr>
+        <tr><td>Göreli güç</td><td>önce <code>rs = (1A getiri) − (endeks 1A)</code>; sonra <code>puan = ((rs+10)/20)×100</code>, 0–100'e kırp. −10%→0 · 0→50 · +10%→100</td></tr>
+        <tr><td>Momentum (r = 1A %)</td><td>r≤0: <code>40+4r</code> (0–40) · 0&lt;r≤12: <code>40+(r/12)×60</code> (40–100) · r&gt;12: <code>100−3(r−12)</code> (aşırı uzama cezası, alt sınır 30)</td></tr>
+        <tr><td>RSI</td><td>55–70 → 100 · 70–78 → 60 · &gt;78 → 25 · 45–55 → 65 · 40–45 → 45 · &lt;40 → 20</td></tr>
+        <tr><td>Volatilite (ATR%)</td><td>%1.5–4 → 100 · %1–1.5 → 70 · %4–6 → 55 · &lt;%1 → 25 · &gt;%6 → 30</td></tr>
+        <tr><td>Zirveye yakınlık</td><td><code>((zirveye_uzaklık% + 30)/30)×100</code>, 0–100'e kırp. Zirvede (0%) → 100 · −%30 → 0</td></tr>
+        <tr><td>Değer/kalite</td><td>Orta/Uzun Vade skorunu (0–100) aynen kullanır; yoksa düşülür</td></tr>
+      </table>
+
+      <h3>Ağırlıklar</h3>
+      <table><tr><th>Bileşen</th><th>Ağırlık</th><th>Tümü varsa pay</th></tr>
+        <tr><td>Trend</td><td>1.6</td><td>%20,5</td></tr>
+        <tr><td>Göreli güç</td><td>1.6</td><td>%20,5</td></tr>
+        <tr><td>Momentum</td><td>1.1</td><td>%14,1</td></tr>
+        <tr><td>Volatilite</td><td>1.1</td><td>%14,1</td></tr>
+        <tr><td>RSI</td><td>1.0</td><td>%12,8</td></tr>
+        <tr><td>Zirveye yakınlık</td><td>0.8</td><td>%10,3</td></tr>
+        <tr><td>Değer/kalite</td><td>0.6</td><td>%7,7</td></tr>
+        <tr><td><b>Toplam</b></td><td><b>7.8</b></td><td><b>%100</b></td></tr>
+      </table>
+      <pre>Skor = ( Σ ağırlık × bileşen ) / ( Σ ağırlık )</pre>
+      <p>Eksik bileşen varsa ağırlığı toplamdan düşülür; kalanlar yeniden ölçeklenir.</p>
+
+      <h3>Örnek hesap</h3>
+      <p>fiyat&gt;MA50&gt;MA200 → Trend <b>100</b> · 1A getiri %8, endeks %2 → rs=6 → <b>80</b> · Momentum(8)=40+(8/12)×60 → <b>80</b> · RSI 62 → <b>100</b> · ATR %2.5 → <b>100</b> · zirveye −%5 → (25/30)×100 → <b>83</b> · kalite <b>70</b>.</p>
+      <pre>pay = 1.6·100 + 1.6·80 + 1.1·80 + 1.0·100 + 1.1·100 + 0.8·83 + 0.6·70
+    = 160 + 128 + 88 + 100 + 110 + 66 + 42 = 694
+Skor = 694 / 7.8 ≈ 89</pre>
 
       <h2>4. Sütun tanımları</h2>
       <table><tr><th>Sütun</th><th>Anlamı</th></tr>
@@ -733,16 +755,45 @@
         <li>Güncelleme ritmi diğer sekmelerle aynı (cron-job.org ~15 dk → <code>fetch_data.py</code> → <code>data.js</code>).</li>
       </ul>
 
-      <h2>2. Skor (0–100) nasıl hesaplanıyor</h2>
-      <p>Beş metrik <b>her piyasa kendi içinde</b> (BIST'i BIST'le, NASDAQ'ı NASDAQ'la) karşılaştırılır; her biri piyasa-içi <b>yüzdelik sıraya</b> göre puanlanıp ağırlıklı birleştirilir:</p>
-      <table><tr><th>Metrik</th><th>Skoru yükselten</th></tr>
-        <tr><td>F/K (Fiyat/Kazanç)</td><td>Düşük (kârına göre ucuz)</td></tr>
-        <tr><td>P/D (Piyasa/Defter)</td><td>Düşük (özsermayeye göre ucuz)</td></tr>
-        <tr><td>ROE (Özsermaye kârlılığı)</td><td>Yüksek</td></tr>
-        <tr><td>Borç/Özsermaye</td><td>Düşük (negatif değerler dışlanır)</td></tr>
-        <tr><td>Net Marj</td><td>Yüksek</td></tr>
+      <h2>2. Skor (0–100) — tam hesap</h2>
+      <p>Soru: "bu hisse, <b>kendi piyasasındaki</b> diğerlerine kıyasla ne kadar ucuz ve sağlam?" Skoru kendin de hesaplayabilirsin; 4 adım:</p>
+
+      <h3>Adım 1 — Metrikler ve geçerlilik</h3>
+      <p>Beş metrik: F/K, P/D, ROE, Borç/Özsr, Net Marj. Şu değerler <b>geçersiz</b> sayılıp o metrikten düşülür: F/K ≤ 0, P/D ≤ 0, Borç/Özsr &lt; 0 (zarar/anlamsız durumlar).</p>
+
+      <h3>Adım 2 — Piyasa-içi yüzdelik sıra</h3>
+      <p>Her metrik, <b>kendi piyasası içinde</b> (BIST'i BIST'le, NASDAQ'ı NASDAQ'la — değerleme rejimleri farklı olduğu için) küçükten büyüğe sıralanır. Her hisseye 0–1 arası sıra verilir:</p>
+      <pre>yüzdelik = konum / (geçerli_adet − 1)
+en küçük değer → 0.0     en büyük değer → 1.0     (tek değer → 0.5)</pre>
+      <p>Yani mutlak rakam değil, <b>piyasadaki yerin</b> önemli.</p>
+
+      <h3>Adım 3 — Yön düzeltme (0–1 puan)</h3>
+      <p>"Düşük iyi" olanlar ters çevrilir ki her metrikte <b>yüksek = iyi</b> olsun:</p>
+      <table><tr><th>Metrik</th><th>Puan (0–1)</th></tr>
+        <tr><td>F/K</td><td><code>1 − yüzdelik</code> (düşük F/K → yüksek puan)</td></tr>
+        <tr><td>P/D</td><td><code>1 − yüzdelik</code></td></tr>
+        <tr><td>Borç/Özsr</td><td><code>1 − yüzdelik</code></td></tr>
+        <tr><td>ROE</td><td><code>yüzdelik</code> (yüksek iyi)</td></tr>
+        <tr><td>Net Marj</td><td><code>yüzdelik</code></td></tr>
       </table>
-      <p><b>Veri</b> sütunu skorun kaç metrikten çıktığını gösterir (5 = tam). Düşükse skora temkinli yaklaş.</p>
+
+      <h3>Adım 4 — Ağırlıklı ortalama</h3>
+      <table><tr><th>Metrik</th><th>Ağırlık</th><th>Tümü varsa pay</th></tr>
+        <tr><td>ROE</td><td>1.5</td><td>%27,3</td></tr>
+        <tr><td>F/K</td><td>1.0</td><td>%18,2</td></tr>
+        <tr><td>P/D</td><td>1.0</td><td>%18,2</td></tr>
+        <tr><td>Borç/Özsr</td><td>1.0</td><td>%18,2</td></tr>
+        <tr><td>Net Marj</td><td>1.0</td><td>%18,2</td></tr>
+        <tr><td><b>Toplam</b></td><td><b>5.5</b></td><td><b>%100</b></td></tr>
+      </table>
+      <pre>Skor = ( Σ ağırlık × puan ) / ( Σ ağırlık ) × 100</pre>
+      <p>Eksik metrik varsa ağırlığı toplamdan düşülür; kalanlar otomatik yeniden ölçeklenir. <b>Veri</b> sütunu kaç metrik kullanıldığını gösterir (5 = tam).</p>
+
+      <h3>Örnek hesap</h3>
+      <p>Bir hisse, piyasası içinde şu sıralarda olsun: F/K yüzdelik 0.2 (çok ucuz), P/D 0.3, ROE 0.8, Borç 0.1, Marj 0.7.</p>
+      <pre>puanlar: F/K 1−0.2=0.80 · P/D 1−0.3=0.70 · ROE 0.80 · Borç 1−0.1=0.90 · Marj 0.70
+pay = 1.0·0.80 + 1.0·0.70 + 1.5·0.80 + 1.0·0.90 + 1.0·0.70 = 4.30
+Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
 
       <h2>3. Renk noktaları</h2>
       <p>Her hücredeki nokta o metriğin kabaca durumunu gösterir: <b class="up">●</b> iyi · <b style="color:#d99a00">●</b> orta · <b class="down">●</b> zayıf. Eşikler sektöre göre değişir; yön gösterir, kesin kural değildir.</p>
