@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-06-24T06:03:28+00:00",
+  "updatedAt": "2026-06-24T06:14:54+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 52.8863,
-    "USDTRY": 46.4928
+    "EURTRY": 52.9139,
+    "USDTRY": 46.4931
   },
   "benchmarks": {
     "DAX": -1.95,
@@ -1433,12 +1433,12 @@ window.STOCK_DATA = {
       "debtToEquity": 15.48,
       "netMargin": 3.76,
       "netIncome": 33105901568,
-      "ma50": 249.271,
-      "ma200": 213.1204,
-      "rsi14": 28.1,
-      "atrPct": 3.78,
-      "ret1m": -9.34,
-      "ret3m": -12.97,
+      "ma50": 248.585,
+      "ma200": 213.4576,
+      "rsi14": 34.3,
+      "atrPct": 3.3,
+      "ret1m": -5.85,
+      "ret3m": -13.57,
       "pctFromHigh": -20.0,
       "relVol": 0.86,
       "score": 63.3,
@@ -1775,8 +1775,8 @@ window.STOCK_DATA = {
       "changePct": -2.15,
       "volume": 2987575,
       "marketCap": 43452682240,
-      "pe": 24.39,
-      "pb": 0.5,
+      "pe": 23.87,
+      "pb": 0.55,
       "roe": 1.85,
       "debtToEquity": 32.3,
       "netMargin": 19.82,
@@ -1789,7 +1789,7 @@ window.STOCK_DATA = {
       "ret3m": 9.89,
       "pctFromHigh": -13.64,
       "relVol": 0.56,
-      "score": 59.8,
+      "score": 59.6,
       "scoreCoverage": 5
     },
     {
@@ -3359,6 +3359,35 @@ window.STOCK_DATA = {
       "scoreCoverage": 5
     },
     {
+      "symbol": "SAHOL.IS",
+      "market": "BIST",
+      "name": "SABANCI HOLDING",
+      "sector": "Financial Services",
+      "currency": "TRY",
+      "priceTime": 1782227398,
+      "price": 99.15,
+      "prevClose": 101.5,
+      "changePct": -2.32,
+      "volume": 24363579,
+      "marketCap": 205025837056,
+      "pe": 25.62,
+      "pb": 0.54,
+      "roe": 2.42,
+      "debtToEquity": null,
+      "netMargin": 3.06,
+      "netIncome": 7999176192,
+      "ma50": 96.099,
+      "ma200": 90.4213,
+      "rsi14": 67.6,
+      "atrPct": 2.92,
+      "ret1m": 9.8,
+      "ret3m": 7.8,
+      "pctFromHigh": -10.53,
+      "relVol": 0.94,
+      "score": 51.0,
+      "scoreCoverage": 4
+    },
+    {
       "symbol": "ENR.DE",
       "market": "DAX",
       "name": "Siemens Energy AG             N",
@@ -3386,35 +3415,6 @@ window.STOCK_DATA = {
       "relVol": 0.73,
       "score": 50.8,
       "scoreCoverage": 5
-    },
-    {
-      "symbol": "SAHOL.IS",
-      "market": "BIST",
-      "name": "SABANCI HOLDING",
-      "sector": "Financial Services",
-      "currency": "TRY",
-      "priceTime": 1782227398,
-      "price": 99.15,
-      "prevClose": 101.5,
-      "changePct": -2.32,
-      "volume": 24363579,
-      "marketCap": 205025837056,
-      "pe": 25.62,
-      "pb": 0.54,
-      "roe": 2.42,
-      "debtToEquity": null,
-      "netMargin": 3.06,
-      "netIncome": 7999176192,
-      "ma50": 96.099,
-      "ma200": 90.4213,
-      "rsi14": 67.6,
-      "atrPct": 2.92,
-      "ret1m": 9.8,
-      "ret3m": 7.8,
-      "pctFromHigh": -10.53,
-      "relVol": 0.94,
-      "score": 50.7,
-      "scoreCoverage": 4
     },
     {
       "symbol": "KLAC",
@@ -5008,7 +5008,7 @@ window.STOCK_DATA = {
       "ret3m": -3.1,
       "pctFromHigh": -16.93,
       "relVol": 0.61,
-      "score": 41.0,
+      "score": 40.8,
       "scoreCoverage": 5
     },
     {
@@ -5965,7 +5965,7 @@ window.STOCK_DATA = {
       "ret3m": -51.46,
       "pctFromHigh": -88.11,
       "relVol": 0.09,
-      "score": 30.2,
+      "score": 30.5,
       "scoreCoverage": 4
     },
     {
