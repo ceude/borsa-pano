@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-07-01T20:44:37+00:00",
+  "updatedAt": "2026-07-01T20:53:29+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.1177,
-    "USDTRY": 46.6591
+    "EURTRY": 53.089,
+    "USDTRY": 46.6586
   },
   "benchmarks": {
     "DAX": -0.33,
@@ -3687,7 +3687,7 @@ window.STOCK_DATA = {
       "price": 1331.73,
       "prevClose": 1382.36,
       "changePct": -3.66,
-      "volume": 1202604,
+      "volume": 1202500,
       "marketCap": 65427894272,
       "pe": 95.4,
       "pb": 17.79,
@@ -4268,7 +4268,7 @@ window.STOCK_DATA = {
       "prevClose": 297.89,
       "changePct": -8.67,
       "volume": 33203888,
-      "marketCap": 238194229248,
+      "marketCap": 237989330944,
       "pe": 93.17,
       "pb": 13.08,
       "roe": 16.03,
@@ -4673,7 +4673,7 @@ window.STOCK_DATA = {
       "price": 79.7,
       "prevClose": 80.3,
       "changePct": -0.75,
-      "volume": 5664612,
+      "volume": 5662392,
       "marketCap": 49754284032,
       "pe": 22.97,
       "pb": 2.11,
@@ -4790,7 +4790,7 @@ window.STOCK_DATA = {
       "prevClose": 965.0,
       "changePct": -5.16,
       "volume": 3586755,
-      "marketCap": 205212139520,
+      "marketCap": 207063678976,
       "pe": 87.0,
       "pb": 187.54,
       "roe": 1787.97,
@@ -5514,7 +5514,7 @@ window.STOCK_DATA = {
       "price": 188.87,
       "prevClose": 184.53,
       "changePct": 2.35,
-      "volume": 4087386,
+      "volume": 4085815,
       "marketCap": 82294194176,
       "pe": 89.94,
       "pb": 8.07,
