@@ -352,13 +352,13 @@
       </div>
       <div class="hint" id="gununInfo" style="margin-bottom:14px"></div>
       <div class="scroll" id="gununBody"></div>
-      <div class="disclaimer"><b>Strateji (swing / kısa-orta vade):</b> Yalnız yeşil günde, yükselen trendde (fiyat&gt;MA50, tercihen MA50&gt;MA200), endekse göre güçlü (göreli güç), sağlıklı RSI ve canlı ama aşırı olmayan volatilitedeki hisseleri seçer; çöp almamak için değer/kalite skoru küçük ağırlıkla katılır. "Setup Skoru" bu etkenlerin şeffaf 0-100 bileşimidir. <b>Çıkış fikri:</b> birkaç gün–hafta tut, takip eden zarar-kes (trailing stop) koy, kırmızı günlerde pozisyon açma. <b>Uyarı:</b> Veriler ~15 dk gecikmeli ve günlüktür → gerçek <b>gün içi</b> işlem için yeterli değildir; bu liste aday/araştırma üretir. Momentum stratejilerinin sert düşüş dönemleri olur. Yatırım tavsiyesi değildir — <b>önce Simülatörde test et.</b></div>
+      <div class="disclaimer"><b>Strateji (swing / kısa-orta vade):</b> Yalnız yeşil günde, yükselen trendde (fiyat&gt;MA50, tercihen MA50&gt;MA200), endekse göre güçlü (göreli güç), sağlıklı RSI ve canlı ama aşırı olmayan volatilitedeki hisseleri seçer; <b>aşırı uzamış (MA50'nin %25'ten fazla üstündeki) hisseler kovalamaca riski nedeniyle elenir</b>; çöp almamak için değer/kalite skoru küçük ağırlıkla katılır. "Setup Skoru" bu etkenlerin şeffaf 0-100 bileşimidir. <b>Çıkış fikri:</b> birkaç gün–hafta tut, takip eden zarar-kes (trailing stop) koy, kırmızı günlerde pozisyon açma. <b>Uyarı:</b> Veriler ~15 dk gecikmeli ve günlüktür → gerçek <b>gün içi</b> işlem için yeterli değildir; bu liste aday/araştırma üretir. Momentum stratejilerinin sert düşüş dönemleri olur. Yatırım tavsiyesi değildir — <b>önce Simülatörde test et.</b></div>
     </section>
 
     <section class="view active card" id="v-screen">
       <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><button class="ghost" id="docBtnMid">📄 Bu sayfa nasıl çalışır?</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr><tr id="screenFilterRow"></tr></thead><tbody id="screenBody"></tbody></table></div>
-      <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir (5 = tam).</div>
+      <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Finans hisselerinde (banka/sigorta) Borç/Özsr skora katılmaz</b> — kaldıraç o işin doğasıdır. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir; düşükse skora temkinli yaklaş.</div>
     </section>
 
     <section class="view card" id="v-all">
@@ -385,7 +385,7 @@
         <div><div class="k">Toplam K/Z</div><div class="v" id="pnlV">—</div></div>
       </div>
       <div class="botbar">
-        <div class="hint" style="margin-bottom:8px"><b>🤖 Oto-trader</b> — her piyasa ayrı açılır/kapanır, ayrı eşik:</div>
+        <div class="hint" style="margin-bottom:8px"><b>🤖 Oto-trader v2</b> — her piyasa ayrı açılır/kapanır, ayrı eşik:</div>
         <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center">
           <div style="display:flex; align-items:center; gap:8px">
             <button class="ghost" id="botBtnBIST">BIST: kapalı</button>
@@ -399,9 +399,12 @@
             <button class="ghost" id="botBtnNASDAQ">NASDAQ: kapalı</button>
             <label class="hint" style="display:flex; align-items:center; gap:6px">eşik <input id="botThrNASDAQ" class="fld" type="number" min="0" max="100" step="5" style="width:62px"></label>
           </div>
+          <div style="display:flex; align-items:center; gap:8px">
+            <label class="hint" style="display:flex; align-items:center; gap:6px">kâr al hedefi % <input id="botTP" class="fld" type="number" min="0.5" max="20" step="0.5" style="width:70px" title="Kalan pozisyon için sabit kâr-al hedefi. Gün içi mantıkta %2–3 gerçekçidir."></label>
+          </div>
         </div>
         <span class="hint" id="botStatus" style="display:block; margin-top:8px"></span>
-        <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> · işlem başına risk %1 · stop 1.5×ATR · hedef 2R · trend kırılınca çık · tek pozisyon en çok özkaynağın %25'i · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
+        <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> · işlem başına risk %1 · stop 1.5×ATR · <b>+1R'de yarısını satar, stop'u başabaşa çeker</b> · kalan için <b>kâr al</b> hedefi yukarıdaki % (vars. %2.5) · kısmi satıştan sonra iz süren (trailing) stop · trend kırılınca çık · <b>kapanışa ~15 dk kala tüm bot pozisyonlarını kapatır (gün içi mantık — pozisyon geceye taşınmaz)</b> · kapanışa &lt;45 dk kala ve açılışın ilk 15 dk'sında yeni alım yok · en fazla 4 eşzamanlı pozisyon · tek pozisyon en çok özkaynağın %25'i · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
       </div>
       <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
       <div class="simgrid">
@@ -541,7 +544,7 @@
           <div class="rng"><span class="g">●</span> &gt;%20 güçlü &nbsp; <span class="m">●</span> %10–20 orta &nbsp; <span class="b">●</span> &lt;%10 zayıf</div>
         </div>
         <div class="eduitem"><b>Borç / Özsermaye</b>
-          <p>Şirketin borcunun özkaynağına oranı. Düşük = sağlam bilanço; yüksek = borca bağımlı, risk artar.</p>
+          <p>Şirketin borcunun özkaynağına oranı. Düşük = sağlam bilanço; yüksek = borca bağımlı, risk artar. Bankalarda anlamlı değildir.</p>
           <div class="rng"><span class="g">●</span> &lt;%50 düşük &nbsp; <span class="m">●</span> %50–100 orta &nbsp; <span class="b">●</span> &gt;%100 yüksek</div>
         </div>
         <div class="eduitem"><b>Net Marj</b>
@@ -557,7 +560,7 @@
   <div class="doccard">
     <button class="docclose" id="docClose">✕ Kapat</button>
     <div class="doc">
-      <h1>Günlük Trade — nasıl çalışır?</h1>
+      <h1>Günlük Trade — nasıl çalışır? (v2)</h1>
       <p>Bu sayfadaki listenin nasıl oluştuğu: verinin kaynağı, gecikmesi, güncelleme sıklığı, her sütunun anlamı ve özellikle Gün İçi Skor ile Trend'in matematiği. Tüm formüller koddan birebir.</p>
       <div class="warn"><b>Önce oku:</b> Veri ~15 dk gecikmeli ve seyrek güncellenir → gerçek zamanlı işlem için uygun değildir; bir izleme/aday aracıdır. Hiçbir satır "al" sinyali değildir. Yatırım tavsiyesi değildir.</div>
 
@@ -612,17 +615,22 @@
         <tr><td>Fiyat</td><td>Güncel fiyat (~15 dk gecikmeli).</td><td>price</td></tr>
       </table>
 
-      <h2>6. Gün İçi Skor (0–100)</h2>
-      <p>Dört bileşenin toplamı. <code>ch</code>=Gün %, <code>mktAvg</code>=piyasa ortalaması.</p>
-      <h3>Bileşen 1 — Yön + güç (en fazla 35)</h3>
-      <ul><li><code>0 &lt; ch ≤ 3.5</code> → <code>(ch/3.5)×35</code></li>
-      <li><code>ch &gt; 3.5</code> → <code>max(10, 35−(ch−3.5)×5)</code> — parabolik hareket cezalı (taban 10).</li></ul>
+      <h2>6. Gün İçi Skor (0–100) — v2, ATR'ye göre normalize</h2>
+      <p>Dört bileşenin toplamı. <code>ch</code>=Gün %, <code>ATR%</code>=hissenin tipik günlük dalgalanması, <code>rMove = ch / ATR%</code> = "bugün, kendi normaline göre kaç birim hareket etti", <code>mktAvg</code>=piyasa ortalaması.</p>
+      <p><b>Neden değişti:</b> eski sürüm günü %3.5 artmış hisseye tavan puan veriyordu — hisse ne kadar oynak olursa olsun. Bu, <b>hareketi çoktan yapmış hisseyi kovalamaya</b> teşvik ediyordu. %3'lük hareket, ATR'si %1 olan sakin bir hissede aşırı uzamadır; ATR'si %4 olan oynak bir hissede sıradan bir gündür. v2 bu yüzden hareketi hissenin kendi oynaklığına bölerek değerlendirir.</p>
+      <h3>Bileşen 1 — Hareket kalitesi (en fazla 30)</h3>
+      <ul>
+        <li><code>rMove ≤ 0.25</code> → <code>(rMove/0.25)×12</code> — henüz kayda değer hareket yok.</li>
+        <li><code>0.25 &lt; rMove ≤ 1.0</code> → 12'den 30'a doğrusal — <b>ideal bölge:</b> anlamlı ama uzamamış hareket.</li>
+        <li><code>1.0 &lt; rMove ≤ 1.5</code> → 30'dan 18'e doğrusal — uzamaya başladı.</li>
+        <li><code>rMove &gt; 1.5</code> → <code>max(4, 18−(rMove−1.5)×10)</code> — parabolik/kovalamaca sert cezalı.</li>
+      </ul>
       <h3>Bileşen 2 — Relatif hacim (en fazla 30)</h3>
-      <p><code>clamp((relVol−0.8)×30, 0, 30)</code>. relVol 0.8→0, 1.8→30.</p>
+      <p><code>clamp((relVol−1.0)×25, 0, 30)</code>. 1.0×→0, 2.2×→tavan. Ortalama-altı hacim artık hiç puan almaz — hacimsiz yükseliş güvenilmezdir.</p>
       <h3>Bileşen 3 — Piyasaya göre güç (en fazla 20)</h3>
       <p><code>clamp((ch−mktAvg)×8, 0, 20)</code>. Piyasayı %2.5 geçince tavan.</p>
-      <h3>Bileşen 4 — Trend uyumu (en fazla 15)</h3>
-      <p>price&gt;ma50 ve ma50&gt;ma200 → 15; sadece price&gt;ma50 → 9; aksi halde 0.</p>
+      <h3>Bileşen 4 — Trend uyumu + giriş bölgesi (en fazla 20)</h3>
+      <p>price&gt;ma50 ve ma50&gt;ma200 → 14; sadece price&gt;ma50 → 8; aksi halde 0. <b>Ek:</b> fiyat MA50'nin %0–6 üstündeyse +6 (tabana yakın, sağlıklı giriş bölgesi); %15'ten fazla üstündeyse −6 (uzamış).</p>
       <p><b>Toplam:</b> <code>yuvarla(clamp(B1+B2+B3+B4, 0, 100))</code>.</p>
 
       <h2>7. TREND sütunu (detaylı)</h2>
@@ -632,7 +640,7 @@
         <tr><td>price &gt; ma50 (ma200 koşulu yok)</td><td>↑</td><td>Yukarı; uzun vade dizilimi henüz tam değil</td></tr>
         <tr><td>price ≤ ma50</td><td>↓</td><td>Zayıf; 50 günlüğün altında</td></tr>
       </table>
-      <p><b>Kullandığı veriler:</b> price (anlık, 15 dk gecikmeli); ma50/ma200 (1 yıllık günlük geçmişten). ↑↑ için ≥200 günlük geçmiş gerekir; yoksa en fazla ↑ çıkar. Gün İçi Skor'daki Trend uyumu da aynı mantığı kullanır (↑↑=15, ↑=9, ↓=0).</p>
+      <p><b>Kullandığı veriler:</b> price (anlık, 15 dk gecikmeli); ma50/ma200 (1 yıllık günlük geçmişten). ↑↑ için ≥200 günlük geçmiş gerekir; yoksa en fazla ↑ çıkar. Gün İçi Skor'daki Trend uyumu da aynı mantığı kullanır.</p>
 
       <h2>8. Özet akış</h2>
       <pre>yfinance (Yahoo, XETRA .DE, 15 dk gecikmeli)
@@ -661,7 +669,7 @@
   <div class="doccard">
     <button class="docclose">✕ Kapat</button>
     <div class="doc">
-      <h1>Kısa Vade Adayları — nasıl çalışır?</h1>
+      <h1>Kısa Vade Adayları — nasıl çalışır? (v2)</h1>
       <p>Bu sayfa <b>swing / kısa-orta vade</b> (birkaç gün–hafta) için aday üretir: yükselen trendde, piyasayı yenen, sağlıklı momentumlu hisseleri bir "Kısa Vade Skor"u ile sıralar. Aşağıda filtre, skor ve her sütun açıklanıyor.</p>
       <div class="warn"><b>Önce oku:</b> Bu bir <b>aday/araştırma listesidir</b>, "al" listesi değil. Veri ~15 dk gecikmeli ve günlüktür → gerçek <b>gün içi</b> işleme uygun değildir. Momentum stratejilerinin sert düşüş dönemleri olur. Yatırım tavsiyesi değildir; önce Simülatörde test et.</div>
 
@@ -678,12 +686,13 @@
         <li>Endekse göre güçlü olması (göreli güç pozitif eğilim).</li>
         <li>Sağlıklı RSI ve <b>canlı ama aşırı olmayan</b> volatilite (ATR ideal bantta).</li>
         <li>Yeterli likidite (işlem görüyor olması).</li>
+        <li><b>Aşırı uzamamış olması: fiyat MA50'nin en fazla %25 üstünde</b> — daha uzamışı kovalamaca sayılır ve elenir.</li>
         <li>Çeşitlilik için <b>sektör başına en fazla 2</b> hisse.</li>
       </ul>
       <p>Aday çoksa son seçim sana bırakılır (üstte uyarı çıkar).</p>
 
-      <h2>3. Kısa Vade Skor (0–100) — tam hesap</h2>
-      <p>Yedi bileşenin <b>ağırlıklı ortalamasıdır</b>. Her bileşen ayrı ayrı 0–100 puanlanır, sonra ağırlıklarıyla birleşir. Veri yoksa o bileşen ağırlıktan düşülür. Kendin de hesaplayabilirsin:</p>
+      <h2>3. Kısa Vade Skor (0–100) — tam hesap (v2)</h2>
+      <p>Dokuz bileşenin <b>ağırlıklı ortalamasıdır</b>. Her bileşen ayrı ayrı 0–100 puanlanır, sonra ağırlıklarıyla birleşir. Veri yoksa o bileşen ağırlıktan düşülür. Kendin de hesaplayabilirsin:</p>
 
       <h3>Bileşen puanları (her biri 0–100)</h3>
       <table><tr><th>Bileşen</th><th>Kural</th></tr>
@@ -693,28 +702,32 @@
         <tr><td>RSI</td><td>55–70 → 100 · 70–78 → 60 · &gt;78 → 25 · 45–55 → 65 · 40–45 → 45 · &lt;40 → 20</td></tr>
         <tr><td>Volatilite (ATR%)</td><td>%1.5–4 → 100 · %1–1.5 → 70 · %4–6 → 55 · &lt;%1 → 25 · &gt;%6 → 30</td></tr>
         <tr><td>Zirveye yakınlık</td><td><code>((zirveye_uzaklık% + 30)/30)×100</code>, 0–100'e kırp. Zirvede (0%) → 100 · −%30 → 0</td></tr>
+        <tr><td><b>Uzama (yeni)</b></td><td>fiyat MA50'nin %0–8 üstünde → 100 (pullback/taban bölgesi, sağlıklı giriş) · %8–15 → 60 · &gt;%15 → 60'tan hızla düşer (alt sınır 10) · MA50 altı → 20</td></tr>
+        <tr><td><b>3A teyidi (yeni)</b></td><td><code>r3</code> = 3 aylık getiri. r3≤0: <code>50+2·r3</code> (0–50) · r3&gt;0: <code>50+(r3/25)×50</code> (50–100, +%25'te tavan). Orta vade momentum da aynı yönde mi diye bakar.</td></tr>
         <tr><td>Değer/kalite</td><td>Orta/Uzun Vade skorunu (0–100) aynen kullanır; yoksa düşülür</td></tr>
       </table>
 
-      <h3>Ağırlıklar</h3>
+      <h3>Ağırlıklar (v2)</h3>
       <table><tr><th>Bileşen</th><th>Ağırlık</th><th>Tümü varsa pay</th></tr>
-        <tr><td>Trend</td><td>1.6</td><td>%20,5</td></tr>
-        <tr><td>Göreli güç</td><td>1.6</td><td>%20,5</td></tr>
-        <tr><td>Momentum</td><td>1.1</td><td>%14,1</td></tr>
-        <tr><td>Volatilite</td><td>1.1</td><td>%14,1</td></tr>
-        <tr><td>RSI</td><td>1.0</td><td>%12,8</td></tr>
-        <tr><td>Zirveye yakınlık</td><td>0.8</td><td>%10,3</td></tr>
-        <tr><td>Değer/kalite</td><td>0.6</td><td>%7,7</td></tr>
-        <tr><td><b>Toplam</b></td><td><b>7.8</b></td><td><b>%100</b></td></tr>
+        <tr><td>Trend</td><td>1.6</td><td>%18,0</td></tr>
+        <tr><td>Göreli güç</td><td>1.6</td><td>%18,0</td></tr>
+        <tr><td>Momentum (1A)</td><td>1.0</td><td>%11,2</td></tr>
+        <tr><td>Volatilite</td><td>1.0</td><td>%11,2</td></tr>
+        <tr><td>Uzama</td><td>1.0</td><td>%11,2</td></tr>
+        <tr><td>RSI</td><td>0.9</td><td>%10,1</td></tr>
+        <tr><td>Zirveye yakınlık</td><td>0.7</td><td>%7,9</td></tr>
+        <tr><td>3A teyidi</td><td>0.6</td><td>%6,7</td></tr>
+        <tr><td>Değer/kalite</td><td>0.5</td><td>%5,6</td></tr>
+        <tr><td><b>Toplam</b></td><td><b>8.9</b></td><td><b>%100</b></td></tr>
       </table>
       <pre>Skor = ( Σ ağırlık × bileşen ) / ( Σ ağırlık )</pre>
       <p>Eksik bileşen varsa ağırlığı toplamdan düşülür; kalanlar yeniden ölçeklenir.</p>
 
       <h3>Örnek hesap</h3>
-      <p>fiyat&gt;MA50&gt;MA200 → Trend <b>100</b> · 1A getiri %8, endeks %2 → rs=6 → <b>80</b> · Momentum(8)=40+(8/12)×60 → <b>80</b> · RSI 62 → <b>100</b> · ATR %2.5 → <b>100</b> · zirveye −%5 → (25/30)×100 → <b>83</b> · kalite <b>70</b>.</p>
-      <pre>pay = 1.6·100 + 1.6·80 + 1.1·80 + 1.0·100 + 1.1·100 + 0.8·83 + 0.6·70
-    = 160 + 128 + 88 + 100 + 110 + 66 + 42 = 694
-Skor = 694 / 7.8 ≈ 89</pre>
+      <p>fiyat&gt;MA50&gt;MA200 → Trend <b>100</b> · 1A getiri %8, endeks %2 → rs=6 → <b>80</b> · Momentum(8)=40+(8/12)×60 → <b>80</b> · RSI 62 → <b>100</b> · ATR %2.5 → <b>100</b> · zirveye −%5 → (25/30)×100 → <b>83</b> · fiyat MA50'nin %5 üstü → Uzama <b>100</b> · 3A getiri %15 → 50+(15/25)×50 → <b>80</b> · kalite <b>70</b>.</p>
+      <pre>pay = 1.6·100 + 1.6·80 + 1.0·80 + 0.9·100 + 1.0·100 + 0.7·83 + 1.0·100 + 0.6·80 + 0.5·70
+    = 160 + 128 + 80 + 90 + 100 + 58.1 + 100 + 48 + 35 = 799.1
+Skor = 799.1 / 8.9 ≈ 90</pre>
 
       <h2>4. Sütun tanımları</h2>
       <table><tr><th>Sütun</th><th>Anlamı</th></tr>
@@ -744,8 +757,8 @@ Skor = 694 / 7.8 ≈ 89</pre>
   <div class="doccard">
     <button class="docclose">✕ Kapat</button>
     <div class="doc">
-      <h1>Orta/Uzun Vade Adayları — nasıl çalışır?</h1>
-      <p>Bu sayfa bir <b>değer/kalite taramasıdır</b>: "hisse ucuz ve şirket sağlam mı?" sorusunu, temel oranları birleştiren 0–100 bir skorla yanıtlar. <b>"Yükselir mi"yi ölçmez</b> — ucuzluğu ve bilanço sağlamlığını ölçer.</p>
+      <h1>Orta/Uzun Vade Adayları — nasıl çalışır? (v2)</h1>
+      <p>Bu sayfa bir <b>değer/kalite taramasıdır</b>: "hisse ucuz ve şirket sağlam mı?" sorusunu, temel oranları birleştiren 0–100 bir skorla yanıtlar. <b>"Yükselir mi"yi ölçmez</b> — ucuzluğu ve bilanço sağlamlığını ölçer. v2'den itibaren skor <b>tarayıcıda</b> hesaplanır (data.js'teki sunucu skoru geçersiz kılınır), böylece kurallar bu dokümanla her zaman birebir aynıdır.</p>
       <div class="warn"><b>Önce oku:</b> Bu bir araştırma/tarama aracıdır, "al" listesi değil. Temel oranlar gecikmeli/eksik olabilir. Yatırım tavsiyesi değildir.</div>
 
       <h2>1. Veri & güncelleme</h2>
@@ -755,11 +768,13 @@ Skor = 694 / 7.8 ≈ 89</pre>
         <li>Güncelleme ritmi diğer sekmelerle aynı (cron-job.org ~15 dk → <code>fetch_data.py</code> → <code>data.js</code>).</li>
       </ul>
 
-      <h2>2. Skor (0–100) — tam hesap</h2>
+      <h2>2. Skor (0–100) — tam hesap (v2)</h2>
       <p>Soru: "bu hisse, <b>kendi piyasasındaki</b> diğerlerine kıyasla ne kadar ucuz ve sağlam?" Skoru kendin de hesaplayabilirsin; 4 adım:</p>
 
       <h3>Adım 1 — Metrikler ve geçerlilik</h3>
-      <p>Beş metrik: F/K, P/D, ROE, Borç/Özsr, Net Marj. Şu değerler <b>geçersiz</b> sayılıp o metrikten düşülür: F/K ≤ 0, P/D ≤ 0, Borç/Özsr &lt; 0 (zarar/anlamsız durumlar).</p>
+      <p>Temel beş metrik: F/K, P/D, ROE, Borç/Özsr, Net Marj. Şu değerler <b>geçersiz</b> sayılıp o metrikten düşülür: F/K ≤ 0, P/D ≤ 0, Borç/Özsr &lt; 0 (zarar/anlamsız durumlar).</p>
+      <p><b>Yeni — finans istisnası:</b> Banka, sigorta ve finansal hizmet hisselerinde <b>Borç/Özsr skora katılmaz</b>. Kaldıraç bankacılığın iş modelinin kendisidir; bir bankayı sanayi şirketiyle aynı borç cetveline koymak skoru sistematik olarak bozar (eski sürümde bankalar bu yüzden haksız yere düşük puan alıyordu).</p>
+      <p><b>Yeni — büyüme metrikleri (opsiyonel):</b> <code>data.js</code>'te <code>earningsGrowth</code> (kâr büyümesi) ve <code>revenueGrowth</code> (ciro büyümesi) alanları varsa skora katılırlar. Değer tek başına yeterli değildir — ucuz ama küçülen şirket "değer tuzağı"dır; büyüme bileşeni bunu ayıklar. Bu alanları etkinleştirmek için <code>fetch_data.py</code>'ye yfinance <code>info</code> sözlüğünden <code>earningsGrowth</code> ve <code>revenueGrowth</code> alanlarını eklemen yeterli (×100 ile yüzdeye çevirerek); yoksa skor eski 5 metrikle çalışmaya devam eder.</p>
 
       <h3>Adım 2 — Piyasa-içi yüzdelik sıra</h3>
       <p>Her metrik, <b>kendi piyasası içinde</b> (BIST'i BIST'le, NASDAQ'ı NASDAQ'la — değerleme rejimleri farklı olduğu için) küçükten büyüğe sıralanır. Her hisseye 0–1 arası sıra verilir:</p>
@@ -772,25 +787,29 @@ en küçük değer → 0.0     en büyük değer → 1.0     (tek değer → 0.5
       <table><tr><th>Metrik</th><th>Puan (0–1)</th></tr>
         <tr><td>F/K</td><td><code>1 − yüzdelik</code> (düşük F/K → yüksek puan)</td></tr>
         <tr><td>P/D</td><td><code>1 − yüzdelik</code></td></tr>
-        <tr><td>Borç/Özsr</td><td><code>1 − yüzdelik</code></td></tr>
+        <tr><td>Borç/Özsr</td><td><code>1 − yüzdelik</code> (finans hisselerinde kullanılmaz)</td></tr>
         <tr><td>ROE</td><td><code>yüzdelik</code> (yüksek iyi)</td></tr>
         <tr><td>Net Marj</td><td><code>yüzdelik</code></td></tr>
+        <tr><td>Kâr büyümesi (varsa)</td><td><code>yüzdelik</code></td></tr>
+        <tr><td>Ciro büyümesi (varsa)</td><td><code>yüzdelik</code></td></tr>
       </table>
 
       <h3>Adım 4 — Ağırlıklı ortalama</h3>
-      <table><tr><th>Metrik</th><th>Ağırlık</th><th>Tümü varsa pay</th></tr>
+      <table><tr><th>Metrik</th><th>Ağırlık</th><th>Temel 5 varsa pay</th></tr>
         <tr><td>ROE</td><td>1.5</td><td>%27,3</td></tr>
         <tr><td>F/K</td><td>1.0</td><td>%18,2</td></tr>
         <tr><td>P/D</td><td>1.0</td><td>%18,2</td></tr>
-        <tr><td>Borç/Özsr</td><td>1.0</td><td>%18,2</td></tr>
+        <tr><td>Borç/Özsr (finans hariç)</td><td>1.0</td><td>%18,2</td></tr>
         <tr><td>Net Marj</td><td>1.0</td><td>%18,2</td></tr>
-        <tr><td><b>Toplam</b></td><td><b>5.5</b></td><td><b>%100</b></td></tr>
+        <tr><td>Kâr büyümesi (varsa)</td><td>1.0</td><td>—</td></tr>
+        <tr><td>Ciro büyümesi (varsa)</td><td>0.7</td><td>—</td></tr>
+        <tr><td><b>Toplam</b></td><td><b>5.5 temel · 7.2 büyümeyle</b></td><td></td></tr>
       </table>
       <pre>Skor = ( Σ ağırlık × puan ) / ( Σ ağırlık ) × 100</pre>
-      <p>Eksik metrik varsa ağırlığı toplamdan düşülür; kalanlar otomatik yeniden ölçeklenir. <b>Veri</b> sütunu kaç metrik kullanıldığını gösterir (5 = tam).</p>
+      <p>Eksik metrik varsa ağırlığı toplamdan düşülür; kalanlar otomatik yeniden ölçeklenir. <b>Veri</b> sütunu kaç metrik kullanıldığını gösterir (finans hisselerinde temel metrik en fazla 4'tür; büyüme verisi varsa 7'ye kadar çıkar).</p>
 
       <h3>Örnek hesap</h3>
-      <p>Bir hisse, piyasası içinde şu sıralarda olsun: F/K yüzdelik 0.2 (çok ucuz), P/D 0.3, ROE 0.8, Borç 0.1, Marj 0.7.</p>
+      <p>Bir hisse (finans dışı), piyasası içinde şu sıralarda olsun: F/K yüzdelik 0.2 (çok ucuz), P/D 0.3, ROE 0.8, Borç 0.1, Marj 0.7. Büyüme verisi yok.</p>
       <pre>puanlar: F/K 1−0.2=0.80 · P/D 1−0.3=0.70 · ROE 0.80 · Borç 1−0.1=0.90 · Marj 0.70
 pay = 1.0·0.80 + 1.0·0.70 + 1.5·0.80 + 1.0·0.90 + 1.0·0.70 = 4.30
 Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
@@ -806,9 +825,9 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
         <tr><td>F/K</td><td>Fiyat/Kazanç. &lt;10 ucuz · 10–20 makul · &gt;20 pahalı · negatif = zarar.</td></tr>
         <tr><td>P/D</td><td>Piyasa/Defter. &lt;1,5 ucuz · 1,5–3 normal · &gt;3 pahalı.</td></tr>
         <tr><td>Özsr.K %</td><td>ROE. &gt;%20 güçlü · %10–20 orta · &lt;%10 zayıf.</td></tr>
-        <tr><td>Borç/Özsr</td><td>Borcun özsermayeye oranı. Düşük = sağlam.</td></tr>
+        <tr><td>Borç/Özsr</td><td>Borcun özsermayeye oranı. Düşük = sağlam. Finans hisselerinde skora katılmaz.</td></tr>
         <tr><td>Marj %</td><td>Net kâr marjı. &gt;%15 iyi · %5–15 orta · &lt;%5 zayıf.</td></tr>
-        <tr><td>Veri</td><td>Skorun kaç metrikten çıktığı (5 = tam).</td></tr>
+        <tr><td>Veri</td><td>Skorun kaç metrikten çıktığı. Finans hisselerinde Borç/Özsr sayılmaz; büyüme verisi varsa 7'ye kadar çıkar.</td></tr>
       </table>
       <p><b>Arama & filtre & sıralama:</b> üstten sembol/şirket ara; her sütunun altındaki filtre satırına koşul yaz (örn. <code>&lt;10</code>); başlığa tıklayarak sırala.</p>
 
@@ -821,7 +840,6 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
     </div>
   </div>
 </div>
-
 <script>
 function startApp(){
 "use strict";
@@ -870,8 +888,50 @@ function sektorTR(s){
     'Real Estate':'Emlak','Communication Services':'İletişim'};
   return m[s]||s||'—';
 }
-/* GÜNÜN HİSSELERİ — sağlam sürüm (trend + momentum + göreli güç + RSI + volatilite + likidite)
-   Mantık: yeşil gün + uptrend (fiyat>MA50) + yeterli hareket (ATR) gate'i;
+/* ---------- ORTA/UZUN VADE SKORU — istemci tarafı v2 ----------
+   data.js'ten gelen sunucu skoru burada yeniden hesaplanıp geçersiz kılınır.
+   Farklar: (1) finans hisselerinde Borç/Özsr skora katılmaz (kaldıraç bankanın
+   iş modelidir; sanayi cetveliyle ölçmek skoru bozar), (2) data.js'te
+   earningsGrowth / revenueGrowth alanları varsa büyüme metrikleri devreye
+   girer ("değer tuzağı" ayıklaması). Piyasa-içi yüzdelik sıralama korunur. */
+var FIN_SECTORS={'Financial Services':1,'Banks':1,'Insurance':1};
+var QMETRICS=[
+  {k:'pe',             inv:true,  w:1.0, valid:function(v){return v!=null&&!isNaN(v)&&v>0;}},
+  {k:'pb',             inv:true,  w:1.0, valid:function(v){return v!=null&&!isNaN(v)&&v>0;}},
+  {k:'roe',            inv:false, w:1.5, valid:function(v){return v!=null&&!isNaN(v);}},
+  {k:'debtToEquity',   inv:true,  w:1.0, valid:function(v){return v!=null&&!isNaN(v)&&v>=0;}, skipFin:true},
+  {k:'netMargin',      inv:false, w:1.0, valid:function(v){return v!=null&&!isNaN(v);}},
+  {k:'earningsGrowth', inv:false, w:1.0, valid:function(v){return v!=null&&!isNaN(v);}},
+  {k:'revenueGrowth',  inv:false, w:0.7, valid:function(v){return v!=null&&!isNaN(v);}}
+];
+function computeQualityScores(){
+  ['BIST','DAX','NASDAQ'].forEach(function(m){
+    var list=STOCKS.filter(function(s){return s.market===m;});
+    if(!list.length) return;
+    var pct={};
+    QMETRICS.forEach(function(mt){
+      var vals=list.filter(function(s){ return mt.valid(s[mt.k]) && !(mt.skipFin && FIN_SECTORS[s.sector]); })
+        .map(function(s){return {sym:s.symbol, v:s[mt.k]};})
+        .sort(function(a,b){return a.v-b.v;});
+      var n=vals.length, map={};
+      vals.forEach(function(x,i){ map[x.sym] = n>1 ? i/(n-1) : 0.5; });
+      pct[mt.k]=map;
+    });
+    list.forEach(function(s){
+      var ws=0, vs=0, cov=0;
+      QMETRICS.forEach(function(mt){
+        if(mt.skipFin && FIN_SECTORS[s.sector]) return;
+        var p=pct[mt.k][s.symbol]; if(p==null) return;
+        var score=mt.inv?(1-p):p;
+        ws+=mt.w; vs+=mt.w*score; cov++;
+      });
+      if(ws>0){ s.score=Math.round(vs/ws*100); s.scoreCoverage=cov; }
+    });
+  });
+}
+computeQualityScores();
+/* GÜNÜN HİSSELERİ — v2 (trend + momentum + göreli güç + RSI + volatilite + likidite + uzama)
+   Mantık: uptrend (fiyat>MA50) + ölü olmayan volatilite + likidite + aşırı uzamamış gate'i;
    sonra şeffaf 0-100 "Setup Skoru" ile sırala, sektör çeşitliliği uygula. */
 function clampN(x,a,b){return Math.max(a,Math.min(b,x));}
 function fSetup(s, bench){
@@ -900,9 +960,15 @@ function fSetup(s, bench){
   } else p.vol=null;
   // Zirveye yakınlık (52h): 0 en iyi, -%30 en kötü
   if(s.pctFromHigh!=null) p.high=clampN((s.pctFromHigh+30)/30*100,0,100); else p.high=null;
+  // Uzama: MA50'ye mesafe — %0–8 pullback/taban bölgesi ideal, >%15 aşırı uzamış (kovalamaca)
+  if(s.ma50!=null && s.price!=null){ var ext=(s.price/s.ma50-1)*100;
+    p.ext = ext<0?20 : ext<=8?100 : ext<=15?60 : clampN(60-(ext-15)*5,10,60);
+  } else p.ext=null;
+  // 3 aylık teyit: orta vade momentum da aynı yönde mi
+  if(s.ret3m!=null){ var r3=s.ret3m; p.mom3 = r3<=0 ? clampN(50+r3*2,0,50) : clampN(50+(r3/25)*50,50,100); } else p.mom3=null;
   // Değer/kalite (küçük ağırlık — çöp almamak için)
   p.quality = (typeof s.score==='number')?s.score:null;
-  var W={trend:1.6, rs:1.6, mom:1.1, rsi:1.0, vol:1.1, high:0.8, quality:0.6};
+  var W={trend:1.6, rs:1.6, mom:1.0, rsi:0.9, vol:1.0, high:0.7, ext:1.0, mom3:0.6, quality:0.5};
   var ws=0, vs=0;
   for(var k in W){ if(p[k]!=null){ ws+=W[k]; vs+=W[k]*p[k]; } }
   return { score: ws>0?Math.round(vs/ws):null, parts:p };
@@ -920,12 +986,13 @@ function gununHisseleri(tumHisseler, opts){
   var hasTech = tumHisseler.some(function(s){ return s.ma50!=null || s.ret1m!=null; });
   if(!hasTech) return { trade:true, avgChange:avgCh, manual:false, stocks:[], hasTech:false };
 
-  // Gate: uptrend (fiyat>MA50) + ölü olmayan volatilite + likidite
+  // Gate: uptrend (fiyat>MA50) + ölü olmayan volatilite + likidite + aşırı uzamamış
   var pool = tumHisseler.filter(function(s){
     if(s.price==null || s.ma50==null || s.ret1m==null) return false;
     if(s.price <= s.ma50) return false;                       // sadece yükselen trend
     if(s.atrPct!=null && s.atrPct < 0.8) return false;        // hareket yok → makas tuzağı
     if(s.relVol!=null && s.relVol < 0.4) return false;        // çok düşük işlem
+    if((s.price/s.ma50-1)*100 > 25) return false;             // aşırı uzamış → kovalamaca, eleniyor
     return true;
   });
 
@@ -972,6 +1039,7 @@ S.botPos = S.botPos || {}; S.botCool = S.botCool || {}; S.botOn = S.botOn || {};
   if(S.botOn[m]===undefined) S.botOn[m]=false;
   if(S.botThr[m]===undefined) S.botThr[m]=70;
 });
+if(S.botTP===undefined) S.botTP=2.5;
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
@@ -1086,15 +1154,15 @@ document.querySelectorAll('.tab').forEach(function(t){ t.onclick=function(){goVi
 /* ---------- screener ---------- */
 var COLS=[
   {k:'symbol',t:'Hisse',l:true,tip:'Hisse kodu ve şirket adı.'},
-  {k:'score',t:'Skor',tip:'0–100 değer/kalite puanı. Düşük F/K, düşük P/D, yüksek özsermaye kârlılığı, düşük borç ve yüksek marj puanı yükseltir.'},
+  {k:'score',t:'Skor',tip:'0–100 değer/kalite puanı. Düşük F/K, düşük P/D, yüksek özsermaye kârlılığı, düşük borç ve yüksek marj puanı yükseltir. Finans hisselerinde borç skora katılmaz.'},
   {k:'price',t:'Fiyat',tip:'Hissenin güncel fiyatı (yaklaşık 15 dk gecikmeli).'},
   {k:'changePct',t:'Gün %',tip:'Bugünkü yüzde değişim (önceki güne göre).'},
   {k:'pe',t:'F/K',tip:'Fiyat/Kazanç: fiyat, yıllık kârın kaç katı. Düşük = ucuz. Kabaca <10 ucuz, 10–20 makul, >20 pahalı.'},
   {k:'pb',t:'P/D',tip:'Piyasa/Defter: fiyat, özsermayenin (defter değeri) kaç katı. <1,5 ucuz, 1,5–3 normal, >3 pahalı.'},
   {k:'roe',t:'Özsr.K %',tip:'Özsermaye Kârlılığı (ROE): şirket kendi sermayesiyle ne kadar verimli kâr üretiyor. Yüksek iyi.'},
-  {k:'debtToEquity',t:'Borç/Özsr',tip:'Borcun özsermayeye oranı. Düşük = daha az borçlu, daha sağlam.'},
+  {k:'debtToEquity',t:'Borç/Özsr',tip:'Borcun özsermayeye oranı. Düşük = daha az borçlu, daha sağlam. Finans hisselerinde skora katılmaz.'},
   {k:'netMargin',t:'Marj %',tip:'Net kâr marjı: satışın yüzde kaçı net kâra dönüşüyor. Yüksek iyi (sektöre göre değişir).'},
-  {k:'scoreCoverage',t:'Veri',tip:'Skorun kaç metrikten hesaplandığı (5 = tam). Düşükse skora temkinli yaklaş.'},
+  {k:'scoreCoverage',t:'Veri',tip:'Skorun kaç metrikten hesaplandığı. Finans hisselerinde Borç/Özsr sayılmaz. Düşükse skora temkinli yaklaş.'},
   {k:'act',t:''}
 ];
 var qScreen='', sortK='score', sortDir=-1, colFilters={};
@@ -1143,18 +1211,36 @@ function trendIcon(s){
   return '<b class="down">↓</b>';
 }
 /* ===== GÜNLÜK TRADE (gecikmeli gün içi izleme + risk hesaplayıcı) ===== */
+/* Gün İçi Skor v2 — ATR'ye normalize: "bugün kendi normaline göre kaç birim hareket etti?"
+   Eski sürüm sabit %3.5'e tavan puan veriyordu → hareketi çoktan yapmışı kovalatıyordu.
+   v2: rMove = Gün% / ATR%. İdeal bölge 0.25–1.0 ATR (anlamlı ama uzamamış);
+   1.5 ATR üstü parabolik sayılır ve sert cezalanır. Hacim tabanı 1.0×'e çekildi
+   (ortalama-altı hacimli yükseliş güvenilmez). Trend bileşenine "giriş bölgesi"
+   eklendi: MA50'ye yakın fiyat ödüllü, MA50'den %15+ uzaklaşmış fiyat cezalı. */
 function gunIciSkoru(s, mktAvg){
   if(s.changePct==null) return null;
   var ch=s.changePct, sc=0;
-  // Yön + güç (35): pozitif ama aşırı uzamamış (parabolik = kovalama riski)
-  if(ch>0) sc += (ch<=3.5) ? (ch/3.5*35) : Math.max(10, 35-(ch-3.5)*5);
-  // Relatif hacim (30): konviksiyon
-  if(s.relVol!=null) sc += Math.max(0, Math.min(30, (s.relVol-0.8)*30));
-  // Bugün piyasaya göre güç (20)
-  if(mktAvg!=null) sc += Math.max(0, Math.min(20, (ch-mktAvg)*8));
-  // Trend uyumu (15)
-  if(s.ma50!=null && s.price!=null){ if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200) sc+=15; else if(s.price>s.ma50) sc+=9; }
-  return Math.round(Math.max(0,Math.min(100,sc)));
+  var atr=(s.atrPct!=null && s.atrPct>0)?s.atrPct:2.0;   // ATR yoksa %2 varsay
+  var rMove=ch/atr;                                       // bugünkü hareket, ATR cinsinden
+  // 1) Hareket kalitesi (30)
+  if(ch>0){
+    if(rMove<=0.25)      sc += (rMove/0.25)*12;
+    else if(rMove<=1.0)  sc += 12 + ((rMove-0.25)/0.75)*18;   // 12→30: ideal bölge
+    else if(rMove<=1.5)  sc += 30 - ((rMove-1.0)/0.5)*12;     // 30→18: uzamaya başladı
+    else                 sc += Math.max(4, 18-(rMove-1.5)*10); // parabolik → sert ceza
+  }
+  // 2) Relatif hacim (30): 1.0×'ten itibaren, 2.2×'te tavan
+  if(s.relVol!=null) sc += clampN((s.relVol-1.0)*25, 0, 30);
+  // 3) Bugün piyasaya göre güç (20)
+  if(mktAvg!=null) sc += clampN((ch-mktAvg)*8, 0, 20);
+  // 4) Trend uyumu + giriş bölgesi (20)
+  if(s.ma50!=null && s.price!=null){
+    if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200) sc+=14; else if(s.price>s.ma50) sc+=8;
+    var ext=(s.price/s.ma50-1)*100;
+    if(ext>=0 && ext<=6) sc+=6;        // tabana yakın = sağlıklı giriş bölgesi
+    else if(ext>15) sc-=6;             // MA50'den fazla kopmuş = uzamış
+  }
+  return Math.round(clampN(sc,0,100));
 }
 /* --- tıklanabilir sütun sıralaması (Günlük Trade + Kısa Vade) --- */
 var sortKT='_gi', sortDirT=-1, sortKG='_setup', sortDirG=-1;
@@ -1169,7 +1255,7 @@ function sortHeadHtml(cols, sk, dir){ return cols.map(function(c){
   return '<th class="'+(c.l?'l':'')+'"'+click+tip+'>'+c.t+arr+'</th>'; }).join(''); }
 var TCOLS=[
   {k:'symbol',t:'Hisse',l:true,tip:'Hisse kodu ve şirket.'},
-  {k:'_gi',t:'Gün İçi Skor',tip:'0–100 gün içi ilgi puanı: bugünkü hareketin gücü + relatif hacim + piyasaya göre güç + trend uyumu. Yüksek = bugün dikkat çeken. AL sinyali DEĞİL.'},
+  {k:'_gi',t:'Gün İçi Skor',tip:'0–100 gün içi ilgi puanı (v2): bugünkü hareket ATR\'ye bölünerek değerlendirilir — kendi normaline göre uzamış hareket cezalı. + relatif hacim + piyasaya göre güç + trend/giriş bölgesi. AL sinyali DEĞİL.'},
   {k:'changePct',t:'Gün %',tip:'Bugünkü yüzde değişim (önceki kapanışa göre, ~15 dk gecikmeli).'},
   {k:'relVol',t:'Rel.Hacim',tip:'Relatif hacim: bugünkü hacim ÷ son 20 günün ortalaması. 1.0 üstü = normalden hareketli.'},
   {k:'_rg',t:'Rel.Güç',tip:'Hissenin bugünkü getirisi eksi piyasanın ortalaması. Pozitifse bugün piyasayı yeniyor.'},
@@ -1182,7 +1268,7 @@ function valT(s,k){ if(k==='_tr')return trendRank(s); if(k==='_rg')return s._rg;
 var GCOLS=[
   {k:'symbol',t:'Hisse',l:true,tip:'Hisse senedinin kodu ve şirketin adı.'},
   {k:'sector',t:'Sektör',l:true,tip:'Şirketin faaliyet alanı. Aynı sektörden listeye en fazla 2 hisse alınır.'},
-  {k:'_setup',t:'Kısa Vade Skor',tip:'0–100 kısa vade puanı. Trend, momentum, piyasaya göre güç, RSI, volatilite ve hacmi birleştirir. Kâr garantisi DEĞİL.'},
+  {k:'_setup',t:'Kısa Vade Skor',tip:'0–100 kısa vade puanı (v2). Trend, momentum (1A+3A), piyasaya göre güç, RSI, volatilite, uzama ve kaliteyi birleştirir. Kâr garantisi DEĞİL.'},
   {k:'_tr',t:'Trend',tip:'Fiyatın ortalamalarına göre yönü. Fiyat hem 50 hem 200 günlük ortalamanın üstündeyse güçlü.'},
   {k:'_rs',t:'Göreli Güç',tip:'Hissenin son 1 aydaki getirisi eksi endeksin getirisi. Pozitifse piyasayı yeniyor.'},
   {k:'ret1m',t:'1A %',tip:'Son ~1 aylık (21 işlem günü) fiyat değişimi.'},
@@ -1275,9 +1361,9 @@ function renderGunun(){
   }
   var benchTxt = bench!=null ? (' · endeks 1A '+(bench>0?'+':'')+fmt(bench,1)+'%') : '';
   info.innerHTML='Piyasa ort. <b class="'+chCls(res.avgChange)+'">'+(res.avgChange>0?'+':'')+fmt(res.avgChange,2)+'%</b>'+benchTxt+
-    '. Filtre: yükselen trend (fiyat&gt;MA50) + canlı volatilite + likidite; sıralama Kısa Vade Skoru.'+
+    '. Filtre: yükselen trend (fiyat&gt;MA50) + canlı volatilite + likidite + aşırı uzamamış (MA50\'nin ≤%25 üstü); sıralama Kısa Vade Skoru (v2).'+
     (res.manual?' <b class="down">Aday çok — son seçimi sen yap.</b>':'');
-  if(!res.stocks.length){ box.innerHTML='<div class="empty">Bugün setup kriterlerine uyan hisse yok (yükselen trendde, hareketli ve göreli güçlü hisse bulunamadı).</div>'; return; }
+  if(!res.stocks.length){ box.innerHTML='<div class="empty">Bugün setup kriterlerine uyan hisse yok (yükselen trendde, hareketli, aşırı uzamamış ve göreli güçlü hisse bulunamadı).</div>'; return; }
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   res.stocks.sort(function(a,b){return cmpVal(a,b,sortKG,sortDirG,valG);});
   var rows=res.stocks.map(function(s){
@@ -1328,7 +1414,7 @@ function renderScreen(){
       '<td>'+(s.roe==null?'<span class="na">—</span>':qDot('roe',s.roe)+fmt(s.roe)+'%')+'</td>'+
       '<td>'+(s.debtToEquity==null?'<span class="na">—</span>':qDot('de',s.debtToEquity)+fmt(s.debtToEquity))+'</td>'+
       '<td>'+(s.netMargin==null?'<span class="na">—</span>':qDot('margin',s.netMargin)+fmt(s.netMargin)+'%')+'</td>'+
-      '<td><span class="cov">'+(s.scoreCoverage||0)+'/5</span></td>'+
+      '<td><span class="cov">'+(s.scoreCoverage||0)+'</span></td>'+
       '<td><button class="miniact" data-sym="'+s.symbol+'">Sim</button></td></tr>';
   }).join('') || '<tr><td colspan="11" class="empty">eşleşen hisse yok</td></tr>';
   $('screenBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
@@ -1382,7 +1468,7 @@ function openStock(sym){
     ['Net Marj', s.netMargin==null?'—':qDot('margin',s.netMargin)+fmt(s.netMargin)+'%'],
     ['Net Kâr', s.netIncome==null?'—':shortNum(s.netIncome)],
     ['Skor', s.score==null?'—':fmt(s.score,0)+' /100'],
-    ['Veri kapsamı', (s.scoreCoverage||0)+'/5'],
+    ['Veri kapsamı', (s.scoreCoverage||0)+' metrik'],
     ['Para birimi', s.currency||ccyCode(s.market)]
   ];
   $('detailMetrics').innerHTML = M.map(function(m){return '<div class="metric"><div class="k">'+m[0]+'</div><div class="v">'+m[1]+'</div></div>';}).join('');
@@ -1444,7 +1530,7 @@ $('setCash').onclick=function(){
   sim.cash+=amt; sim.deposited=(sim.deposited||0)+amt;
   save(); renderSim();
 };
-$('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ var start=(MK==='BIST'?100000:10000); S.sim[MK]={cash:start,deposited:start,holdings:{},log:[]}; save(); renderSim(); } };
+$('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ var start=(MK==='BIST'?100000:10000); S.sim[MK]={cash:start,deposited:start,holdings:{},log:[]}; S.botPos[MK]={}; S.botCool[MK]={}; save(); renderSim(); } };
 /* sim: günü grafiğe kaydet */
 function simTotalVal(){
   var sim=simFor(MK), holdVal=0;
@@ -1478,7 +1564,9 @@ function renderSim(){
     var val=px!=null?px*h.qty:null; var avg=h.qty?h.cost/h.qty:0;
     var pnl=px!=null?(px-avg)*h.qty:null; var pct=(px!=null&&avg)?(px-avg)/avg*100:null;
     if(val!=null) holdVal+=val; invested+=h.cost;
-    rows+='<tr><td><span class="sym" data-sym="'+sym+'">'+clean(sym)+'</span><div class="nm">'+h.qty+' adet @ '+fmt(avg)+'</div></td>'+
+    var bp=S.botPos[MK]&&S.botPos[MK][sym];
+    var botInfo=bp?('<div class="nm">🤖 stop '+fmt(bp.stop)+(bp.half?' (başabaş/iz süren)':'')+' · hedef '+fmt(bp.target)+'</div>'):'';
+    rows+='<tr><td><span class="sym" data-sym="'+sym+'">'+clean(sym)+'</span><div class="nm">'+h.qty+' adet @ '+fmt(avg)+'</div>'+botInfo+'</td>'+
       '<td>'+(px==null?'—':fmt(px))+'</td>'+
       '<td>'+(val==null?'—':amt(MK,val))+'</td>'+
       '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+fmt(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
@@ -1680,31 +1768,59 @@ function renderMovers(){
 }
 
 /* ---------- render all ---------- */
-/* ===== OTO-TRADER (yalnız simülasyon; tarayıcı açıkken çalışır) ===== */
-var BOT = { scoreMin:70, riskPct:1.0, atrMult:1.5, targetR:2.0, maxPos:Infinity, maxPosPct:25, regimeMin:-0.5, coolMs:3*3600*1000 };
+/* ===== OTO-TRADER v2 (yalnız simülasyon; tarayıcı açıkken çalışır) =====
+   Eski sürümün sorunu: hedef 2R = ~3×ATR (%5-6+) uzaktaydı, gecikmeli veriyle
+   neredeyse hiç vurulmuyordu; pozisyonlar kârı geri verip "trend kırıldı" ile
+   (çoğu zaman ekside) kapanıyordu. v2 gün içi mantığa uygun çıkış merdiveni:
+   1) +1R'de pozisyonun yarısı satılır, stop başabaşa çekilir → işlem artık kaybedemez
+   2) kalan için sabit % kâr-al hedefi (vars. %2.5 — gün içi için gerçekçi)
+   3) kısmi satıştan sonra iz süren (trailing) stop kârı kilitler
+   4) kapanışa ~15 dk kala tüm bot pozisyonları kapatılır (geceye taşınmaz)
+   5) açılışın ilk 15 dk'sında ve kapanışa <45 dk kala yeni giriş yok
+   6) en fazla 4 eşzamanlı pozisyon (konsantrasyon sınırı) */
+var BOT = { scoreMin:70, riskPct:1.0, atrMult:1.5, tp1R:1.0, maxPos:4, maxPosPct:25, regimeMin:-0.5, coolMs:3*3600*1000 };
 var MARKETS = ['BIST','DAX','NASDAQ'];
+var MHOURS = { BIST:{tz:'Europe/Istanbul', open:10*60, close:18*60},
+               DAX:{tz:'Europe/Berlin', open:9*60, close:17*60+30},
+               NASDAQ:{tz:'America/New_York', open:9*60+30, close:16*60} };
+/* piyasa yerel saati: açılıştan bu yana / kapanışa kalan dakika + hafta sonu */
+function mktClock(m){
+  var cfg=MHOURS[m]; if(!cfg) return null;
+  try{
+    var parts=new Intl.DateTimeFormat('en-GB',{timeZone:cfg.tz,hour:'2-digit',minute:'2-digit',weekday:'short',hour12:false}).formatToParts(new Date());
+    var h=0,mi=0,wd='';
+    parts.forEach(function(p){ if(p.type==='hour')h=parseInt(p.value,10); if(p.type==='minute')mi=parseInt(p.value,10); if(p.type==='weekday')wd=p.value; });
+    var mins=h*60+mi;
+    return { weekend:(wd==='Sat'||wd==='Sun'), sinceOpen:mins-cfg.open, toClose:cfg.close-mins };
+  }catch(e){ return null; }
+}
+function botTPpct(){ var v=parseFloat(S.botTP); return (isNaN(v)||v<=0)?2.5:v; }
 function anyBot(){ return MARKETS.some(function(m){return S.botOn[m];}); }
 var botTimer=null;
 function bySym(list,sym){ for(var i=0;i<list.length;i++) if(list[i].symbol===sym) return list[i]; return null; }
 function botEquity(sim,list){ var v=sim.cash; Object.keys(sim.holdings).forEach(function(sym){ var s=bySym(list,sym); if(s&&s.price!=null) v+=s.price*sim.holdings[sym].qty; }); return v; }
-function botBuy(m,sym,qty,px,stop,target){
+function botBuy(m,sym,qty,px,stop,tp1,target){
   var sim=simFor(m); var cost=px*qty; if(qty<1||cost>sim.cash) return false;
   var rate=(m==='BIST'?EURTRY:null);
   sim.cash-=cost; var h=sim.holdings[sym]||{qty:0,cost:0,eurCost:0};
   h.cost+=cost; h.qty+=qty; if(m==='BIST') h.eurCost=(h.eurCost||0)+(rate?cost/rate:0); sim.holdings[sym]=h;
   sim.log.unshift({t:Date.now(),side:'buy',sym:sym,qty:qty,px:px,rate:rate,bot:true,reason:'oto giriş'});
-  S.botPos[m][sym]={qty:qty,entry:px,stop:stop,target:target,t:Date.now()};
+  S.botPos[m][sym]={qty:qty,entry:px,stop:stop,tp1:tp1,target:target,half:false,t:Date.now()};
   return true;
 }
-function botSell(m,sym,px,reason){
+/* kısmi/tam satış: keepPos=true ise pozisyon kaydı korunur (kısmi kâr alımı) */
+function botSellQty(m,sym,px,qty,reason,keepPos){
   var sim=simFor(m); var h=sim.holdings[sym]; var bp=S.botPos[m][sym];
   if(!h||!bp||px==null){ delete S.botPos[m][sym]; return; }
-  var q=Math.min(bp.qty,h.qty); if(q<1){ delete S.botPos[m][sym]; return; }
+  var q=Math.min(qty,bp.qty,h.qty);
+  if(q<1){ if(!keepPos){ delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs; } return; }
   var avg=h.cost/h.qty; h.cost-=avg*q; if(m==='BIST'){var ea=(h.eurCost||0)/h.qty; h.eurCost=(h.eurCost||0)-ea*q;} h.qty-=q;
   var rate=(m==='BIST'?EURTRY:null); sim.cash+=px*q; if(h.qty<=0) delete sim.holdings[sym];
   sim.log.unshift({t:Date.now(),side:'sell',sym:sym,qty:q,px:px,rate:rate,bot:true,reason:reason,pnl:(px-avg)*q,pnlPct:avg>0?(px/avg-1)*100:0});
-  delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs;
+  bp.qty-=q;
+  if(!keepPos || bp.qty<1){ delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs; }
 }
+function botSell(m,sym,px,reason){ var bp=S.botPos[m][sym]; if(bp) botSellQty(m,sym,px,bp.qty,reason,false); }
 function botTick(){
   if(!anyBot()) return; var acted=false, now=Date.now();
   MARKETS.forEach(function(m){
@@ -1712,20 +1828,37 @@ function botTick(){
     var thr=(S.botThr[m]!=null?S.botThr[m]:BOT.scoreMin);
     var list=(STOCKS||[]).filter(function(s){return s.market===m;}); if(!list.length) return;
     var sim=simFor(m);
-    // 1) açık pozisyonların çıkışları (stop / hedef / trend kırılması)
+    var ck=mktClock(m);
+    var eod=(ck && !ck.weekend && ck.toClose<=15 && ck.toClose>=-90);  // kapanışa ≤15 dk / hemen sonrası
+    // 1) açık pozisyon yönetimi (çıkış merdiveni)
     Object.keys(S.botPos[m]).forEach(function(sym){
       var bp=S.botPos[m][sym]; if(!sim.holdings[sym]){ delete S.botPos[m][sym]; return; }
       var s=bySym(list,sym); if(!s||s.price==null) return; var px=s.price;
-      if(px<=bp.stop) { botSell(m,sym,px,'stop'); acted=true; }
-      else if(px>=bp.target) { botSell(m,sym,px,'hedef (2R)'); acted=true; }
-      else if(s.ma50!=null && px<s.ma50) { botSell(m,sym,px,'trend kırıldı'); acted=true; }
+      if(eod){ botSell(m,sym,px,'gün sonu'); acted=true; return; }
+      if(px<=bp.stop){ botSell(m,sym,px, bp.half?'iz süren stop':'stop'); acted=true; return; }
+      if(px>=bp.target){ botSell(m,sym,px,'kâr al (+'+botTPpct()+'%)'); acted=true; return; }
+      // +1R'de yarısını sat, stop'u başabaşa çek → işlem artık kaybedemez
+      if(!bp.half && bp.tp1!=null && px>=bp.tp1){
+        var half=Math.floor(bp.qty/2);
+        if(half>=1) botSellQty(m,sym,px,half,'kısmi kâr (1R)',true);
+        var bp2=S.botPos[m][sym];
+        if(bp2){ bp2.half=true; bp2.stop=Math.max(bp2.stop, bp2.entry); }
+        acted=true; return;
+      }
+      // kısmi satış sonrası iz süren (trailing) stop: kârı kilitle
+      if(bp.half && s.atrPct!=null){
+        var trail=px*(1-BOT.atrMult*s.atrPct/100);
+        if(trail>bp.stop) bp.stop=trail;
+      }
+      if(s.ma50!=null && px<s.ma50){ botSell(m,sym,px,'trend kırıldı'); acted=true; }
     });
-    // 2) piyasa rejimi: kırmızı günde yeni alım yok
+    // 2) rejim + zaman filtresi
     var withCh=list.filter(function(s){return typeof s.changePct==='number';});
     var avgCh=withCh.length? withCh.reduce(function(a,s){return a+s.changePct;},0)/withCh.length : 0;
-    if(avgCh<BOT.regimeMin) return;
+    if(avgCh<BOT.regimeMin) return;                                   // kırmızı zemin → yeni alım yok
+    if(ck && (ck.weekend || ck.sinceOpen<15 || ck.toClose<45)) return; // hafta sonu / açılış gürültüsü / kapanışa yakın → giriş yok
     var openCount=Object.keys(S.botPos[m]).length; if(openCount>=BOT.maxPos) return;
-    // 3) aday giriş: Gün İçi Skor yüksek olanlar
+    // 3) aday giriş: Gün İçi Skor (v2) yüksek olanlar
     var cands=list.map(function(s){ s._gi=gunIciSkoru(s,avgCh); return s; })
       .filter(function(s){ return s._gi!=null && s._gi>=thr && s.changePct>0 && s.price!=null && s.atrPct!=null
         && !S.botPos[m][s.symbol] && !sim.holdings[s.symbol]
@@ -1737,7 +1870,9 @@ function botTick(){
       var equity=botEquity(sim,list); var riskAmt=equity*BOT.riskPct/100;
       var shares=Math.min(Math.floor(riskAmt/perShare), Math.floor((equity*BOT.maxPosPct/100)/px), Math.floor(sim.cash/px));
       if(shares<1) continue;
-      if(botBuy(m,s.symbol,shares,px,stopPrice,px+BOT.targetR*perShare)){ openCount++; acted=true; }
+      var tp1=px+BOT.tp1R*perShare;                 // kısmi kâr seviyesi (+1R)
+      var target=px*(1+botTPpct()/100);             // tam kâr-al hedefi (vars. +%2.5)
+      if(botBuy(m,s.symbol,shares,px,stopPrice,tp1,target)){ openCount++; acted=true; }
     }
   });
   S.botLastTick=now; save();
@@ -1754,7 +1889,7 @@ function updateBotBtn(){
   var parts=[];
   MARKETS.forEach(function(m){ if(S.botOn[m]){ var n=S.botPos[m]?Object.keys(S.botPos[m]).length:0; parts.push(m+' açık ('+n+' poz)'); } });
   st.innerHTML = parts.length ? (parts.join(' · ')+(S.botLastTick?(' · son kontrol '+new Date(S.botLastTick).toLocaleTimeString('tr-TR')):''))
-    : 'İkisi de kapalı — açtığın piyasada, bu sekme açık kaldığı sürece kurallara göre al-sat yapar.';
+    : 'Hepsi kapalı — açtığın piyasada, bu sekme açık kaldığı sürece kurallara göre al-sat yapar.';
 }
 function setBot(m,on){
   S.botOn[m]=on; save();
@@ -1778,6 +1913,7 @@ function refreshData(){
     STOCKS = (DATA&&DATA.stocks)?DATA.stocks:STOCKS;
     RATES = (DATA&&DATA.rates)?DATA.rates:RATES;
     EURTRY = RATES.EURTRY;
+    computeQualityScores();
     if(MK) renderAll();
     if(anyBot()) botTick();
     if(s.parentNode) s.parentNode.removeChild(s);
@@ -1804,6 +1940,11 @@ MARKETS.forEach(function(m){
   var inp=$('botThr'+m); inp.value=(S.botThr[m]!=null?S.botThr[m]:70);
   inp.onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botThr[m]=Math.max(0,Math.min(100,v)); this.value=S.botThr[m]; save(); if(S.botOn[m]) botTick(); updateBotBtn(); };
 });
+(function(){
+  var tp=$('botTP'); if(!tp) return;
+  tp.value=(S.botTP!=null?S.botTP:2.5);
+  tp.onchange=function(){ var v=parseFloat(this.value); if(isNaN(v)||v<=0) v=2.5; S.botTP=Math.min(20,Math.max(0.5,v)); this.value=S.botTP; save(); };
+})();
 function wireDoc(btnId, ovId){ var ov=$(ovId); if(!ov) return; var b=$(btnId); if(b) b.onclick=function(){ ov.classList.add('open'); }; var c=ov.querySelector('.docclose'); if(c) c.onclick=function(){ ov.classList.remove('open'); }; ov.onclick=function(e){ if(e.target===ov) ov.classList.remove('open'); }; }
 wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnMid','docOvMid');
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
