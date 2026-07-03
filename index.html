@@ -231,6 +231,13 @@
   .seg button.on{background:var(--brand); color:#fff}
   .disclaimer{margin-top:18px; color:var(--faint); font-size:11.5px; line-height:1.6; border-top:1px solid var(--line); padding-top:14px}
 </style>
+  <script>
+    // ==== SUPABASE BULUT AYARLARI — kendi projenden doldur ====
+    // Supabase panel → Project Settings → API → Project URL ve anon/public key
+    window.SUPA_URL='https://BURAYA.supabase.co';
+    window.SUPA_ANON='BURAYA_ANON_PUBLIC_KEY';
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -285,6 +292,7 @@
       </div>
       <span class="ratebox" id="rateBox"></span>
       <button class="ghost" id="autoBtn" title="10 dakikada bir verileri tazeler"></button>
+      <button class="ghost" id="cloudBtn" title="Bulut hesabı — cihazlar arası eşitleme">☁ Bulut</button>
     </div>
   </header>
 
@@ -840,6 +848,38 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
     </div>
   </div>
 </div>
+<div class="docov" id="authOv">
+  <div class="doccard" style="max-width:440px">
+    <button class="docclose" id="authClose">✕ Kapat</button>
+    <div class="doc">
+      <div id="authSignedOut">
+        <h1>Bulut hesabı</h1>
+        <p>Kayıt ol ya da giriş yap — portföyün, işlem geçmişin ve notların bütün cihazlarında (telefon + PC'ler) otomatik aynı olur.</p>
+        <div class="tpfield"><label>E-posta</label><input class="fld" id="authEmail" type="email" placeholder="ornek@mail.com" style="width:100%"></div>
+        <div class="tpfield"><label>Şifre (en az 6 hane)</label><input class="fld" id="authPass" type="password" placeholder="••••••" style="width:100%"></div>
+        <div style="display:flex; gap:10px; margin-top:6px">
+          <button class="go buy" id="authLogin" style="flex:1">Giriş yap</button>
+          <button class="ghost" id="authSignup" style="flex:1; padding:14px">Kayıt ol</button>
+        </div>
+        <div class="hint" id="authMsg" style="margin-top:12px"></div>
+        <div class="hint" style="margin-top:14px">Şifreni Supabase güvenli saklar; bu dosyada tutulmaz. Aynı e-posta/şifreyle her cihazdan gir.</div>
+      </div>
+      <div id="authSignedIn" style="display:none">
+        <h1>Bulut açık</h1>
+        <p id="authWho"></p>
+        <div class="hint" id="authSync" style="margin:6px 0 16px"></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap">
+          <button class="ghost" id="authPull">Buluttan çek</button>
+          <button class="ghost" id="authPush">Buluta gönder</button>
+          <button class="ghost" id="authRestore">Yerel yedeği geri yükle</button>
+          <button class="ghost" id="authLogout">Çıkış</button>
+        </div>
+        <div class="hint" style="margin-top:14px"><b>Nasıl çalışır:</b> Her değişiklik önce bu cihaza, sonra ~2.5 sn içinde buluta yazılır; başka bir cihaz açıksa oraya anında yansır. <b>Çakışma güvenliği:</b> buluttan veri alınmadan önce mevcut durumun yerel yedeği alınır (son 5 yedek) ve <b>gerçek işlem geçmişi asla silinmez</b> — iki cihazdaki gerçek işlemler birleştirilir. Botu tek cihazda çalıştır.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 function startApp(){
 "use strict";
@@ -1042,7 +1082,19 @@ S.botPos = S.botPos || {}; S.botCool = S.botCool || {}; S.botOn = S.botOn || {};
 if(S.botTP===undefined) S.botTP=2.5;
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
-function save(){ localStorage.setItem(LS, JSON.stringify(S)); }
+function ensureShape(st){
+  st.sim=st.sim||{}; st.real=st.real||{}; st.stockNotes=st.stockNotes||{};
+  st.notes=st.notes||''; st.simHist=st.simHist||{}; st.realHist=st.realHist||{};
+  st.botPos=st.botPos||{}; st.botCool=st.botCool||{}; st.botOn=st.botOn||{}; st.botThr=st.botThr||{};
+  ['BIST','DAX','NASDAQ'].forEach(function(m){
+    st.botPos[m]=st.botPos[m]||{}; st.botCool[m]=st.botCool[m]||{};
+    if(st.botOn[m]===undefined) st.botOn[m]=false;
+    if(st.botThr[m]===undefined) st.botThr[m]=70;
+  });
+  if(st.botTP===undefined) st.botTP=2.5;
+  return st;
+}
+function save(){ localStorage.setItem(LS, JSON.stringify(S)); if(typeof scheduleSync==='function') scheduleSync(); }
 function simFor(m){
   var start=(m==='BIST'?100000:10000);
   if(!S.sim[m]) S.sim[m]={cash:start, deposited:start, holdings:{}, log:[]};
@@ -1627,7 +1679,7 @@ function realTrade(side){
   var dateStr=$('rDate').value;
   var t = dateStr ? new Date(dateStr+'T12:00:00').getTime() : Date.now();
   var rate=parseFloat($('rRate').value); if(isNaN(rate)) rate=(MK==='BIST'?EURTRY:null);
-  real.log.push({t:t, side:side, sym:sym, qty:qty, px:price, rate:rate, manual:true});
+  real.log.push({t:t, id:genId(), side:side, sym:sym, qty:qty, px:price, rate:rate, manual:true});
   save();
   $('rSym').value='';$('rQty').value='';$('rPrice').value='';$('rRate').value='';
   renderReal(); renderScreen(); renderAllList();
@@ -1950,6 +2002,162 @@ wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnM
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
 updateBotBtn();
 if(anyBot()){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
+
+/* ================= SUPABASE BULUT SENKRON ================= */
+var SB=null, SB_USER=null, SB_REV=0, syncTimer=null, realtimeCh=null, suppressSync=false, sbInitTries=0;
+function cloudCfgOk(){ return typeof window.SUPA_URL==='string' && typeof window.SUPA_ANON==='string' && window.SUPA_URL.indexOf('supabase.co')>0 && window.SUPA_URL.indexOf('BURAYA')<0; }
+function sbReady(){ return !!(SB && SB_USER); }
+function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function hhmm(){ return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
+function setSyncStatus(t){ var el=$('authSync'); if(el) el.textContent=t; var b=$('cloudBtn'); if(b && sbReady()) b.title=t; }
+
+function backupLocal(){
+  try{ var cur=localStorage.getItem(LS); if(!cur) return;
+    var arr=JSON.parse(localStorage.getItem(LS+'.bak')||'[]');
+    arr.unshift({t:Date.now(), data:cur}); arr=arr.slice(0,5);
+    localStorage.setItem(LS+'.bak', JSON.stringify(arr));
+  }catch(e){}
+}
+/* gerçek işlem geçmişini asla kaybetme: iki taraftaki gerçek işlemleri birleştir */
+function mergeRealLogs(incoming, local){
+  ['BIST','DAX','NASDAQ'].forEach(function(m){
+    var l=local.real && local.real[m]; if(!l||!l.log) return;
+    incoming.real=incoming.real||{};
+    var r=incoming.real[m]; if(!r){ incoming.real[m]=JSON.parse(JSON.stringify(l)); return; }
+    r.log=r.log||[]; var seen={}, out=[];
+    r.log.concat(l.log).forEach(function(e){
+      var k=e.id||(e.side+'|'+e.sym+'|'+e.qty+'|'+e.px+'|'+e.t);
+      if(!seen[k]){ seen[k]=1; out.push(e); }
+    });
+    out.sort(function(a,b){return a.t-b.t;});
+    r.log=out;
+  });
+}
+function snapshot(){ return JSON.parse(JSON.stringify(S)); }
+function reinitUIFromState(){
+  MARKETS.forEach(function(m){ var inp=$('botThr'+m); if(inp) inp.value=(S.botThr[m]!=null?S.botThr[m]:70); });
+  var tp=$('botTP'); if(tp) tp.value=(S.botTP!=null?S.botTP:2.5);
+  if(typeof updateBotBtn==='function') updateBotBtn();
+  if(typeof updateAutoBtn==='function') updateAutoBtn();
+}
+function adoptRemote(data){
+  if(!data) return;
+  suppressSync=true;
+  try{
+    backupLocal();
+    var incoming=JSON.parse(JSON.stringify(data));
+    mergeRealLogs(incoming, S);
+    S=ensureShape(incoming);
+    localStorage.setItem(LS, JSON.stringify(S));
+  }catch(e){ console.warn('adopt hata', e); }
+  reinitUIFromState();
+  if(MK && $('app').style.display!=='none'){ renderAll(); }
+  suppressSync=false;
+}
+function scheduleSync(){ if(!sbReady()||suppressSync) return; if(syncTimer) clearTimeout(syncTimer); syncTimer=setTimeout(function(){ syncTimer=null; pushRemote(false); }, 2500); }
+function pullThenAdopt(){
+  if(!sbReady()) return;
+  SB.from('portfolios').select('data,rev').eq('user_id',SB_USER.id).maybeSingle().then(function(res){
+    if(res.error||!res.data){ return; }
+    SB_REV=res.data.rev||0; adoptRemote(res.data.data); setSyncStatus('bulutla eşitlendi '+hhmm());
+  });
+}
+function pushRemote(seed){
+  if(!sbReady()) return;
+  var upd={data:snapshot(), rev:SB_REV+1, updated_at:new Date().toISOString()};
+  var q = seed
+    ? SB.from('portfolios').insert({user_id:SB_USER.id, data:upd.data, rev:1, updated_at:upd.updated_at}).select('rev')
+    : SB.from('portfolios').update({data:upd.data, rev:upd.rev, updated_at:upd.updated_at}).eq('user_id',SB_USER.id).eq('rev',SB_REV).select('rev');
+  q.then(function(res){
+    if(res.error){ if(seed){ pullThenAdopt(); } else setSyncStatus('kayıt hatası: '+res.error.message); return; }
+    if(!res.data || !res.data.length){ pullThenAdopt(); return; }
+    SB_REV=res.data[0].rev; setSyncStatus('kaydedildi '+hhmm());
+  }, function(){ setSyncStatus('ağ hatası — tekrar denenecek'); });
+}
+function startRealtime(){
+  if(!SB||realtimeCh||!SB_USER) return;
+  realtimeCh=SB.channel('pf-'+SB_USER.id)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'portfolios',filter:'user_id=eq.'+SB_USER.id},function(payload){
+      var r=payload['new']; if(r && r.rev>SB_REV){ SB_REV=r.rev; adoptRemote(r.data); setSyncStatus('başka cihazdan güncellendi '+hhmm()); }
+    }).subscribe();
+}
+function stopRealtime(){ if(realtimeCh){ try{SB.removeChannel(realtimeCh);}catch(e){} realtimeCh=null; } }
+function afterLogin(){
+  setSyncStatus('bağlanıyor…'); updateAuthBar();
+  SB.from('portfolios').select('data,rev').eq('user_id',SB_USER.id).maybeSingle().then(function(res){
+    if(res.error){ setSyncStatus('hata: '+res.error.message); return; }
+    if(res.data){ SB_REV=res.data.rev||0; adoptRemote(res.data.data); setSyncStatus('buluttan yüklendi '+hhmm()); }
+    else { SB_REV=0; pushRemote(true); setSyncStatus('bulut hesabın oluşturuldu '+hhmm()); }
+    startRealtime();
+  });
+}
+function updateAuthBar(){
+  var b=$('cloudBtn'); var so=$('authSignedOut'), si=$('authSignedIn');
+  if(!cloudCfgOk()){
+    if(b){ b.textContent='☁ Bulut (kapalı)'; b.style.color=''; b.style.borderColor=''; }
+    if(so){ so.style.display='block'; so.innerHTML='<h1>Bulut kapalı</h1><p>Cihazlar arası eşitleme için dosyanın en üstündeki <code>SUPA_URL</code> ve <code>SUPA_ANON</code> değerlerini Supabase projenden doldurup dosyayı yeniden yükle. Kurulum adımlarını sana ayrıca verdim.</p>'; }
+    if(si) si.style.display='none';
+    return;
+  }
+  if(sbReady()){
+    if(b){ b.textContent='☁ '+(SB_USER.email? SB_USER.email.split('@')[0] : 'bağlı'); b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
+    if(so) so.style.display='none';
+    if(si){ si.style.display='block'; var w=$('authWho'); if(w) w.textContent=SB_USER.email+' olarak bağlısın. Değişikliklerin otomatik buluta kaydediliyor.'; }
+  } else {
+    if(b){ b.textContent='☁ Bulut'; b.style.color=''; b.style.borderColor=''; }
+    if(so) so.style.display='block'; if(si) si.style.display='none';
+  }
+}
+function wireCloud(){
+  var open=function(){ var o=$('authOv'); if(o){ o.classList.add('open'); updateAuthBar(); } };
+  var close=function(){ var o=$('authOv'); if(o) o.classList.remove('open'); };
+  var cb=$('cloudBtn'); if(cb) cb.onclick=open;
+  var ac=$('authClose'); if(ac) ac.onclick=close;
+  var ov=$('authOv'); if(ov) ov.onclick=function(e){ if(e.target===ov) close(); };
+  function creds(){ return { email:($('authEmail')?$('authEmail').value.trim():''), pass:($('authPass')?$('authPass').value:'') }; }
+  function msg(t){ var m=$('authMsg'); if(m) m.innerHTML=t; }
+  var su=$('authSignup'); if(su) su.onclick=function(){ if(!SB){ msg('Bulut yapılandırılmamış.'); return; } var c=creds(); if(!c.email||c.pass.length<6){ msg('Geçerli e-posta ve en az 6 haneli şifre gir.'); return; } msg('Kaydediliyor…');
+    SB.auth.signUp({email:c.email, password:c.pass}).then(function(res){
+      if(res.error){ msg('Hata: '+res.error.message); return; }
+      if(res.data.session){ msg('Kayıt tamam, giriş yapıldı.'); } else { msg('Kayıt alındı. E-posta onayı açıksa gelen kutunu kontrol edip linke tıkla, sonra giriş yap. (Supabase → Authentication → Providers → Email → "Confirm email" kapatırsan bu adım atlanır.)'); }
+    }); };
+  var li=$('authLogin'); if(li) li.onclick=function(){ if(!SB){ msg('Bulut yapılandırılmamış.'); return; } var c=creds(); if(!c.email||!c.pass){ msg('E-posta ve şifre gir.'); return; } msg('Giriş yapılıyor…');
+    SB.auth.signInWithPassword({email:c.email, password:c.pass}).then(function(res){
+      if(res.error){ msg('Hata: '+res.error.message); return; } msg('Giriş başarılı.');
+    }); };
+  var lo=$('authLogout'); if(lo) lo.onclick=function(){ if(SB) SB.auth.signOut(); stopRealtime(); };
+  var pl=$('authPull'); if(pl) pl.onclick=function(){ pullThenAdopt(); };
+  var ps=$('authPush'); if(ps) ps.onclick=function(){ if(sbReady()) pushRemote(false); };
+  var rs=$('authRestore'); if(rs) rs.onclick=function(){
+    try{ var arr=JSON.parse(localStorage.getItem(LS+'.bak')||'[]'); if(!arr.length){ alert('Yerel yedek yok.'); return; }
+      if(!confirm('En son yerel yedeğe dönülsün mü? Şu anki durum üzerine yazılır (bulut da güncellenir).')) return;
+      suppressSync=true; S=ensureShape(JSON.parse(arr[0].data)); localStorage.setItem(LS, JSON.stringify(S)); reinitUIFromState(); if(MK) renderAll(); suppressSync=false;
+      if(sbReady()) pushRemote(false);
+    }catch(e){ alert('Yedek geri yüklenemedi.'); }
+  };
+}
+function initSupabase(){
+  if(!cloudCfgOk()){ updateAuthBar(); return; }
+  if(!window.supabase || !window.supabase.createClient){
+    if(sbInitTries++ < 40){ setTimeout(initSupabase, 250); return; }
+    updateAuthBar(); return;
+  }
+  SB=window.supabase.createClient(window.SUPA_URL, window.SUPA_ANON, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:false}});
+  SB.auth.getSession().then(function(res){
+    SB_USER=(res.data && res.data.session)?res.data.session.user:null;
+    if(SB_USER) afterLogin();
+    updateAuthBar();
+  });
+  SB.auth.onAuthStateChange(function(_evt, session){
+    var prev=SB_USER && SB_USER.id;
+    SB_USER=session?session.user:null;
+    if(SB_USER){ if(SB_USER.id!==prev) afterLogin(); }
+    else { stopRealtime(); SB_REV=0; }
+    updateAuthBar();
+  });
+}
+wireCloud();
+initSupabase();
 
 /* ---------- boot ---------- */
 if(MK){ syncSwitch(); showApp(); } else { showGate(); }
