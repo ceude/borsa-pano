@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-03T18:44:00+00:00",
+  "updatedAt": "2026-07-03T18:53:40+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.5624,
-    "USDTRY": 46.7979
+    "EURTRY": 53.5503,
+    "USDTRY": 46.7988
   },
   "benchmarks": {
     "DAX": 3.34,
@@ -360,14 +360,14 @@
       "debtToEquity": 21.72,
       "netMargin": 10.97,
       "netIncome": 6733000192,
-      "ma50": 478.7798,
-      "ma200": 505.6604,
-      "rsi14": 83.0,
-      "atrPct": 1.66,
-      "ret1m": 13.08,
-      "ret3m": -3.76,
+      "ma50": 479.6324,
+      "ma200": 505.7343,
+      "rsi14": 79.3,
+      "atrPct": 1.68,
+      "ret1m": 12.21,
+      "ret3m": -3.58,
       "pctFromHigh": -14.43,
-      "relVol": 0.62,
+      "relVol": 0.61,
       "score": 79.4,
       "scoreCoverage": 5
     },
@@ -1056,14 +1056,14 @@
       "debtToEquity": null,
       "netMargin": 10.43,
       "netIncome": 11870000128,
-      "ma50": 384.8419,
-      "ma200": 359.9838,
-      "rsi14": 93.9,
-      "atrPct": 1.24,
-      "ret1m": 13.89,
-      "ret3m": 19.42,
+      "ma50": 384.0129,
+      "ma200": 359.6126,
+      "rsi14": 94.4,
+      "atrPct": 1.25,
+      "ret1m": 11.44,
+      "ret3m": 22.21,
       "pctFromHigh": 0.0,
-      "relVol": 0.65,
+      "relVol": 0.63,
       "score": 67.4,
       "scoreCoverage": 4
     },
