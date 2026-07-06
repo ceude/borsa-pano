@@ -234,15 +234,35 @@
   <script>
     // ==== SUPABASE BULUT AYARLARI — kendi projenden doldur ====
     // Supabase panel → Project Settings → API → Project URL ve anon/public key
-    window.SUPA_URL='https://kuuwdpzyeovkfjoradwq.supabase.co';
-    window.SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXdkcHp5ZW92a2Zqb3JhZHdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNjc5MDUsImV4cCI6MjA5Nzg0MzkwNX0.QHEKJKZrKaDj7y8xPoad88-B4_cMsM4ri-Tv0CZOL0k';
+    window.SUPA_URL='https://BURAYA.supabase.co';
+    window.SUPA_ANON='BURAYA_ANON_PUBLIC_KEY';
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
+<!-- LOGIN GATE -->
+<div id="loginGate" style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px">
+  <div class="gate-card" style="max-width:420px; text-align:left">
+    <h1 style="text-align:center">Borsa Pano<span class="dot">.</span></h1>
+    <p style="text-align:center">Devam etmek için giriş yap ya da kayıt ol.<br>Verilerin bütün cihazlarında otomatik eşitlenir.</p>
+    <div style="background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:26px 24px; box-shadow:var(--shadow)">
+      <div class="tpfield"><label>E-posta</label><input class="fld" id="lgEmail" type="email" autocomplete="username" placeholder="ornek@mail.com" style="width:100%"></div>
+      <div class="tpfield"><label>Şifre (en az 6 hane)</label><input class="fld" id="lgPass" type="password" autocomplete="current-password" placeholder="••••••" style="width:100%"></div>
+      <div style="display:flex; gap:10px; margin-top:8px">
+        <button class="go buy" id="lgLogin" style="flex:1.4">Giriş yap</button>
+        <button class="ghost" id="lgSignup" style="flex:1; padding:14px">Kayıt ol</button>
+      </div>
+      <div class="hint" id="lgMsg" style="margin-top:12px; min-height:16px"></div>
+    </div>
+    <div class="hint" id="lgOffWrap" style="text-align:center; margin-top:14px">
+      <a href="#" id="lgOffline" style="color:var(--faint)">çevrimdışı devam et (yalnız bu cihaz, senkron yok)</a>
+    </div>
+  </div>
+</div>
+
 <!-- MARKET GATE -->
-<div id="gate">
+<div id="gate" style="display:none">
   <div class="gate-card">
     <h1>Borsa Pano<span class="dot">.</span></h1>
     <p>Hesaplar karışmasın diye tek piyasa seç. İstediğin zaman üstten değiştirebilirsin.</p>
@@ -391,6 +411,7 @@
         <div><div class="k">Pozisyon</div><div class="v" id="holdV">—</div></div>
         <div><div class="k">Toplam</div><div class="v" id="totV">—</div></div>
         <div><div class="k">Toplam K/Z</div><div class="v" id="pnlV">—</div></div>
+        <div><div class="k">Kesinti (komisyon)</div><div class="v" id="feeV" title="Ödenen toplam komisyon. Spread/kayma ayrıca dolum fiyatlarının içinde.">—</div></div>
       </div>
       <div class="botbar">
         <div class="hint" style="margin-bottom:8px"><b>🤖 Oto-trader v2</b> — her piyasa ayrı açılır/kapanır, ayrı eşik:</div>
@@ -414,7 +435,15 @@
         <span class="hint" id="botStatus" style="display:block; margin-top:8px"></span>
         <div class="hint" style="margin-top:6px">Kurallar: Gün İçi Skor ≥ <b>eşik</b> · işlem başına risk %1 · stop 1.5×ATR · <b>+1R'de yarısını satar, stop'u başabaşa çeker</b> · kalan için <b>kâr al</b> hedefi yukarıdaki % (vars. %2.5) · kısmi satıştan sonra iz süren (trailing) stop · trend kırılınca çık · <b>kapanışa ~15 dk kala tüm bot pozisyonlarını kapatır (gün içi mantık — pozisyon geceye taşınmaz)</b> · kapanışa &lt;45 dk kala ve açılışın ilk 15 dk'sında yeni alım yok · en fazla 4 eşzamanlı pozisyon · tek pozisyon en çok özkaynağın %25'i · kırmızı günde (ort. &lt; %-0.5) yeni alım yok · satıştan sonra aynı hisseye 3 saat girmez.</div>
       </div>
-      <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
+      <div class="botbar">
+        <div class="hint" style="margin-bottom:8px"><b>💶 Gerçekçi maliyet modeli</b> — hem elle işlemlere hem bota uygulanır:</div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center">
+          <label class="hint" style="display:flex; align-items:center; gap:6px">spread+kayma (yön başına %) <input id="costSpread" class="fld" type="number" min="0" max="2" step="0.01" style="width:80px" title="Alışta dolum fiyatı bu kadar yukarı, satışta bu kadar aşağı kayar. Tradegate/likit DAX hissesi için %0.03–0.08 tipik; seans dışı daha geniş."></label>
+          <label class="hint" style="display:flex; align-items:center; gap:6px">komisyon (emir başına, <span id="costCcy"></span>) <input id="costComm" class="fld" type="number" min="0" step="0.1" style="width:80px" title="Bu piyasa için emir başına sabit komisyon. N26: 2 Eylül 2026'dan itibaren 0,90 €/işlem (Go 3, Metal 10 ücretsiz işlem/ay)."></label>
+        </div>
+        <div class="hint" style="margin-top:6px">Alış <b>görünenden pahalı</b>, satış <b>görünenden ucuz</b> dolar (spread) + her emirde komisyon düşülür; komisyon pozisyon maliyetine eklenir, K/Z <b>net</b> gösterilir. Varsayılan: %0.05 spread · DAX/NASDAQ 0,90 komisyon (N26'nın 2 Eylül 2026'da başlayan işlem ücreti; Go/Metal aylık ücretsiz kotanı kullanıyorsan 0 yapabilirsin) · BIST 0 (kendi aracı kurumuna göre gir).</div>
+      </div>
+      <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı; spread+komisyon artık modellense de <b>gecikme kaynaklı ekstra kayma modellenmiyor</b> — momentum sistemlerinde gecikme sistematik olarak aleyhe çalışır, gerçek sonuç sim'den kötü olur. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
       <div class="simgrid">
         <div class="trade">
           <h3>İşlem</h3>
@@ -895,6 +924,12 @@ function fmtInt(n){ return n==null?'—':Number(n).toLocaleString('tr-TR'); }
 function clean(sym){ return sym.replace(/\.(IS|DE)$/,''); }
 function ccySym(m){ return m==='BIST'?'₺':m==='NASDAQ'?'$':'€'; }
 function ccyCode(m){ return m==='BIST'?'TRY':m==='NASDAQ'?'USD':'EUR'; }
+/* ---- gerçekçi maliyet modeli: yön başına spread/kayma % + emir başına sabit komisyon ---- */
+function costCfg(){ return (S && S.cost) ? S.cost : {spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}}; }
+function spreadPct(){ var v=parseFloat(costCfg().spread); return isNaN(v)||v<0?0:v; }
+function commOf(m){ var c=costCfg().comm||{}; var v=parseFloat(c[m]); return isNaN(v)||v<0?0:v; }
+/* Alışta gerçek dolum fiyatı görünenin ÜSTÜNDE, satışta ALTINDA olur (spread+kayma). */
+function fillPx(m, side, px){ var sp=spreadPct()/100; return side==='buy' ? px*(1+sp) : px*(1-sp); }
 function pnlCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
 function chCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
 function find(sym){ for(var i=0;i<STOCKS.length;i++) if(STOCKS[i].symbol===sym) return STOCKS[i]; return null; }
@@ -1080,6 +1115,8 @@ S.botPos = S.botPos || {}; S.botCool = S.botCool || {}; S.botOn = S.botOn || {};
   if(S.botThr[m]===undefined) S.botThr[m]=70;
 });
 if(S.botTP===undefined) S.botTP=2.5;
+if(!S.cost) S.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
+if(!S.cost.comm) S.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
 function ensureShape(st){
@@ -1092,6 +1129,8 @@ function ensureShape(st){
     if(st.botThr[m]===undefined) st.botThr[m]=70;
   });
   if(st.botTP===undefined) st.botTP=2.5;
+  if(!st.cost) st.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
+  if(!st.cost.comm) st.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
   return st;
 }
 function save(){ localStorage.setItem(LS, JSON.stringify(S)); if(typeof scheduleSync==='function') scheduleSync(); }
@@ -1549,7 +1588,8 @@ function updateSimPx(){
 function recalcCost(){
   var s=find($('simSel').value); var q=parseInt($('simQty').value,10);
   if(!s||!s.price||!q){ $('simCost').textContent='—'; return; }
-  $('simCost').innerHTML = amt(s.market, s.price*q);
+  var comm=commOf(s.market); var fill=fillPx(s.market,'buy',s.price);
+  $('simCost').innerHTML = amt(s.market, fill*q + comm) + '<span class="sub">spread + '+ccySym(s.market)+fmt(comm)+' komisyon dahil</span>';
 }
 $('simSel').onchange=updateSimPx;
 $('simQty').oninput=recalcCost;
@@ -1557,18 +1597,23 @@ $('simQty').oninput=recalcCost;
 function trade(side){
   var s=find($('simSel').value); var q=parseInt($('simQty').value,10);
   if(!s||!s.price||!q||q<1) return;
-  var sim=simFor(MK); var cost=s.price*q; var rate=(MK==='BIST'?EURTRY:null); var pnl=null, pnlPct=null;
+  var sim=simFor(MK); var rate=(MK==='BIST'?EURTRY:null); var pnl=null, pnlPct=null;
+  var comm=commOf(MK); var fill=fillPx(MK, side, s.price);
   if(side==='buy'){
-    if(cost>sim.cash){ alert('Yetersiz nakit. Gerekli '+ccySym(MK)+fmt(cost)+' / Mevcut '+ccySym(MK)+fmt(sim.cash)); return; }
+    var cost=fill*q + comm;                          // spread'li dolum + komisyon
+    if(cost>sim.cash){ alert('Yetersiz nakit (ücretler dahil). Gerekli '+ccySym(MK)+fmt(cost)+' / Mevcut '+ccySym(MK)+fmt(sim.cash)); return; }
     sim.cash-=cost; var h=sim.holdings[s.symbol]||{qty:0,cost:0,eurCost:0};
     h.cost+=cost; h.qty+=q; if(MK==='BIST') h.eurCost=(h.eurCost||0)+(rate?cost/rate:0); sim.holdings[s.symbol]=h;
+    sim.log.unshift({t:Date.now(), side:side, sym:s.symbol, qty:q, px:fill, rawPx:s.price, fee:comm, rate:rate, pnl:null, pnlPct:null});
   } else {
     var h2=sim.holdings[s.symbol]; if(!h2||h2.qty<q){ alert('Yeterli pozisyon yok.'); return; }
-    var avg=h2.cost/h2.qty; pnl=(s.price-avg)*q; pnlPct=avg>0?(s.price/avg-1)*100:0;
-    h2.cost-=avg*q; if(MK==='BIST'){var ea=(h2.eurCost||0)/h2.qty; h2.eurCost=(h2.eurCost||0)-ea*q;} h2.qty-=q; sim.cash+=cost;
+    var avg=h2.cost/h2.qty;
+    var proceeds=fill*q - comm;                      // spread'li dolum − komisyon
+    pnl=proceeds-avg*q; pnlPct=avg>0?(proceeds/q/avg-1)*100:0;
+    h2.cost-=avg*q; if(MK==='BIST'){var ea=(h2.eurCost||0)/h2.qty; h2.eurCost=(h2.eurCost||0)-ea*q;} h2.qty-=q; sim.cash+=proceeds;
     if(h2.qty<=0) delete sim.holdings[s.symbol];
+    sim.log.unshift({t:Date.now(), side:side, sym:s.symbol, qty:q, px:fill, rawPx:s.price, fee:comm, rate:rate, pnl:pnl, pnlPct:pnlPct});
   }
-  sim.log.unshift({t:Date.now(), side:side, sym:s.symbol, qty:q, px:s.price, rate:rate, pnl:pnl, pnlPct:pnlPct});
   save(); renderSim(); renderScreen(); renderAllList();
 }
 $('simBuy').onclick=function(){trade('buy');};
@@ -1641,12 +1686,15 @@ function renderSim(){
   $('cashV').innerHTML=amt(MK,sim.cash); $('simInvV').innerHTML=amt(MK,invested);
   $('holdV').innerHTML=amt(MK,holdVal); $('totV').innerHTML=amt(MK,total);
   $('pnlV').innerHTML=(pnl>0?'+':'')+amt(MK,pnl); $('pnlV').className='v '+pnlCls(pnl);
+  var fees=sim.log.reduce(function(a,e){return a+(e.fee||0);},0);
+  if($('feeV')) $('feeV').innerHTML=fees>0?('−'+amt(MK,fees)):amt(MK,0);
   $('simLog').innerHTML = sim.log.length? sim.log.map(function(e){
     var d=new Date(e.t); var sc=e.side==='buy'?'up':'down'; var st=e.side==='buy'?'AL':'SAT';
     var tot=' = '+ccySym(MK)+fmt(e.px*e.qty);
     var bot=e.bot?' <span class="bottag">🤖'+(e.reason?' '+e.reason:'')+'</span>':'';
     var pl=(e.side==='sell' && e.pnl!=null) ? ' <b class="'+(e.pnl>=0?'up':'down')+'">'+(e.pnl>0?'+':'')+ccySym(MK)+fmt(e.pnl)+' ('+(e.pnlPct>0?'+':'')+fmt(e.pnlPct,2)+'%)</b>' : '';
-    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+tot+pl+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
+    var feeTxt=(e.fee&&e.fee>0)?' <span class="cov">· ücret '+ccySym(MK)+fmt(e.fee)+'</span>':'';
+    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+clean(e.sym)+' × '+e.qty+' @ '+fmt(e.px)+tot+pl+feeTxt+bot+'</span><span class="t">'+d.toLocaleString('tr-TR')+'</span></div>';
   }).join(''):'<div class="empty">işlem yok</div>';
   var buys=sim.log.filter(function(e){return e.side==='buy';}).length, sells=sim.log.length-buys;
   var swp=sim.log.filter(function(e){return e.side==='sell' && e.pnl!=null;}), wins=swp.filter(function(e){return e.pnl>0;}).length;
@@ -1852,11 +1900,12 @@ var botTimer=null;
 function bySym(list,sym){ for(var i=0;i<list.length;i++) if(list[i].symbol===sym) return list[i]; return null; }
 function botEquity(sim,list){ var v=sim.cash; Object.keys(sim.holdings).forEach(function(sym){ var s=bySym(list,sym); if(s&&s.price!=null) v+=s.price*sim.holdings[sym].qty; }); return v; }
 function botBuy(m,sym,qty,px,stop,tp1,target){
-  var sim=simFor(m); var cost=px*qty; if(qty<1||cost>sim.cash) return false;
+  var sim=simFor(m); var comm=commOf(m); var fill=fillPx(m,'buy',px);
+  var cost=fill*qty + comm; if(qty<1||cost>sim.cash) return false;
   var rate=(m==='BIST'?EURTRY:null);
   sim.cash-=cost; var h=sim.holdings[sym]||{qty:0,cost:0,eurCost:0};
   h.cost+=cost; h.qty+=qty; if(m==='BIST') h.eurCost=(h.eurCost||0)+(rate?cost/rate:0); sim.holdings[sym]=h;
-  sim.log.unshift({t:Date.now(),side:'buy',sym:sym,qty:qty,px:px,rate:rate,bot:true,reason:'oto giriş'});
+  sim.log.unshift({t:Date.now(),side:'buy',sym:sym,qty:qty,px:fill,rawPx:px,fee:comm,rate:rate,bot:true,reason:'oto giriş'});
   S.botPos[m][sym]={qty:qty,entry:px,stop:stop,tp1:tp1,target:target,half:false,t:Date.now()};
   return true;
 }
@@ -1864,11 +1913,13 @@ function botBuy(m,sym,qty,px,stop,tp1,target){
 function botSellQty(m,sym,px,qty,reason,keepPos){
   var sim=simFor(m); var h=sim.holdings[sym]; var bp=S.botPos[m][sym];
   if(!h||!bp||px==null){ delete S.botPos[m][sym]; return; }
-  var q=Math.min(qty,bp.qty,h.qty);
-  if(q<1){ if(!keepPos){ delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs; } return; }
+  var q=Math.min(qty,bp.qty,h.qty); if(q<1){ if(!keepPos){ delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs; } return; }
+  var comm=commOf(m); var fill=fillPx(m,'sell',px);
   var avg=h.cost/h.qty; h.cost-=avg*q; if(m==='BIST'){var ea=(h.eurCost||0)/h.qty; h.eurCost=(h.eurCost||0)-ea*q;} h.qty-=q;
-  var rate=(m==='BIST'?EURTRY:null); sim.cash+=px*q; if(h.qty<=0) delete sim.holdings[sym];
-  sim.log.unshift({t:Date.now(),side:'sell',sym:sym,qty:q,px:px,rate:rate,bot:true,reason:reason,pnl:(px-avg)*q,pnlPct:avg>0?(px/avg-1)*100:0});
+  var rate=(m==='BIST'?EURTRY:null);
+  var proceeds=fill*q - comm; sim.cash+=proceeds; if(h.qty<=0) delete sim.holdings[sym];
+  var pnl=proceeds-avg*q;
+  sim.log.unshift({t:Date.now(),side:'sell',sym:sym,qty:q,px:fill,rawPx:px,fee:comm,rate:rate,bot:true,reason:reason,pnl:pnl,pnlPct:avg>0?(proceeds/q/avg-1)*100:0});
   bp.qty-=q;
   if(!keepPos || bp.qty<1){ delete S.botPos[m][sym]; S.botCool[m][sym]=Date.now()+BOT.coolMs; }
 }
@@ -1951,6 +2002,7 @@ function setBot(m,on){
 }
 function renderAll(){
   syncSwitch(); renderMeta(); renderTicker(); fillSimSelect(); fillSymList();
+  if(window.__refreshCostInputs) window.__refreshCostInputs();
   renderGunun(); renderScreen(); renderAllList(); renderMovers(); updateSimPx(); renderSim(); renderSimChart(); renderReal(); renderRealChart();
   renderTrade();
 }
@@ -1993,6 +2045,16 @@ MARKETS.forEach(function(m){
   inp.onchange=function(){ var v=parseInt(this.value,10); if(isNaN(v))return; S.botThr[m]=Math.max(0,Math.min(100,v)); this.value=S.botThr[m]; save(); if(S.botOn[m]) botTick(); updateBotBtn(); };
 });
 (function(){
+  var cs=$('costSpread'), cc=$('costComm'), ccy=$('costCcy');
+  function refreshCostInputs(){
+    if(cs) cs.value=spreadPct();
+    if(cc) cc.value=commOf(MK||'DAX');
+    if(ccy) ccy.textContent=ccySym(MK||'DAX');
+  }
+  refreshCostInputs();
+  window.__refreshCostInputs=refreshCostInputs;
+  if(cs) cs.onchange=function(){ var v=parseFloat(this.value); if(isNaN(v)||v<0) v=0.05; S.cost.spread=Math.min(2,v); this.value=S.cost.spread; save(); recalcCost(); };
+  if(cc) cc.onchange=function(){ var v=parseFloat(this.value); if(isNaN(v)||v<0) v=0; S.cost.comm[MK||'DAX']=v; this.value=v; save(); recalcCost(); };
   var tp=$('botTP'); if(!tp) return;
   tp.value=(S.botTP!=null?S.botTP:2.5);
   tp.onchange=function(){ var v=parseFloat(this.value); if(isNaN(v)||v<=0) v=2.5; S.botTP=Math.min(20,Math.max(0.5,v)); this.value=S.botTP; save(); };
@@ -2145,14 +2207,14 @@ function initSupabase(){
   SB=window.supabase.createClient(window.SUPA_URL, window.SUPA_ANON, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:false}});
   SB.auth.getSession().then(function(res){
     SB_USER=(res.data && res.data.session)?res.data.session.user:null;
-    if(SB_USER) afterLogin();
+    if(SB_USER){ if(typeof enterApp==='function') enterApp(); afterLogin(); }
     updateAuthBar();
   });
   SB.auth.onAuthStateChange(function(_evt, session){
     var prev=SB_USER && SB_USER.id;
     SB_USER=session?session.user:null;
-    if(SB_USER){ if(SB_USER.id!==prev) afterLogin(); }
-    else { stopRealtime(); SB_REV=0; }
+    if(SB_USER){ if(typeof enterApp==='function') enterApp(); if(SB_USER.id!==prev) afterLogin(); }
+    else { stopRealtime(); SB_REV=0; if(typeof showLogin==='function') showLogin(); }
     updateAuthBar();
   });
 }
@@ -2160,7 +2222,43 @@ wireCloud();
 initSupabase();
 
 /* ---------- boot ---------- */
-if(MK){ syncSwitch(); showApp(); } else { showGate(); }
+function showLogin(){
+  var lg=$('loginGate'); if(lg) lg.style.display='flex';
+  $('gate').style.display='none'; $('app').style.display='none';
+  var ov=$('authOv'); if(ov) ov.classList.remove('open');
+}
+function enterApp(){
+  var lg=$('loginGate'); if(lg) lg.style.display='none';
+  if(MK){ syncSwitch(); showApp(); } else { showGate(); }
+}
+function wireLoginGate(){
+  function msg(t){ var m=$('lgMsg'); if(m) m.innerHTML=t; }
+  function creds(){ return { email:($('lgEmail')?$('lgEmail').value.trim():''), pass:($('lgPass')?$('lgPass').value:'') }; }
+  var li=$('lgLogin'); if(li) li.onclick=function(){
+    if(!SB){ msg(cloudCfgOk()?'Bulut yükleniyor, bir sn sonra tekrar dene…':'Bulut yapılandırılmamış — dosyadaki SUPA_URL/SUPA_ANON değerlerini doldur ya da çevrimdışı devam et.'); return; }
+    var c=creds(); if(!c.email||!c.pass){ msg('E-posta ve şifre gir.'); return; }
+    msg('Giriş yapılıyor…');
+    SB.auth.signInWithPassword({email:c.email, password:c.pass}).then(function(res){
+      if(res.error){ msg('<span class="down">Hata: '+res.error.message+'</span>'); return; }
+      msg('Giriş başarılı, yükleniyor…');
+    });
+  };
+  var su=$('lgSignup'); if(su) su.onclick=function(){
+    if(!SB){ msg(cloudCfgOk()?'Bulut yükleniyor, bir sn sonra tekrar dene…':'Bulut yapılandırılmamış — dosyadaki SUPA_URL/SUPA_ANON değerlerini doldur ya da çevrimdışı devam et.'); return; }
+    var c=creds(); if(!c.email||c.pass.length<6){ msg('Geçerli e-posta ve en az 6 haneli şifre gir.'); return; }
+    msg('Kaydediliyor…');
+    SB.auth.signUp({email:c.email, password:c.pass}).then(function(res){
+      if(res.error){ msg('<span class="down">Hata: '+res.error.message+'</span>'); return; }
+      if(res.data && res.data.session){ msg('Kayıt tamam, giriş yapıldı.'); }
+      else msg('Kayıt alındı. E-posta onayı açıksa gelen kutundaki linke tıkla, sonra buradan giriş yap.');
+    });
+  };
+  var pw=$('lgPass'); if(pw) pw.onkeydown=function(e){ if(e.key==='Enter' && li) li.onclick(); };
+  var off=$('lgOffline'); if(off) off.onclick=function(e){ e.preventDefault(); enterApp(); };
+  if(!cloudCfgOk()) msg('Bulut yapılandırılmamış: dosyadaki SUPA_URL / SUPA_ANON alanlarını doldur. Şimdilik alttan çevrimdışı devam edebilirsin.');
+}
+wireLoginGate();
+showLogin();
 }
 function loadData(cb){
   var url='data.js';
