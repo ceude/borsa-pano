@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-07-07T06:23:36+00:00",
+  "updatedAt": "2026-07-07T06:33:37+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.5556,
-    "USDTRY": 46.835
+    "EURTRY": 53.557,
+    "USDTRY": 46.8345
   },
   "benchmarks": {
     "DAX": 4.28,
@@ -48,7 +48,7 @@ window.STOCK_DATA = {
       "ret1m": -1.71,
       "ret3m": 0.12,
       "pctFromHigh": -19.26,
-      "relVol": 0.53,
+      "relVol": 0.93,
       "score": 92.5,
       "scoreCoverage": 4
     },
@@ -77,7 +77,7 @@ window.STOCK_DATA = {
       "ret1m": 0.6,
       "ret3m": 3.42,
       "pctFromHigh": -14.88,
-      "relVol": 0.51,
+      "relVol": 0.69,
       "score": 91.5,
       "scoreCoverage": 4
     },
@@ -106,7 +106,7 @@ window.STOCK_DATA = {
       "ret1m": -2.51,
       "ret3m": 1.72,
       "pctFromHigh": -24.49,
-      "relVol": 0.54,
+      "relVol": 1.03,
       "score": 84.9,
       "scoreCoverage": 4
     },
@@ -135,7 +135,7 @@ window.STOCK_DATA = {
       "ret1m": 3.09,
       "ret3m": 5.78,
       "pctFromHigh": -15.82,
-      "relVol": 0.65,
+      "relVol": 1.15,
       "score": 83.6,
       "scoreCoverage": 4
     },
@@ -164,7 +164,7 @@ window.STOCK_DATA = {
       "ret1m": -2.03,
       "ret3m": 4.81,
       "pctFromHigh": -12.77,
-      "relVol": 0.53,
+      "relVol": 0.75,
       "score": 82.4,
       "scoreCoverage": 5
     },
@@ -193,7 +193,7 @@ window.STOCK_DATA = {
       "ret1m": 3.57,
       "ret3m": 7.81,
       "pctFromHigh": -18.36,
-      "relVol": 0.72,
+      "relVol": 1.03,
       "score": 81.6,
       "scoreCoverage": 4
     },
@@ -222,7 +222,7 @@ window.STOCK_DATA = {
       "ret1m": -5.63,
       "ret3m": -3.05,
       "pctFromHigh": -18.82,
-      "relVol": 1.0,
+      "relVol": 0.99,
       "score": 80.9,
       "scoreCoverage": 5
     },
@@ -251,7 +251,7 @@ window.STOCK_DATA = {
       "ret1m": -5.41,
       "ret3m": -0.42,
       "pctFromHigh": -16.34,
-      "relVol": 0.33,
+      "relVol": 0.55,
       "score": 80.4,
       "scoreCoverage": 5
     },
@@ -280,7 +280,7 @@ window.STOCK_DATA = {
       "ret1m": 9.83,
       "ret3m": 6.5,
       "pctFromHigh": -18.11,
-      "relVol": 0.84,
+      "relVol": 1.57,
       "score": 80.3,
       "scoreCoverage": 4
     },
@@ -309,7 +309,7 @@ window.STOCK_DATA = {
       "ret1m": 8.01,
       "ret3m": 9.82,
       "pctFromHigh": -13.63,
-      "relVol": 1.16,
+      "relVol": 1.74,
       "score": 80.0,
       "scoreCoverage": 4
     },
@@ -628,7 +628,7 @@ window.STOCK_DATA = {
       "ret1m": 4.31,
       "ret3m": 17.66,
       "pctFromHigh": -2.22,
-      "relVol": 0.51,
+      "relVol": 1.88,
       "score": 73.0,
       "scoreCoverage": 5
     },
@@ -802,7 +802,7 @@ window.STOCK_DATA = {
       "ret1m": -3.65,
       "ret3m": 19.11,
       "pctFromHigh": -13.09,
-      "relVol": 0.68,
+      "relVol": 0.63,
       "score": 69.8,
       "scoreCoverage": 4
     },
@@ -889,7 +889,7 @@ window.STOCK_DATA = {
       "ret1m": 0.1,
       "ret3m": -13.03,
       "pctFromHigh": -24.11,
-      "relVol": 0.72,
+      "relVol": 0.81,
       "score": 68.9,
       "scoreCoverage": 5
     },
@@ -918,7 +918,7 @@ window.STOCK_DATA = {
       "ret1m": -1.32,
       "ret3m": 1.6,
       "pctFromHigh": -15.89,
-      "relVol": 0.89,
+      "relVol": 1.64,
       "score": 68.7,
       "scoreCoverage": 5
     },
@@ -976,7 +976,7 @@ window.STOCK_DATA = {
       "ret1m": -9.82,
       "ret3m": -11.8,
       "pctFromHigh": -24.23,
-      "relVol": 0.82,
+      "relVol": 1.1,
       "score": 67.9,
       "scoreCoverage": 5
     },
@@ -1324,7 +1324,7 @@ window.STOCK_DATA = {
       "ret1m": 18.41,
       "ret3m": 15.97,
       "pctFromHigh": -11.45,
-      "relVol": 2.03,
+      "relVol": 1.6,
       "score": 65.1,
       "scoreCoverage": 5
     },
@@ -1353,7 +1353,7 @@ window.STOCK_DATA = {
       "ret1m": -3.85,
       "ret3m": 4.97,
       "pctFromHigh": -16.05,
-      "relVol": 0.7,
+      "relVol": 1.01,
       "score": 64.8,
       "scoreCoverage": 5
     },
@@ -1411,7 +1411,7 @@ window.STOCK_DATA = {
       "ret1m": 1.16,
       "ret3m": 19.8,
       "pctFromHigh": -9.57,
-      "relVol": 0.77,
+      "relVol": 2.0,
       "score": 64.1,
       "scoreCoverage": 5
     },
@@ -1440,7 +1440,7 @@ window.STOCK_DATA = {
       "ret1m": -6.24,
       "ret3m": -14.56,
       "pctFromHigh": -20.48,
-      "relVol": 0.83,
+      "relVol": 0.42,
       "score": 63.8,
       "scoreCoverage": 5
     },
@@ -1527,7 +1527,7 @@ window.STOCK_DATA = {
       "ret1m": -4.84,
       "ret3m": 6.84,
       "pctFromHigh": -23.57,
-      "relVol": 0.64,
+      "relVol": 0.87,
       "score": 62.4,
       "scoreCoverage": 5
     },
@@ -1556,7 +1556,7 @@ window.STOCK_DATA = {
       "ret1m": 20.22,
       "ret3m": 26.81,
       "pctFromHigh": 0.0,
-      "relVol": 1.1,
+      "relVol": 1.42,
       "score": 61.9,
       "scoreCoverage": 5
     },
@@ -1643,7 +1643,7 @@ window.STOCK_DATA = {
       "ret1m": -1.59,
       "ret3m": -6.45,
       "pctFromHigh": -30.39,
-      "relVol": 0.98,
+      "relVol": 0.73,
       "score": 60.5,
       "scoreCoverage": 5
     },
@@ -1701,7 +1701,7 @@ window.STOCK_DATA = {
       "ret1m": 4.76,
       "ret3m": 12.1,
       "pctFromHigh": -17.32,
-      "relVol": 1.18,
+      "relVol": 1.71,
       "score": 60.2,
       "scoreCoverage": 5
     },
@@ -1788,7 +1788,7 @@ window.STOCK_DATA = {
       "ret1m": -2.51,
       "ret3m": 0.53,
       "pctFromHigh": -14.2,
-      "relVol": 1.21,
+      "relVol": 0.89,
       "score": 59.5,
       "scoreCoverage": 5
     },
@@ -1817,7 +1817,7 @@ window.STOCK_DATA = {
       "ret1m": 13.02,
       "ret3m": 13.02,
       "pctFromHigh": -3.11,
-      "relVol": 0.84,
+      "relVol": 1.42,
       "score": 59.5,
       "scoreCoverage": 5
     },
@@ -1846,7 +1846,7 @@ window.STOCK_DATA = {
       "ret1m": 6.89,
       "ret3m": -3.05,
       "pctFromHigh": -9.91,
-      "relVol": 0.98,
+      "relVol": 1.23,
       "score": 59.2,
       "scoreCoverage": 5
     },
@@ -1875,7 +1875,7 @@ window.STOCK_DATA = {
       "ret1m": 3.76,
       "ret3m": 17.27,
       "pctFromHigh": -9.41,
-      "relVol": 0.46,
+      "relVol": 0.53,
       "score": 58.9,
       "scoreCoverage": 5
     },
@@ -1933,7 +1933,7 @@ window.STOCK_DATA = {
       "ret1m": -1.16,
       "ret3m": 53.51,
       "pctFromHigh": -12.24,
-      "relVol": 0.86,
+      "relVol": 1.5,
       "score": 58.8,
       "scoreCoverage": 5
     },
@@ -2049,7 +2049,7 @@ window.STOCK_DATA = {
       "ret1m": 37.47,
       "ret3m": 67.98,
       "pctFromHigh": 0.0,
-      "relVol": 1.4,
+      "relVol": 0.8,
       "score": 57.7,
       "scoreCoverage": 4
     },
@@ -2136,7 +2136,7 @@ window.STOCK_DATA = {
       "ret1m": -3.44,
       "ret3m": 17.59,
       "pctFromHigh": -15.7,
-      "relVol": 0.88,
+      "relVol": 0.35,
       "score": 57.4,
       "scoreCoverage": 5
     },
@@ -2165,7 +2165,7 @@ window.STOCK_DATA = {
       "ret1m": 8.88,
       "ret3m": 27.61,
       "pctFromHigh": -0.6,
-      "relVol": 1.7,
+      "relVol": 0.88,
       "score": 57.3,
       "scoreCoverage": 5
     },
@@ -2194,7 +2194,7 @@ window.STOCK_DATA = {
       "ret1m": -2.9,
       "ret3m": -9.63,
       "pctFromHigh": -26.38,
-      "relVol": 1.48,
+      "relVol": 0.82,
       "score": 57.1,
       "scoreCoverage": 5
     },
@@ -2252,7 +2252,7 @@ window.STOCK_DATA = {
       "ret1m": -12.73,
       "ret3m": -7.18,
       "pctFromHigh": -26.15,
-      "relVol": 0.77,
+      "relVol": 0.59,
       "score": 56.6,
       "scoreCoverage": 5
     },
@@ -2339,7 +2339,7 @@ window.STOCK_DATA = {
       "ret1m": -0.77,
       "ret3m": 19.9,
       "pctFromHigh": -5.61,
-      "relVol": 0.76,
+      "relVol": 1.18,
       "score": 56.4,
       "scoreCoverage": 5
     },
@@ -2397,7 +2397,7 @@ window.STOCK_DATA = {
       "ret1m": -0.65,
       "ret3m": 0.28,
       "pctFromHigh": -15.92,
-      "relVol": 1.09,
+      "relVol": 0.93,
       "score": 56.1,
       "scoreCoverage": 5
     },
@@ -2455,7 +2455,7 @@ window.STOCK_DATA = {
       "ret1m": -5.5,
       "ret3m": -12.24,
       "pctFromHigh": -27.27,
-      "relVol": 0.67,
+      "relVol": 0.6,
       "score": 56.0,
       "scoreCoverage": 5
     },
@@ -2513,7 +2513,7 @@ window.STOCK_DATA = {
       "ret1m": -5.47,
       "ret3m": -16.83,
       "pctFromHigh": -35.5,
-      "relVol": 1.1,
+      "relVol": 0.7,
       "score": 55.6,
       "scoreCoverage": 5
     },
@@ -2687,7 +2687,7 @@ window.STOCK_DATA = {
       "ret1m": 1.69,
       "ret3m": -2.68,
       "pctFromHigh": -36.46,
-      "relVol": 1.33,
+      "relVol": 0.82,
       "score": 55.0,
       "scoreCoverage": 5
     },
@@ -2716,7 +2716,7 @@ window.STOCK_DATA = {
       "ret1m": -5.41,
       "ret3m": -2.45,
       "pctFromHigh": -17.59,
-      "relVol": 1.37,
+      "relVol": 1.95,
       "score": 54.7,
       "scoreCoverage": 5
     },
@@ -2745,7 +2745,7 @@ window.STOCK_DATA = {
       "ret1m": 2.65,
       "ret3m": 39.46,
       "pctFromHigh": -4.65,
-      "relVol": 2.26,
+      "relVol": 3.71,
       "score": 54.7,
       "scoreCoverage": 5
     },
@@ -2803,7 +2803,7 @@ window.STOCK_DATA = {
       "ret1m": -10.41,
       "ret3m": 3.43,
       "pctFromHigh": -16.88,
-      "relVol": 0.56,
+      "relVol": 0.51,
       "score": 54.5,
       "scoreCoverage": 5
     },
@@ -2948,7 +2948,7 @@ window.STOCK_DATA = {
       "ret1m": -10.2,
       "ret3m": 18.03,
       "pctFromHigh": -11.27,
-      "relVol": 0.53,
+      "relVol": 1.01,
       "score": 53.8,
       "scoreCoverage": 5
     },
@@ -3035,7 +3035,7 @@ window.STOCK_DATA = {
       "ret1m": -6.73,
       "ret3m": 4.38,
       "pctFromHigh": -22.85,
-      "relVol": 0.58,
+      "relVol": 0.69,
       "score": 53.7,
       "scoreCoverage": 5
     },
@@ -3122,7 +3122,7 @@ window.STOCK_DATA = {
       "ret1m": 10.28,
       "ret3m": 18.72,
       "pctFromHigh": -7.95,
-      "relVol": 1.81,
+      "relVol": 1.48,
       "score": 53.0,
       "scoreCoverage": 5
     },
@@ -3180,7 +3180,7 @@ window.STOCK_DATA = {
       "ret1m": -8.63,
       "ret3m": -11.99,
       "pctFromHigh": -24.33,
-      "relVol": 0.86,
+      "relVol": 1.39,
       "score": 52.8,
       "scoreCoverage": 5
     },
@@ -3325,7 +3325,7 @@ window.STOCK_DATA = {
       "ret1m": -3.85,
       "ret3m": -12.58,
       "pctFromHigh": -33.69,
-      "relVol": 1.06,
+      "relVol": 0.92,
       "score": 52.2,
       "scoreCoverage": 5
     },
@@ -3383,7 +3383,7 @@ window.STOCK_DATA = {
       "ret1m": -4.53,
       "ret3m": 2.62,
       "pctFromHigh": -12.64,
-      "relVol": 0.94,
+      "relVol": 1.25,
       "score": 51.9,
       "scoreCoverage": 5
     },
@@ -3441,7 +3441,7 @@ window.STOCK_DATA = {
       "ret1m": -3.79,
       "ret3m": 3.87,
       "pctFromHigh": -13.32,
-      "relVol": 1.27,
+      "relVol": 1.03,
       "score": 51.2,
       "scoreCoverage": 5
     },
@@ -3499,7 +3499,7 @@ window.STOCK_DATA = {
       "ret1m": 2.72,
       "ret3m": 4.88,
       "pctFromHigh": -14.73,
-      "relVol": 1.33,
+      "relVol": 0.88,
       "score": 51.0,
       "scoreCoverage": 4
     },
@@ -3905,7 +3905,7 @@ window.STOCK_DATA = {
       "ret1m": 13.13,
       "ret3m": 32.35,
       "pctFromHigh": -15.01,
-      "relVol": 0.52,
+      "relVol": 0.63,
       "score": 48.9,
       "scoreCoverage": 5
     },
@@ -3963,7 +3963,7 @@ window.STOCK_DATA = {
       "ret1m": 1.51,
       "ret3m": 12.06,
       "pctFromHigh": -12.46,
-      "relVol": 0.76,
+      "relVol": 0.86,
       "score": 48.8,
       "scoreCoverage": 5
     },
@@ -3992,7 +3992,7 @@ window.STOCK_DATA = {
       "ret1m": -2.29,
       "ret3m": 2.93,
       "pctFromHigh": -8.69,
-      "relVol": 1.82,
+      "relVol": 0.47,
       "score": 48.4,
       "scoreCoverage": 5
     },
@@ -4195,7 +4195,7 @@ window.STOCK_DATA = {
       "ret1m": -7.29,
       "ret3m": -5.92,
       "pctFromHigh": -28.5,
-      "relVol": 0.82,
+      "relVol": 0.59,
       "score": 47.2,
       "scoreCoverage": 4
     },
@@ -4311,7 +4311,7 @@ window.STOCK_DATA = {
       "ret1m": 5.3,
       "ret3m": 9.16,
       "pctFromHigh": -18.4,
-      "relVol": 1.07,
+      "relVol": 1.53,
       "score": 46.7,
       "scoreCoverage": 5
     },
@@ -4340,7 +4340,7 @@ window.STOCK_DATA = {
       "ret1m": -10.63,
       "ret3m": -27.2,
       "pctFromHigh": -40.17,
-      "relVol": 1.14,
+      "relVol": 0.68,
       "score": 46.6,
       "scoreCoverage": 4
     },
@@ -4369,7 +4369,7 @@ window.STOCK_DATA = {
       "ret1m": -2.34,
       "ret3m": -2.06,
       "pctFromHigh": -22.23,
-      "relVol": 0.75,
+      "relVol": 0.89,
       "score": 45.8,
       "scoreCoverage": 4
     },
@@ -4427,7 +4427,7 @@ window.STOCK_DATA = {
       "ret1m": 17.77,
       "ret3m": 23.49,
       "pctFromHigh": -9.67,
-      "relVol": 1.8,
+      "relVol": 0.95,
       "score": 45.2,
       "scoreCoverage": 5
     },
@@ -4572,7 +4572,7 @@ window.STOCK_DATA = {
       "ret1m": -7.64,
       "ret3m": 34.25,
       "pctFromHigh": -13.31,
-      "relVol": 0.53,
+      "relVol": 0.59,
       "score": 44.0,
       "scoreCoverage": 5
     },
@@ -4601,7 +4601,7 @@ window.STOCK_DATA = {
       "ret1m": -5.08,
       "ret3m": 103.09,
       "pctFromHigh": -15.87,
-      "relVol": 0.51,
+      "relVol": 0.7,
       "score": 43.9,
       "scoreCoverage": 5
     },
@@ -4630,7 +4630,7 @@ window.STOCK_DATA = {
       "ret1m": -10.14,
       "ret3m": 5.46,
       "pctFromHigh": -34.1,
-      "relVol": 0.51,
+      "relVol": 0.63,
       "score": 43.7,
       "scoreCoverage": 5
     },
@@ -4688,7 +4688,7 @@ window.STOCK_DATA = {
       "ret1m": -9.94,
       "ret3m": -5.35,
       "pctFromHigh": -30.25,
-      "relVol": 0.6,
+      "relVol": 0.97,
       "score": 43.6,
       "scoreCoverage": 5
     },
@@ -4717,7 +4717,7 @@ window.STOCK_DATA = {
       "ret1m": 11.43,
       "ret3m": 11.43,
       "pctFromHigh": -3.95,
-      "relVol": 1.81,
+      "relVol": 0.93,
       "score": 43.5,
       "scoreCoverage": 5
     },
@@ -4775,7 +4775,7 @@ window.STOCK_DATA = {
       "ret1m": -0.84,
       "ret3m": -1.81,
       "pctFromHigh": -12.19,
-      "relVol": 1.37,
+      "relVol": 0.79,
       "score": 43.0,
       "scoreCoverage": 5
     },
@@ -4891,7 +4891,7 @@ window.STOCK_DATA = {
       "ret1m": -9.54,
       "ret3m": -4.74,
       "pctFromHigh": -20.2,
-      "relVol": 0.66,
+      "relVol": 0.61,
       "score": 41.7,
       "scoreCoverage": 2
     },
@@ -4920,7 +4920,7 @@ window.STOCK_DATA = {
       "ret1m": 12.31,
       "ret3m": 20.61,
       "pctFromHigh": 0.0,
-      "relVol": 1.21,
+      "relVol": 3.56,
       "score": 41.4,
       "scoreCoverage": 5
     },
@@ -4949,7 +4949,7 @@ window.STOCK_DATA = {
       "ret1m": -9.59,
       "ret3m": -9.9,
       "pctFromHigh": -39.24,
-      "relVol": 0.76,
+      "relVol": 0.98,
       "score": 41.3,
       "scoreCoverage": 4
     },
@@ -4978,7 +4978,7 @@ window.STOCK_DATA = {
       "ret1m": 20.27,
       "ret3m": 33.84,
       "pctFromHigh": -6.52,
-      "relVol": 0.89,
+      "relVol": 0.8,
       "score": 41.1,
       "scoreCoverage": 5
     },
@@ -5007,7 +5007,7 @@ window.STOCK_DATA = {
       "ret1m": -3.88,
       "ret3m": -8.97,
       "pctFromHigh": -18.11,
-      "relVol": 1.11,
+      "relVol": 0.61,
       "score": 40.6,
       "scoreCoverage": 5
     },
@@ -5094,7 +5094,7 @@ window.STOCK_DATA = {
       "ret1m": -2.16,
       "ret3m": 7.89,
       "pctFromHigh": -26.25,
-      "relVol": 0.43,
+      "relVol": 0.63,
       "score": 40.0,
       "scoreCoverage": 5
     },
@@ -5181,7 +5181,7 @@ window.STOCK_DATA = {
       "ret1m": -4.3,
       "ret3m": -12.68,
       "pctFromHigh": -42.15,
-      "relVol": 0.77,
+      "relVol": 0.81,
       "score": 38.6,
       "scoreCoverage": 5
     },
@@ -5210,7 +5210,7 @@ window.STOCK_DATA = {
       "ret1m": 2.82,
       "ret3m": 2.52,
       "pctFromHigh": -26.74,
-      "relVol": 1.29,
+      "relVol": 0.35,
       "score": 38.4,
       "scoreCoverage": 4
     },
@@ -5268,7 +5268,7 @@ window.STOCK_DATA = {
       "ret1m": 4.31,
       "ret3m": -10.21,
       "pctFromHigh": -30.62,
-      "relVol": 1.12,
+      "relVol": 4.1,
       "score": 37.9,
       "scoreCoverage": 5
     },
@@ -5471,7 +5471,7 @@ window.STOCK_DATA = {
       "ret1m": -5.02,
       "ret3m": -9.57,
       "pctFromHigh": -31.28,
-      "relVol": 0.71,
+      "relVol": 0.59,
       "score": 36.0,
       "scoreCoverage": 5
     },
@@ -5529,7 +5529,7 @@ window.STOCK_DATA = {
       "ret1m": -7.38,
       "ret3m": 37.88,
       "pctFromHigh": -10.51,
-      "relVol": 0.98,
+      "relVol": 1.07,
       "score": 35.2,
       "scoreCoverage": 5
     },
@@ -5558,7 +5558,7 @@ window.STOCK_DATA = {
       "ret1m": 0.0,
       "ret3m": 44.13,
       "pctFromHigh": -4.8,
-      "relVol": 1.31,
+      "relVol": 0.74,
       "score": 34.9,
       "scoreCoverage": 5
     },
@@ -5616,7 +5616,7 @@ window.STOCK_DATA = {
       "ret1m": -1.34,
       "ret3m": -1.78,
       "pctFromHigh": -31.73,
-      "relVol": 1.06,
+      "relVol": 0.67,
       "score": 34.8,
       "scoreCoverage": 5
     },
@@ -5674,7 +5674,7 @@ window.STOCK_DATA = {
       "ret1m": -2.17,
       "ret3m": 22.29,
       "pctFromHigh": -13.76,
-      "relVol": 0.97,
+      "relVol": 1.1,
       "score": 33.6,
       "scoreCoverage": 5
     },
@@ -5732,7 +5732,7 @@ window.STOCK_DATA = {
       "ret1m": 4.73,
       "ret3m": -14.33,
       "pctFromHigh": -24.61,
-      "relVol": 0.97,
+      "relVol": 0.46,
       "score": 33.2,
       "scoreCoverage": 5
     },
@@ -5819,7 +5819,7 @@ window.STOCK_DATA = {
       "ret1m": -10.23,
       "ret3m": -3.89,
       "pctFromHigh": -35.7,
-      "relVol": 0.41,
+      "relVol": 0.4,
       "score": 30.9,
       "scoreCoverage": 4
     },
@@ -5848,7 +5848,7 @@ window.STOCK_DATA = {
       "ret1m": -9.45,
       "ret3m": -11.95,
       "pctFromHigh": -33.17,
-      "relVol": 0.59,
+      "relVol": 1.04,
       "score": 30.9,
       "scoreCoverage": 4
     },
@@ -5906,7 +5906,7 @@ window.STOCK_DATA = {
       "ret1m": -7.76,
       "ret3m": 19.21,
       "pctFromHigh": -22.25,
-      "relVol": 0.53,
+      "relVol": 0.46,
       "score": 30.7,
       "scoreCoverage": 5
     },
@@ -5993,7 +5993,7 @@ window.STOCK_DATA = {
       "ret1m": -7.34,
       "ret3m": -1.64,
       "pctFromHigh": -54.29,
-      "relVol": 6.14,
+      "relVol": 4.09,
       "score": 29.5,
       "scoreCoverage": 4
     },
@@ -6080,7 +6080,7 @@ window.STOCK_DATA = {
       "ret1m": -19.04,
       "ret3m": 26.11,
       "pctFromHigh": -25.37,
-      "relVol": 0.38,
+      "relVol": 0.52,
       "score": 28.8,
       "scoreCoverage": 5
     },
@@ -6196,7 +6196,7 @@ window.STOCK_DATA = {
       "ret1m": -55.67,
       "ret3m": -56.98,
       "pctFromHigh": -90.81,
-      "relVol": 0.31,
+      "relVol": 0.25,
       "score": 26.0,
       "scoreCoverage": 4
     },
@@ -6399,7 +6399,7 @@ window.STOCK_DATA = {
       "ret1m": 13.07,
       "ret3m": 12.48,
       "pctFromHigh": -28.63,
-      "relVol": 0.47,
+      "relVol": 0.53,
       "score": 24.3,
       "scoreCoverage": 4
     },
@@ -6457,7 +6457,7 @@ window.STOCK_DATA = {
       "ret1m": 9.45,
       "ret3m": 10.48,
       "pctFromHigh": -30.83,
-      "relVol": 0.8,
+      "relVol": 0.9,
       "score": 23.0,
       "scoreCoverage": 5
     },
@@ -6486,7 +6486,7 @@ window.STOCK_DATA = {
       "ret1m": -26.29,
       "ret3m": -13.98,
       "pctFromHigh": -35.28,
-      "relVol": 0.56,
+      "relVol": 1.0,
       "score": 22.8,
       "scoreCoverage": 4
     },
@@ -6602,7 +6602,7 @@ window.STOCK_DATA = {
       "ret1m": -0.12,
       "ret3m": 5.2,
       "pctFromHigh": -22.66,
-      "relVol": 0.37,
+      "relVol": 0.38,
       "score": 20.6,
       "scoreCoverage": 4
     },
@@ -6660,7 +6660,7 @@ window.STOCK_DATA = {
       "ret1m": -6.77,
       "ret3m": -29.79,
       "pctFromHigh": -38.34,
-      "relVol": 0.47,
+      "relVol": 0.66,
       "score": 18.6,
       "scoreCoverage": 5
     },
@@ -6718,7 +6718,7 @@ window.STOCK_DATA = {
       "ret1m": -6.8,
       "ret3m": 76.53,
       "pctFromHigh": -11.26,
-      "relVol": 0.89,
+      "relVol": 0.77,
       "score": 16.8,
       "scoreCoverage": 5
     },
@@ -6747,7 +6747,7 @@ window.STOCK_DATA = {
       "ret1m": -25.73,
       "ret3m": 12.29,
       "pctFromHigh": -34.07,
-      "relVol": 0.76,
+      "relVol": 1.25,
       "score": 16.2,
       "scoreCoverage": 4
     },
@@ -6776,7 +6776,7 @@ window.STOCK_DATA = {
       "ret1m": 2.37,
       "ret3m": 5.22,
       "pctFromHigh": -32.48,
-      "relVol": 1.06,
+      "relVol": 1.09,
       "score": 10.6,
       "scoreCoverage": 5
     },
@@ -6805,7 +6805,7 @@ window.STOCK_DATA = {
       "ret1m": -7.0,
       "ret3m": -1.77,
       "pctFromHigh": -23.55,
-      "relVol": 4.79,
+      "relVol": 0.69,
       "score": 6.4,
       "scoreCoverage": 4
     },
@@ -6834,7 +6834,7 @@ window.STOCK_DATA = {
       "ret1m": -9.6,
       "ret3m": 33.87,
       "pctFromHigh": -16.57,
-      "relVol": 0.75,
+      "relVol": 0.74,
       "score": 6.1,
       "scoreCoverage": 4
     },
