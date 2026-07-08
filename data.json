@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-08T06:24:31+00:00",
+  "updatedAt": "2026-07-08T06:33:53+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.5445,
-    "USDTRY": 46.8546
+    "EURTRY": 53.5442,
+    "USDTRY": 46.8533
   },
   "benchmarks": {
     "DAX": 3.45,
@@ -48,7 +48,7 @@
       "ret1m": 0.87,
       "ret3m": 0.12,
       "pctFromHigh": -19.16,
-      "relVol": 0.74,
+      "relVol": 0.53,
       "score": 93.0,
       "scoreCoverage": 4
     },
@@ -77,7 +77,7 @@
       "ret1m": 2.08,
       "ret3m": 3.97,
       "pctFromHigh": -15.02,
-      "relVol": 0.63,
+      "relVol": 0.51,
       "score": 91.7,
       "scoreCoverage": 4
     },
@@ -106,7 +106,7 @@
       "ret1m": 0.57,
       "ret3m": 2.57,
       "pctFromHigh": -24.35,
-      "relVol": 0.99,
+      "relVol": 0.54,
       "score": 84.9,
       "scoreCoverage": 4
     },
@@ -135,7 +135,7 @@
       "ret1m": 6.96,
       "ret3m": 5.22,
       "pctFromHigh": -15.7,
-      "relVol": 0.89,
+      "relVol": 0.65,
       "score": 83.3,
       "scoreCoverage": 4
     },
@@ -164,7 +164,7 @@
       "ret1m": -0.15,
       "ret3m": 3.92,
       "pctFromHigh": -12.77,
-      "relVol": 0.61,
+      "relVol": 0.53,
       "score": 82.4,
       "scoreCoverage": 5
     },
@@ -193,7 +193,7 @@
       "ret1m": 8.72,
       "ret3m": 9.05,
       "pctFromHigh": -17.62,
-      "relVol": 0.88,
+      "relVol": 0.72,
       "score": 80.9,
       "scoreCoverage": 4
     },
@@ -222,7 +222,7 @@
       "ret1m": -6.18,
       "ret3m": -6.98,
       "pctFromHigh": -19.35,
-      "relVol": 0.87,
+      "relVol": 1.0,
       "score": 80.9,
       "scoreCoverage": 5
     },
@@ -251,7 +251,7 @@
       "ret1m": -1.94,
       "ret3m": 0.57,
       "pctFromHigh": -17.39,
-      "relVol": 0.36,
+      "relVol": 0.33,
       "score": 80.6,
       "scoreCoverage": 5
     },
@@ -309,7 +309,7 @@
       "ret1m": 11.49,
       "ret3m": 8.83,
       "pctFromHigh": -14.9,
-      "relVol": 1.14,
+      "relVol": 1.16,
       "score": 80.0,
       "scoreCoverage": 4
     },
@@ -628,7 +628,7 @@
       "ret1m": 2.18,
       "ret3m": 16.63,
       "pctFromHigh": -2.86,
-      "relVol": 2.76,
+      "relVol": 0.51,
       "score": 72.9,
       "scoreCoverage": 5
     },
@@ -802,7 +802,7 @@
       "ret1m": -2.67,
       "ret3m": 19.93,
       "pctFromHigh": -13.01,
-      "relVol": 0.89,
+      "relVol": 0.68,
       "score": 70.3,
       "scoreCoverage": 4
     },
@@ -860,7 +860,7 @@
       "ret1m": -2.46,
       "ret3m": -0.54,
       "pctFromHigh": -18.27,
-      "relVol": 0.8,
+      "relVol": 0.89,
       "score": 69.0,
       "scoreCoverage": 5
     },
@@ -889,7 +889,7 @@
       "ret1m": -0.39,
       "ret3m": -12.88,
       "pctFromHigh": -25.56,
-      "relVol": 0.8,
+      "relVol": 0.72,
       "score": 68.7,
       "scoreCoverage": 5
     },
@@ -1063,7 +1063,7 @@
       "ret1m": -9.29,
       "ret3m": -11.29,
       "pctFromHigh": -24.12,
-      "relVol": 1.53,
+      "relVol": 0.82,
       "score": 66.9,
       "scoreCoverage": 5
     },
@@ -1324,7 +1324,7 @@
       "ret1m": -2.97,
       "ret3m": 3.16,
       "pctFromHigh": -17.08,
-      "relVol": 1.15,
+      "relVol": 0.7,
       "score": 65.5,
       "scoreCoverage": 5
     },
@@ -1353,7 +1353,7 @@
       "ret1m": 24.68,
       "ret3m": 18.93,
       "pctFromHigh": -9.15,
-      "relVol": 0.95,
+      "relVol": 2.03,
       "score": 65.1,
       "scoreCoverage": 5
     },
@@ -1382,7 +1382,7 @@
       "ret1m": -6.35,
       "ret3m": -16.85,
       "pctFromHigh": -21.93,
-      "relVol": 0.75,
+      "relVol": 0.83,
       "score": 64.3,
       "scoreCoverage": 5
     },
@@ -1411,7 +1411,7 @@
       "ret1m": 1.67,
       "ret3m": 17.45,
       "pctFromHigh": -10.76,
-      "relVol": 0.94,
+      "relVol": 0.77,
       "score": 63.9,
       "scoreCoverage": 5
     },
@@ -1527,7 +1527,7 @@
       "ret1m": 18.52,
       "ret3m": 24.55,
       "pctFromHigh": -3.31,
-      "relVol": 0.46,
+      "relVol": 1.1,
       "score": 61.9,
       "scoreCoverage": 5
     },
@@ -1556,7 +1556,7 @@
       "ret1m": -4.12,
       "ret3m": 5.45,
       "pctFromHigh": -24.73,
-      "relVol": 1.54,
+      "relVol": 0.64,
       "score": 61.9,
       "scoreCoverage": 5
     },
@@ -1614,7 +1614,7 @@
       "ret1m": 6.83,
       "ret3m": -1.79,
       "pctFromHigh": -28.67,
-      "relVol": 0.99,
+      "relVol": 0.98,
       "score": 60.7,
       "scoreCoverage": 5
     },
@@ -1672,7 +1672,7 @@
       "ret1m": 13.42,
       "ret3m": 17.27,
       "pctFromHigh": -16.34,
-      "relVol": 1.05,
+      "relVol": 1.18,
       "score": 60.2,
       "scoreCoverage": 5
     },
@@ -1788,7 +1788,7 @@
       "ret1m": -2.95,
       "ret3m": 0.1,
       "pctFromHigh": -15.86,
-      "relVol": 1.15,
+      "relVol": 1.21,
       "score": 59.7,
       "scoreCoverage": 5
     },
@@ -1817,7 +1817,7 @@
       "ret1m": 11.17,
       "ret3m": 12.12,
       "pctFromHigh": -5.58,
-      "relVol": 0.72,
+      "relVol": 0.84,
       "score": 59.5,
       "scoreCoverage": 5
     },
@@ -1846,7 +1846,7 @@
       "ret1m": 5.28,
       "ret3m": 16.26,
       "pctFromHigh": -10.45,
-      "relVol": 0.66,
+      "relVol": 0.46,
       "score": 58.9,
       "scoreCoverage": 5
     },
@@ -1875,7 +1875,7 @@
       "ret1m": 2.74,
       "ret3m": -3.08,
       "pctFromHigh": -10.2,
-      "relVol": 1.26,
+      "relVol": 0.98,
       "score": 58.9,
       "scoreCoverage": 5
     },
@@ -1904,7 +1904,7 @@
       "ret1m": 0.16,
       "ret3m": 53.75,
       "pctFromHigh": -12.65,
-      "relVol": 1.24,
+      "relVol": 0.86,
       "score": 58.8,
       "scoreCoverage": 5
     },
@@ -2049,7 +2049,7 @@
       "ret1m": -3.22,
       "ret3m": 18.72,
       "pctFromHigh": -16.43,
-      "relVol": 1.27,
+      "relVol": 0.88,
       "score": 57.9,
       "scoreCoverage": 5
     },
@@ -2107,7 +2107,7 @@
       "ret1m": 50.17,
       "ret3m": 77.06,
       "pctFromHigh": 0.0,
-      "relVol": 0.8,
+      "relVol": 1.4,
       "score": 57.7,
       "scoreCoverage": 4
     },
@@ -2194,7 +2194,7 @@
       "ret1m": -3.74,
       "ret3m": -11.55,
       "pctFromHigh": -27.98,
-      "relVol": 1.69,
+      "relVol": 1.48,
       "score": 57.1,
       "scoreCoverage": 5
     },
@@ -2310,7 +2310,7 @@
       "ret1m": 4.57,
       "ret3m": 25.96,
       "pctFromHigh": -4.54,
-      "relVol": 1.1,
+      "relVol": 1.7,
       "score": 56.6,
       "scoreCoverage": 5
     },
@@ -2339,7 +2339,7 @@
       "ret1m": 3.33,
       "ret3m": 1.02,
       "pctFromHigh": -14.82,
-      "relVol": 1.04,
+      "relVol": 1.09,
       "score": 56.4,
       "scoreCoverage": 5
     },
@@ -2368,7 +2368,7 @@
       "ret1m": -6.64,
       "ret3m": -4.06,
       "pctFromHigh": -25.47,
-      "relVol": 0.74,
+      "relVol": 0.77,
       "score": 56.4,
       "scoreCoverage": 5
     },
@@ -2397,7 +2397,7 @@
       "ret1m": -0.69,
       "ret3m": 16.51,
       "pctFromHigh": -6.9,
-      "relVol": 1.07,
+      "relVol": 0.76,
       "score": 56.4,
       "scoreCoverage": 5
     },
@@ -2455,7 +2455,7 @@
       "ret1m": -5.67,
       "ret3m": -13.34,
       "pctFromHigh": -27.51,
-      "relVol": 0.96,
+      "relVol": 0.67,
       "score": 56.0,
       "scoreCoverage": 5
     },
@@ -2571,7 +2571,7 @@
       "ret1m": -4.87,
       "ret3m": -17.67,
       "pctFromHigh": -36.85,
-      "relVol": 0.99,
+      "relVol": 1.1,
       "score": 55.4,
       "scoreCoverage": 5
     },
@@ -2600,7 +2600,7 @@
       "ret1m": 3.68,
       "ret3m": -1.02,
       "pctFromHigh": -36.2,
-      "relVol": 1.39,
+      "relVol": 1.33,
       "score": 55.4,
       "scoreCoverage": 5
     },
@@ -2745,7 +2745,7 @@
       "ret1m": -2.58,
       "ret3m": -1.59,
       "pctFromHigh": -18.24,
-      "relVol": 1.47,
+      "relVol": 1.37,
       "score": 54.9,
       "scoreCoverage": 5
     },
@@ -2774,7 +2774,7 @@
       "ret1m": -4.26,
       "ret3m": 6.17,
       "pctFromHigh": -16.15,
-      "relVol": 0.72,
+      "relVol": 0.56,
       "score": 54.7,
       "scoreCoverage": 5
     },
@@ -2832,7 +2832,7 @@
       "ret1m": -1.33,
       "ret3m": 33.51,
       "pctFromHigh": -6.98,
-      "relVol": 1.32,
+      "relVol": 2.26,
       "score": 54.5,
       "scoreCoverage": 5
     },
@@ -2890,7 +2890,7 @@
       "ret1m": -8.55,
       "ret3m": 15.78,
       "pctFromHigh": -12.96,
-      "relVol": 0.7,
+      "relVol": 0.53,
       "score": 54.1,
       "scoreCoverage": 5
     },
@@ -2919,7 +2919,7 @@
       "ret1m": -4.68,
       "ret3m": 2.96,
       "pctFromHigh": -23.56,
-      "relVol": 0.53,
+      "relVol": 0.58,
       "score": 53.9,
       "scoreCoverage": 5
     },
@@ -3064,7 +3064,7 @@
       "ret1m": -9.95,
       "ret3m": -1.61,
       "pctFromHigh": -18.49,
-      "relVol": 0.56,
+      "relVol": 0.44,
       "score": 53.1,
       "scoreCoverage": 5
     },
@@ -3093,7 +3093,7 @@
       "ret1m": 10.67,
       "ret3m": 21.56,
       "pctFromHigh": -7.43,
-      "relVol": 2.11,
+      "relVol": 1.81,
       "score": 53.0,
       "scoreCoverage": 5
     },
@@ -3180,7 +3180,7 @@
       "ret1m": -5.29,
       "ret3m": -12.55,
       "pctFromHigh": -34.97,
-      "relVol": 0.77,
+      "relVol": 1.06,
       "score": 52.7,
       "scoreCoverage": 5
     },
@@ -3267,7 +3267,7 @@
       "ret1m": -9.83,
       "ret3m": -10.91,
       "pctFromHigh": -24.93,
-      "relVol": 0.76,
+      "relVol": 0.86,
       "score": 52.6,
       "scoreCoverage": 5
     },
@@ -3441,7 +3441,7 @@
       "ret1m": -3.47,
       "ret3m": 7.04,
       "pctFromHigh": -11.74,
-      "relVol": 1.19,
+      "relVol": 0.94,
       "score": 51.5,
       "scoreCoverage": 5
     },
@@ -3499,7 +3499,7 @@
       "ret1m": -1.14,
       "ret3m": 8.81,
       "pctFromHigh": -9.92,
-      "relVol": 1.19,
+      "relVol": 1.27,
       "score": 51.2,
       "scoreCoverage": 5
     },
@@ -3528,7 +3528,7 @@
       "ret1m": 4.0,
       "ret3m": 5.17,
       "pctFromHigh": -15.54,
-      "relVol": 1.26,
+      "relVol": 1.33,
       "score": 51.0,
       "scoreCoverage": 4
     },
@@ -3905,7 +3905,7 @@
       "ret1m": 13.04,
       "ret3m": 29.98,
       "pctFromHigh": -14.48,
-      "relVol": 0.47,
+      "relVol": 0.52,
       "score": 48.9,
       "scoreCoverage": 5
     },
@@ -3934,7 +3934,7 @@
       "ret1m": 2.55,
       "ret3m": 14.1,
       "pctFromHigh": -12.61,
-      "relVol": 0.85,
+      "relVol": 0.76,
       "score": 48.8,
       "scoreCoverage": 5
     },
@@ -4137,7 +4137,7 @@
       "ret1m": 6.58,
       "ret3m": 8.83,
       "pctFromHigh": -4.01,
-      "relVol": 2.52,
+      "relVol": 1.82,
       "score": 47.3,
       "scoreCoverage": 5
     },
@@ -4166,7 +4166,7 @@
       "ret1m": -7.74,
       "ret3m": -7.13,
       "pctFromHigh": -30.0,
-      "relVol": 0.61,
+      "relVol": 0.82,
       "score": 47.2,
       "scoreCoverage": 4
     },
@@ -4253,7 +4253,7 @@
       "ret1m": -11.13,
       "ret3m": -27.97,
       "pctFromHigh": -41.96,
-      "relVol": 0.94,
+      "relVol": 1.14,
       "score": 46.8,
       "scoreCoverage": 4
     },
@@ -4311,7 +4311,7 @@
       "ret1m": 9.66,
       "ret3m": 8.09,
       "pctFromHigh": -19.58,
-      "relVol": 1.06,
+      "relVol": 1.07,
       "score": 46.7,
       "scoreCoverage": 5
     },
@@ -4398,7 +4398,7 @@
       "ret1m": -1.26,
       "ret3m": -4.18,
       "pctFromHigh": -23.33,
-      "relVol": 0.98,
+      "relVol": 0.75,
       "score": 45.8,
       "scoreCoverage": 4
     },
@@ -4456,7 +4456,7 @@
       "ret1m": 30.2,
       "ret3m": 35.86,
       "pctFromHigh": -1.47,
-      "relVol": 1.84,
+      "relVol": 1.8,
       "score": 45.2,
       "scoreCoverage": 5
     },
@@ -4572,7 +4572,7 @@
       "ret1m": -1.32,
       "ret3m": 33.89,
       "pctFromHigh": -13.17,
-      "relVol": 0.63,
+      "relVol": 0.53,
       "score": 44.2,
       "scoreCoverage": 5
     },
@@ -4630,7 +4630,7 @@
       "ret1m": -2.31,
       "ret3m": 115.44,
       "pctFromHigh": -13.22,
-      "relVol": 0.4,
+      "relVol": 0.51,
       "score": 43.9,
       "scoreCoverage": 5
     },
@@ -4717,7 +4717,7 @@
       "ret1m": 16.84,
       "ret3m": 17.23,
       "pctFromHigh": -0.22,
-      "relVol": 1.2,
+      "relVol": 1.81,
       "score": 43.5,
       "scoreCoverage": 5
     },
@@ -4746,7 +4746,7 @@
       "ret1m": -0.53,
       "ret3m": -1.73,
       "pctFromHigh": -12.93,
-      "relVol": 1.16,
+      "relVol": 1.37,
       "score": 43.2,
       "scoreCoverage": 5
     },
@@ -4775,7 +4775,7 @@
       "ret1m": -9.6,
       "ret3m": -5.23,
       "pctFromHigh": -30.58,
-      "relVol": 0.95,
+      "relVol": 0.6,
       "score": 43.2,
       "scoreCoverage": 5
     },
@@ -4891,7 +4891,7 @@
       "ret1m": -9.06,
       "ret3m": -10.92,
       "pctFromHigh": -39.93,
-      "relVol": 1.92,
+      "relVol": 0.76,
       "score": 42.0,
       "scoreCoverage": 4
     },
@@ -4920,7 +4920,7 @@
       "ret1m": -5.66,
       "ret3m": 2.29,
       "pctFromHigh": -17.96,
-      "relVol": 0.71,
+      "relVol": 0.66,
       "score": 41.7,
       "scoreCoverage": 2
     },
@@ -4949,7 +4949,7 @@
       "ret1m": 10.47,
       "ret3m": 17.9,
       "pctFromHigh": -2.93,
-      "relVol": 0.87,
+      "relVol": 1.21,
       "score": 41.6,
       "scoreCoverage": 5
     },
@@ -4978,7 +4978,7 @@
       "ret1m": 13.33,
       "ret3m": 28.57,
       "pctFromHigh": -7.27,
-      "relVol": 0.68,
+      "relVol": 0.89,
       "score": 41.1,
       "scoreCoverage": 5
     },
@@ -5007,7 +5007,7 @@
       "ret1m": -3.64,
       "ret3m": -6.77,
       "pctFromHigh": -18.74,
-      "relVol": 1.06,
+      "relVol": 1.11,
       "score": 40.6,
       "scoreCoverage": 5
     },
@@ -5094,7 +5094,7 @@
       "ret1m": -10.42,
       "ret3m": 7.6,
       "pctFromHigh": -27.36,
-      "relVol": 0.64,
+      "relVol": 0.43,
       "score": 40.0,
       "scoreCoverage": 5
     },
@@ -5181,7 +5181,7 @@
       "ret1m": -4.07,
       "ret3m": -15.75,
       "pctFromHigh": -43.13,
-      "relVol": 0.64,
+      "relVol": 0.77,
       "score": 38.6,
       "scoreCoverage": 5
     },
@@ -5210,7 +5210,7 @@
       "ret1m": 2.5,
       "ret3m": 3.04,
       "pctFromHigh": -26.07,
-      "relVol": 0.64,
+      "relVol": 1.29,
       "score": 38.4,
       "scoreCoverage": 4
     },
@@ -5239,7 +5239,7 @@
       "ret1m": 6.66,
       "ret3m": -9.17,
       "pctFromHigh": -30.16,
-      "relVol": 0.42,
+      "relVol": 1.12,
       "score": 38.1,
       "scoreCoverage": 5
     },
@@ -5384,7 +5384,7 @@
       "ret1m": -3.58,
       "ret3m": -9.12,
       "pctFromHigh": -31.69,
-      "relVol": 0.63,
+      "relVol": 0.71,
       "score": 36.4,
       "scoreCoverage": 5
     },
@@ -5529,7 +5529,7 @@
       "ret1m": -1.75,
       "ret3m": 33.3,
       "pctFromHigh": -14.33,
-      "relVol": 0.67,
+      "relVol": 0.98,
       "score": 35.4,
       "scoreCoverage": 5
     },
@@ -5545,7 +5545,7 @@
       "changePct": 0.44,
       "volume": 287327,
       "marketCap": 91944919040,
-      "pe": 47.83,
+      "pe": 47.61,
       "pb": 12.63,
       "roe": 31.26,
       "debtToEquity": 169.98,
@@ -5587,7 +5587,7 @@
       "ret1m": 6.03,
       "ret3m": 44.13,
       "pctFromHigh": -1.42,
-      "relVol": 1.25,
+      "relVol": 1.31,
       "score": 34.9,
       "scoreCoverage": 5
     },
@@ -5645,7 +5645,7 @@
       "ret1m": 0.28,
       "ret3m": -1.35,
       "pctFromHigh": -31.89,
-      "relVol": 0.98,
+      "relVol": 1.06,
       "score": 34.8,
       "scoreCoverage": 5
     },
@@ -5703,7 +5703,7 @@
       "ret1m": 0.36,
       "ret3m": 22.7,
       "pctFromHigh": -12.87,
-      "relVol": 1.04,
+      "relVol": 0.97,
       "score": 33.6,
       "scoreCoverage": 5
     },
@@ -5761,7 +5761,7 @@
       "ret1m": 5.83,
       "ret3m": -14.98,
       "pctFromHigh": -25.7,
-      "relVol": 0.9,
+      "relVol": 0.97,
       "score": 33.2,
       "scoreCoverage": 5
     },
@@ -5819,7 +5819,7 @@
       "ret1m": -11.22,
       "ret3m": -5.94,
       "pctFromHigh": -36.41,
-      "relVol": 0.31,
+      "relVol": 0.41,
       "score": 30.9,
       "scoreCoverage": 4
     },
@@ -5848,7 +5848,7 @@
       "ret1m": -10.2,
       "ret3m": -13.3,
       "pctFromHigh": -34.33,
-      "relVol": 0.4,
+      "relVol": 0.59,
       "score": 30.9,
       "scoreCoverage": 4
     },
@@ -5935,7 +5935,7 @@
       "ret1m": -6.02,
       "ret3m": -1.27,
       "pctFromHigh": -55.43,
-      "relVol": 8.55,
+      "relVol": 2.5,
       "score": 30.0,
       "scoreCoverage": 4
     },
@@ -6051,7 +6051,7 @@
       "ret1m": -8.38,
       "ret3m": 22.7,
       "pctFromHigh": -23.68,
-      "relVol": 1.11,
+      "relVol": 0.53,
       "score": 29.1,
       "scoreCoverage": 5
     },
@@ -6080,7 +6080,7 @@
       "ret1m": -17.48,
       "ret3m": 22.94,
       "pctFromHigh": -27.52,
-      "relVol": 0.52,
+      "relVol": 0.38,
       "score": 28.8,
       "scoreCoverage": 5
     },
@@ -6283,7 +6283,7 @@
       "ret1m": -48.4,
       "ret3m": -52.12,
       "pctFromHigh": -90.17,
-      "relVol": 0.19,
+      "relVol": 0.31,
       "score": 24.8,
       "scoreCoverage": 4
     },
@@ -6370,7 +6370,7 @@
       "ret1m": 10.38,
       "ret3m": 11.67,
       "pctFromHigh": -28.96,
-      "relVol": 0.61,
+      "relVol": 0.47,
       "score": 24.0,
       "scoreCoverage": 4
     },
@@ -6399,7 +6399,7 @@
       "ret1m": 2.34,
       "ret3m": 11.63,
       "pctFromHigh": -30.64,
-      "relVol": 9.5,
+      "relVol": 0.8,
       "score": 23.7,
       "scoreCoverage": 5
     },
@@ -6457,7 +6457,7 @@
       "ret1m": -23.95,
       "ret3m": -12.63,
       "pctFromHigh": -35.6,
-      "relVol": 0.52,
+      "relVol": 0.56,
       "score": 22.6,
       "scoreCoverage": 4
     },
@@ -6602,7 +6602,7 @@
       "ret1m": -1.94,
       "ret3m": 2.27,
       "pctFromHigh": -24.2,
-      "relVol": 0.67,
+      "relVol": 0.37,
       "score": 20.6,
       "scoreCoverage": 4
     },
@@ -6660,7 +6660,7 @@
       "ret1m": -4.27,
       "ret3m": -28.62,
       "pctFromHigh": -38.49,
-      "relVol": 0.5,
+      "relVol": 0.47,
       "score": 18.8,
       "scoreCoverage": 5
     },
@@ -6718,7 +6718,7 @@
       "ret1m": -6.57,
       "ret3m": 74.92,
       "pctFromHigh": -13.42,
-      "relVol": 0.66,
+      "relVol": 0.89,
       "score": 17.0,
       "scoreCoverage": 5
     },
@@ -6747,7 +6747,7 @@
       "ret1m": -23.43,
       "ret3m": 10.45,
       "pctFromHigh": -36.47,
-      "relVol": 0.63,
+      "relVol": 0.76,
       "score": 16.5,
       "scoreCoverage": 4
     },
@@ -6776,7 +6776,7 @@
       "ret1m": -0.33,
       "ret3m": 1.01,
       "pctFromHigh": -34.96,
-      "relVol": 0.48,
+      "relVol": 1.06,
       "score": 10.8,
       "scoreCoverage": 5
     },
@@ -6805,7 +6805,7 @@
       "ret1m": 2.63,
       "ret3m": 7.84,
       "pctFromHigh": -15.94,
-      "relVol": 12.4,
+      "relVol": 4.79,
       "score": 6.4,
       "scoreCoverage": 4
     },
@@ -6834,7 +6834,7 @@
       "ret1m": -7.39,
       "ret3m": 25.23,
       "pctFromHigh": -20.61,
-      "relVol": 0.64,
+      "relVol": 0.75,
       "score": 6.1,
       "scoreCoverage": 4
     },
