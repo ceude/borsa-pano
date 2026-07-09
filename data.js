@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-07-09T06:35:18+00:00",
+  "updatedAt": "2026-07-09T06:45:02+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.7744,
-    "USDTRY": 46.8709
+    "EURTRY": 53.7607,
+    "USDTRY": 46.8615
   },
   "benchmarks": {
     "DAX": 1.9,
@@ -1927,7 +1927,7 @@ window.STOCK_DATA = {
       "netMargin": 29.71,
       "netIncome": 10011100160,
       "ma50": 1667.5862,
-      "ma200": 1325.1802,
+      "ma200": 1325.1803,
       "rsi14": 48.2,
       "atrPct": 5.77,
       "ret1m": 7.73,
