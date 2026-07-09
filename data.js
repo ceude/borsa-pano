@@ -1,5 +1,5 @@
 window.STOCK_DATA = {
-  "updatedAt": "2026-07-09T20:44:59+00:00",
+  "updatedAt": "2026-07-09T20:53:47+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@ window.STOCK_DATA = {
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.6516,
-    "USDTRY": 46.866
+    "EURTRY": 53.6474,
+    "USDTRY": 46.8655
   },
   "benchmarks": {
     "DAX": 3.81,
@@ -469,7 +469,7 @@ window.STOCK_DATA = {
       "prevClose": 28.59,
       "changePct": -0.91,
       "volume": 10580902,
-      "marketCap": 26228238336,
+      "marketCap": 27290527744,
       "pe": 17.6,
       "pb": 2.99,
       "roe": 17.61,
@@ -542,7 +542,7 @@ window.STOCK_DATA = {
       "ret3m": 2.9,
       "pctFromHigh": -28.64,
       "relVol": 0.62,
-      "score": 73.6,
+      "score": 73.4,
       "scoreCoverage": 5
     },
     {
@@ -1950,7 +1950,7 @@ window.STOCK_DATA = {
       "volume": 1538499,
       "marketCap": 695389847552,
       "pe": 61.08,
-      "pb": 1626.72,
+      "pb": 1633.53,
       "roe": 52.24,
       "debtToEquity": 12.99,
       "netMargin": 29.71,
@@ -3226,7 +3226,7 @@ window.STOCK_DATA = {
       "volume": 263587,
       "marketCap": 47156371456,
       "pe": 44.71,
-      "pb": 8.83,
+      "pb": 9.38,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -4094,7 +4094,7 @@ window.STOCK_DATA = {
       "prevClose": 231.71,
       "changePct": 4.99,
       "volume": 20925588,
-      "marketCap": 212812595200,
+      "marketCap": 212995817472,
       "pe": 83.31,
       "pb": 11.69,
       "roe": 16.03,
@@ -4819,7 +4819,7 @@ window.STOCK_DATA = {
       "prevClose": 860.02,
       "changePct": 3.5,
       "volume": 4459327,
-      "marketCap": 201384755200,
+      "marketCap": 199583989760,
       "pe": 84.13,
       "pb": 182.4,
       "roe": 1787.97,
@@ -4937,7 +4937,7 @@ window.STOCK_DATA = {
       "volume": 18851530,
       "marketCap": 4626957312,
       "pe": 52.8,
-      "pb": 0.36,
+      "pb": 0.4,
       "roe": -0.41,
       "debtToEquity": 54.21,
       "netMargin": -0.02,
@@ -5691,7 +5691,7 @@ window.STOCK_DATA = {
       "volume": 1348930,
       "marketCap": 46201475072,
       "pe": 49.66,
-      "pb": 6.91,
+      "pb": 6.89,
       "roe": 14.32,
       "debtToEquity": 140.01,
       "netMargin": 9.22,
@@ -5704,7 +5704,7 @@ window.STOCK_DATA = {
       "ret3m": -7.17,
       "pctFromHigh": -12.35,
       "relVol": 0.77,
-      "score": 33.9,
+      "score": 34.1,
       "scoreCoverage": 5
     },
     {
