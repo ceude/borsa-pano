@@ -234,8 +234,8 @@
   <script>
     // ==== SUPABASE BULUT AYARLARI — kendi projenden doldur ====
     // Supabase panel → Project Settings → API → Project URL ve anon/public key
-    window.SUPA_URL='https://kuuwdpzyeovkfjoradwq.supabase.co';
-    window.SUPA_ANON='sb_publishable_M-QnplymNuUQVcbHQr0_RQ_wLh2YFOp';
+    window.SUPA_URL='https://BURAYA.supabase.co';
+    window.SUPA_ANON='BURAYA_ANON_PUBLIC_KEY';
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -254,9 +254,6 @@
         <button class="ghost" id="lgSignup" style="flex:1; padding:14px">Kayıt ol</button>
       </div>
       <div class="hint" id="lgMsg" style="margin-top:12px; min-height:16px"></div>
-    </div>
-    <div class="hint" id="lgOffWrap" style="text-align:center; margin-top:14px">
-      <a href="#" id="lgOffline" style="color:var(--faint)">çevrimdışı devam et (yalnız bu cihaz, senkron yok)</a>
     </div>
   </div>
 </div>
@@ -903,7 +900,7 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
           <button class="ghost" id="authRestore">Yerel yedeği geri yükle</button>
           <button class="ghost" id="authLogout">Çıkış</button>
         </div>
-        <div class="hint" style="margin-top:14px"><b>Nasıl çalışır:</b> Her değişiklik önce bu cihaza, sonra ~2.5 sn içinde buluta yazılır; başka bir cihaz açıksa oraya anında yansır. <b>Çakışma güvenliği:</b> buluttan veri alınmadan önce mevcut durumun yerel yedeği alınır (son 5 yedek) ve <b>gerçek işlem geçmişi asla silinmez</b> — iki cihazdaki gerçek işlemler birleştirilir. Botu tek cihazda çalıştır.</div>
+        <div class="hint" style="margin-top:14px"><b>Nasıl çalışır:</b> Veriler yalnız bulutta tutulur, tarayıcıda hiçbir şey saklanmaz; her değişiklik ~2.5 sn içinde buluta yazılır, başka bir cihaz açıksa oraya anında yansır. <b>Çakışma güvenliği:</b> buluttan veri alınmadan önce mevcut durumun oturum içi yedeği alınır (son 5) ve <b>gerçek işlem geçmişi asla silinmez</b> — iki cihazdaki gerçek işlemler birleştirilir. Botu tek cihazda çalıştır.</div>
       </div>
     </div>
   </div>
@@ -1103,9 +1100,10 @@ function shortNum(v){ var a=Math.abs(v);
   if(a>=1e3) return (v/1e3).toFixed(0)+'K'; return ''+Math.round(v); }
 
 /* ---------- storage ---------- */
-var LS='borsapano.v2';
-function load(){ try{return JSON.parse(localStorage.getItem(LS))||{};}catch(e){return {};} }
-var S = load();
+/* Kalıcılık YALNIZ Supabase'te. Tarayıcıda hiçbir veri saklanmaz —
+   aynı tarayıcıda başka hesapla girilse bile önceki hesabın verisi görünmez. */
+var MEM_BAK=[];              // oturum içi güvenlik yedekleri (buluttan veri almadan önce)
+var S = {};
 S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.simHist = S.simHist || {}; S.realHist = S.realHist || {};
 S.botPos = S.botPos || {}; S.botCool = S.botCool || {}; S.botOn = S.botOn || {}; S.botThr = S.botThr || {};
@@ -1133,7 +1131,7 @@ function ensureShape(st){
   if(!st.cost.comm) st.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
   return st;
 }
-function save(){ localStorage.setItem(LS, JSON.stringify(S)); if(typeof scheduleSync==='function') scheduleSync(); }
+function save(){ if(typeof scheduleSync==='function') scheduleSync(); }
 function simFor(m){
   var start=(m==='BIST'?100000:10000);
   if(!S.sim[m]) S.sim[m]={cash:start, deposited:start, holdings:{}, log:[]};
@@ -2074,11 +2072,7 @@ function hhmm(){ return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',mi
 function setSyncStatus(t){ var el=$('authSync'); if(el) el.textContent=t; var b=$('cloudBtn'); if(b && sbReady()) b.title=t; }
 
 function backupLocal(){
-  try{ var cur=localStorage.getItem(LS); if(!cur) return;
-    var arr=JSON.parse(localStorage.getItem(LS+'.bak')||'[]');
-    arr.unshift({t:Date.now(), data:cur}); arr=arr.slice(0,5);
-    localStorage.setItem(LS+'.bak', JSON.stringify(arr));
-  }catch(e){}
+  try{ MEM_BAK.unshift({t:Date.now(), data:JSON.stringify(S)}); MEM_BAK=MEM_BAK.slice(0,5); }catch(e){}
 }
 /* gerçek işlem geçmişini asla kaybetme: iki taraftaki gerçek işlemleri birleştir */
 function mergeRealLogs(incoming, local){
@@ -2110,8 +2104,8 @@ function adoptRemote(data){
     var incoming=JSON.parse(JSON.stringify(data));
     mergeRealLogs(incoming, S);
     S=ensureShape(incoming);
-    localStorage.setItem(LS, JSON.stringify(S));
   }catch(e){ console.warn('adopt hata', e); }
+  if(!MK && S.lastMarket) MK=S.lastMarket;   // buluttan gelen son piyasa tercihi
   reinitUIFromState();
   if(MK && $('app').style.display!=='none'){ renderAll(); }
   suppressSync=false;
@@ -2144,13 +2138,39 @@ function startRealtime(){
     }).subscribe();
 }
 function stopRealtime(){ if(realtimeCh){ try{SB.removeChannel(realtimeCh);}catch(e){} realtimeCh=null; } }
+var afterLoginBusy=false;
 function afterLogin(){
+  if(afterLoginBusy) return; afterLoginBusy=true;
   setSyncStatus('bağlanıyor…'); updateAuthBar();
+  checkAccess(function(allowed){
+    if(!allowed){
+      var m=$('lgMsg'); if(m) m.innerHTML='<b>Bekleme listesine girdiniz</b> — kısa bir süre sonra girebileceksiniz. Onay verildiğinde aynı e-posta ve şifreyle giriş yapman yeterli.';
+      afterLoginBusy=false;
+      SB.auth.signOut();            // onay gelmeden oturum açık kalmaz
+      if(typeof showLogin==='function') showLogin();
+      return;
+    }
+    loadCloud();
+  });
+}
+/* pano_access: satır yoksa bekleme listesine ekle (allowed=false).
+   Onayı yalnız sen verirsin: Supabase → Table Editor → pano_access → allowed = TRUE.
+   Client tarafında UPDATE politikası yok → kimse kendini onaylayamaz. */
+function checkAccess(cb){
+  SB.from('pano_access').select('allowed').eq('user_id',SB_USER.id).maybeSingle().then(function(res){
+    if(res.error){ var m=$('lgMsg'); if(m) m.innerHTML='<span class="down">Erişim kontrolü hatası: '+res.error.message+' (pano_access tablosu kurulu mu?)</span>'; cb(false); return; }
+    if(res.data){ cb(!!res.data.allowed); return; }
+    SB.from('pano_access').insert({user_id:SB_USER.id, email:SB_USER.email||null}).then(function(){ cb(false); }, function(){ cb(false); });
+  });
+}
+function loadCloud(){
   SB.from('portfolios').select('data,rev').eq('user_id',SB_USER.id).maybeSingle().then(function(res){
+    afterLoginBusy=false;
     if(res.error){ setSyncStatus('hata: '+res.error.message); return; }
     if(res.data){ SB_REV=res.data.rev||0; adoptRemote(res.data.data); setSyncStatus('buluttan yüklendi '+hhmm()); }
     else { SB_REV=0; pushRemote(true); setSyncStatus('bulut hesabın oluşturuldu '+hhmm()); }
     startRealtime();
+    if(typeof enterApp==='function') enterApp();
   });
 }
 function updateAuthBar(){
@@ -2181,7 +2201,7 @@ function wireCloud(){
   var su=$('authSignup'); if(su) su.onclick=function(){ if(!SB){ msg('Bulut yapılandırılmamış.'); return; } var c=creds(); if(!c.email||c.pass.length<6){ msg('Geçerli e-posta ve en az 6 haneli şifre gir.'); return; } msg('Kaydediliyor…');
     SB.auth.signUp({email:c.email, password:c.pass}).then(function(res){
       if(res.error){ msg('Hata: '+res.error.message); return; }
-      if(res.data.session){ msg('Kayıt tamam, giriş yapıldı.'); } else { msg('Kayıt alındı. E-posta onayı açıksa gelen kutunu kontrol edip linke tıkla, sonra giriş yap. (Supabase → Authentication → Providers → Email → "Confirm email" kapatırsan bu adım atlanır.)'); }
+      msg('<b>Bekleme listesine girdiniz</b> — onay verildiğinde aynı e-posta/şifreyle girebileceksiniz.');
     }); };
   var li=$('authLogin'); if(li) li.onclick=function(){ if(!SB){ msg('Bulut yapılandırılmamış.'); return; } var c=creds(); if(!c.email||!c.pass){ msg('E-posta ve şifre gir.'); return; } msg('Giriş yapılıyor…');
     SB.auth.signInWithPassword({email:c.email, password:c.pass}).then(function(res){
@@ -2191,9 +2211,9 @@ function wireCloud(){
   var pl=$('authPull'); if(pl) pl.onclick=function(){ pullThenAdopt(); };
   var ps=$('authPush'); if(ps) ps.onclick=function(){ if(sbReady()) pushRemote(false); };
   var rs=$('authRestore'); if(rs) rs.onclick=function(){
-    try{ var arr=JSON.parse(localStorage.getItem(LS+'.bak')||'[]'); if(!arr.length){ alert('Yerel yedek yok.'); return; }
-      if(!confirm('En son yerel yedeğe dönülsün mü? Şu anki durum üzerine yazılır (bulut da güncellenir).')) return;
-      suppressSync=true; S=ensureShape(JSON.parse(arr[0].data)); localStorage.setItem(LS, JSON.stringify(S)); reinitUIFromState(); if(MK) renderAll(); suppressSync=false;
+    try{ if(!MEM_BAK.length){ alert('Bu oturumda alınmış yedek yok.'); return; }
+      if(!confirm('Bu oturumdaki en son yedeğe dönülsün mü? Şu anki durum üzerine yazılır (bulut da güncellenir).')) return;
+      suppressSync=true; S=ensureShape(JSON.parse(MEM_BAK[0].data)); reinitUIFromState(); if(MK) renderAll(); suppressSync=false;
       if(sbReady()) pushRemote(false);
     }catch(e){ alert('Yedek geri yüklenemedi.'); }
   };
@@ -2207,14 +2227,20 @@ function initSupabase(){
   SB=window.supabase.createClient(window.SUPA_URL, window.SUPA_ANON, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:false}});
   SB.auth.getSession().then(function(res){
     SB_USER=(res.data && res.data.session)?res.data.session.user:null;
-    if(SB_USER){ if(typeof enterApp==='function') enterApp(); afterLogin(); }
+    if(SB_USER){ afterLogin(); }   // içeri alma kararını onay kontrolü verir
     updateAuthBar();
   });
   SB.auth.onAuthStateChange(function(_evt, session){
     var prev=SB_USER && SB_USER.id;
     SB_USER=session?session.user:null;
-    if(SB_USER){ if(typeof enterApp==='function') enterApp(); if(SB_USER.id!==prev) afterLogin(); }
-    else { stopRealtime(); SB_REV=0; if(typeof showLogin==='function') showLogin(); }
+    if(SB_USER){ if(SB_USER.id!==prev) afterLogin(); }
+    else {
+      stopRealtime(); SB_REV=0;
+      if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
+      // çıkışta bellek tamamen temizlenir — sonraki hesaba tek satır veri sızmaz
+      suppressSync=true; S=ensureShape({}); MK=null; MEM_BAK=[]; reinitUIFromState(); suppressSync=false;
+      if(typeof showLogin==='function') showLogin();
+    }
     updateAuthBar();
   });
 }
@@ -2235,7 +2261,7 @@ function wireLoginGate(){
   function msg(t){ var m=$('lgMsg'); if(m) m.innerHTML=t; }
   function creds(){ return { email:($('lgEmail')?$('lgEmail').value.trim():''), pass:($('lgPass')?$('lgPass').value:'') }; }
   var li=$('lgLogin'); if(li) li.onclick=function(){
-    if(!SB){ msg(cloudCfgOk()?'Bulut yükleniyor, bir sn sonra tekrar dene…':'Bulut yapılandırılmamış — dosyadaki SUPA_URL/SUPA_ANON değerlerini doldur ya da çevrimdışı devam et.'); return; }
+    if(!SB){ msg(cloudCfgOk()?'Bulut yükleniyor, bir sn sonra tekrar dene…':'Bulut yapılandırılmamış — dosyadaki SUPA_URL/SUPA_ANON değerlerini doldur.'); return; }
     var c=creds(); if(!c.email||!c.pass){ msg('E-posta ve şifre gir.'); return; }
     msg('Giriş yapılıyor…');
     SB.auth.signInWithPassword({email:c.email, password:c.pass}).then(function(res){
@@ -2244,18 +2270,17 @@ function wireLoginGate(){
     });
   };
   var su=$('lgSignup'); if(su) su.onclick=function(){
-    if(!SB){ msg(cloudCfgOk()?'Bulut yükleniyor, bir sn sonra tekrar dene…':'Bulut yapılandırılmamış — dosyadaki SUPA_URL/SUPA_ANON değerlerini doldur ya da çevrimdışı devam et.'); return; }
+    if(!SB){ msg(cloudCfgOk()?'Bulut yükleniyor, bir sn sonra tekrar dene…':'Bulut yapılandırılmamış — dosyadaki SUPA_URL/SUPA_ANON değerlerini doldur.'); return; }
     var c=creds(); if(!c.email||c.pass.length<6){ msg('Geçerli e-posta ve en az 6 haneli şifre gir.'); return; }
     msg('Kaydediliyor…');
     SB.auth.signUp({email:c.email, password:c.pass}).then(function(res){
       if(res.error){ msg('<span class="down">Hata: '+res.error.message+'</span>'); return; }
       if(res.data && res.data.session){ msg('Kayıt tamam, giriş yapıldı.'); }
-      else msg('Kayıt alındı. E-posta onayı açıksa gelen kutundaki linke tıkla, sonra buradan giriş yap.');
+      else msg('<b>Bekleme listesine girdiniz</b> — kısa bir süre sonra girebileceksiniz. (E-posta onayı açıksa önce gelen kutundaki linke tıkla.)');
     });
   };
   var pw=$('lgPass'); if(pw) pw.onkeydown=function(e){ if(e.key==='Enter' && li) li.onclick(); };
-  var off=$('lgOffline'); if(off) off.onclick=function(e){ e.preventDefault(); enterApp(); };
-  if(!cloudCfgOk()) msg('Bulut yapılandırılmamış: dosyadaki SUPA_URL / SUPA_ANON alanlarını doldur. Şimdilik alttan çevrimdışı devam edebilirsin.');
+  if(!cloudCfgOk()) msg('<span class="down">Bulut yapılandırılmamış: dosyadaki SUPA_URL / SUPA_ANON alanları doldurulmadan giriş yapılamaz.</span>');
 }
 wireLoginGate();
 showLogin();
