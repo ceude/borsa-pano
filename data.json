@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-09T06:15:26+00:00",
+  "updatedAt": "2026-07-09T06:23:38+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.6941,
-    "USDTRY": 46.8705
+    "EURTRY": 53.742,
+    "USDTRY": 46.8689
   },
   "benchmarks": {
     "DAX": 1.9,
@@ -469,7 +469,7 @@
       "prevClose": 29.27,
       "changePct": -2.32,
       "volume": 10493549,
-      "marketCap": 26468950016,
+      "marketCap": 27540987904,
       "pe": 18.21,
       "pb": 3.02,
       "roe": 17.61,
@@ -3226,7 +3226,7 @@
       "volume": 238585,
       "marketCap": 49278689280,
       "pe": 46.68,
-      "pb": 9.23,
+      "pb": 9.8,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -4094,7 +4094,7 @@
       "prevClose": 230.7,
       "changePct": 0.44,
       "volume": 24599756,
-      "marketCap": 202699915264,
+      "marketCap": 202874421248,
       "pe": 79.63,
       "pb": 11.14,
       "roe": 16.03,
@@ -4732,7 +4732,7 @@
       "prevClose": 827.64,
       "changePct": 3.91,
       "volume": 4922443,
-      "marketCap": 194581348352,
+      "marketCap": 192841416704,
       "pe": 78.76,
       "pb": 176.23,
       "roe": 1787.97,
