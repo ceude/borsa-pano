@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-09T06:23:38+00:00",
+  "updatedAt": "2026-07-09T06:35:18+00:00",
   "count": 238,
   "weights": {
     "pe": 1.0,
@@ -9,8 +9,8 @@
     "margin": 1.0
   },
   "rates": {
-    "EURTRY": 53.742,
-    "USDTRY": 46.8689
+    "EURTRY": 53.7744,
+    "USDTRY": 46.8709
   },
   "benchmarks": {
     "DAX": 1.9,
@@ -48,7 +48,7 @@
       "ret1m": -0.49,
       "ret3m": -0.1,
       "pctFromHigh": -18.76,
-      "relVol": 0.57,
+      "relVol": 0.74,
       "score": 92.7,
       "scoreCoverage": 4
     },
@@ -77,7 +77,7 @@
       "ret1m": 0.51,
       "ret3m": 2.86,
       "pctFromHigh": -14.52,
-      "relVol": 0.42,
+      "relVol": 0.63,
       "score": 91.5,
       "scoreCoverage": 4
     },
@@ -106,7 +106,7 @@
       "ret1m": 0.43,
       "ret3m": 2.92,
       "pctFromHigh": -23.16,
-      "relVol": 0.97,
+      "relVol": 0.99,
       "score": 84.9,
       "scoreCoverage": 4
     },
@@ -135,7 +135,7 @@
       "ret1m": 3.94,
       "ret3m": 3.12,
       "pctFromHigh": -15.25,
-      "relVol": 1.08,
+      "relVol": 0.89,
       "score": 83.1,
       "scoreCoverage": 4
     },
@@ -164,7 +164,7 @@
       "ret1m": -0.44,
       "ret3m": 4.31,
       "pctFromHigh": -12.58,
-      "relVol": 0.71,
+      "relVol": 0.61,
       "score": 82.0,
       "scoreCoverage": 5
     },
@@ -193,7 +193,7 @@
       "ret1m": 4.48,
       "ret3m": 8.48,
       "pctFromHigh": -16.98,
-      "relVol": 1.23,
+      "relVol": 0.88,
       "score": 80.9,
       "scoreCoverage": 4
     },
@@ -222,7 +222,7 @@
       "ret1m": -5.79,
       "ret3m": -10.15,
       "pctFromHigh": -19.09,
-      "relVol": 1.83,
+      "relVol": 0.87,
       "score": 80.6,
       "scoreCoverage": 5
     },
@@ -251,7 +251,7 @@
       "ret1m": 10.01,
       "ret3m": 4.69,
       "pctFromHigh": -18.28,
-      "relVol": 1.21,
+      "relVol": 0.84,
       "score": 80.5,
       "scoreCoverage": 4
     },
@@ -280,7 +280,7 @@
       "ret1m": 7.61,
       "ret3m": 7.0,
       "pctFromHigh": -14.58,
-      "relVol": 1.46,
+      "relVol": 1.14,
       "score": 80.3,
       "scoreCoverage": 4
     },
@@ -309,7 +309,7 @@
       "ret1m": -0.85,
       "ret3m": -0.85,
       "pctFromHigh": -17.85,
-      "relVol": 0.99,
+      "relVol": 0.36,
       "score": 80.0,
       "scoreCoverage": 5
     },
@@ -469,7 +469,7 @@
       "prevClose": 29.27,
       "changePct": -2.32,
       "volume": 10493549,
-      "marketCap": 27540987904,
+      "marketCap": 26468950016,
       "pe": 18.21,
       "pb": 3.02,
       "roe": 17.61,
@@ -657,7 +657,7 @@
       "ret1m": 3.05,
       "ret3m": 17.82,
       "pctFromHigh": -0.1,
-      "relVol": 0.7,
+      "relVol": 2.76,
       "score": 72.5,
       "scoreCoverage": 5
     },
@@ -802,7 +802,7 @@
       "ret1m": -4.95,
       "ret3m": 17.85,
       "pctFromHigh": -13.72,
-      "relVol": 0.64,
+      "relVol": 0.89,
       "score": 69.8,
       "scoreCoverage": 4
     },
@@ -831,7 +831,7 @@
       "ret1m": -0.1,
       "ret3m": -13.59,
       "pctFromHigh": -24.98,
-      "relVol": 0.84,
+      "relVol": 0.8,
       "score": 68.9,
       "scoreCoverage": 5
     },
@@ -860,7 +860,7 @@
       "ret1m": -4.11,
       "ret3m": -2.97,
       "pctFromHigh": -18.27,
-      "relVol": 1.16,
+      "relVol": 0.8,
       "score": 68.6,
       "scoreCoverage": 5
     },
@@ -1121,7 +1121,7 @@
       "ret1m": -1.12,
       "ret3m": -8.82,
       "pctFromHigh": -20.96,
-      "relVol": 2.98,
+      "relVol": 1.61,
       "score": 66.6,
       "scoreCoverage": 5
     },
@@ -1324,7 +1324,7 @@
       "ret1m": -7.78,
       "ret3m": 0.42,
       "pctFromHigh": -18.66,
-      "relVol": 0.96,
+      "relVol": 1.15,
       "score": 65.6,
       "scoreCoverage": 5
     },
@@ -1353,7 +1353,7 @@
       "ret1m": 23.4,
       "ret3m": 17.8,
       "pctFromHigh": -7.38,
-      "relVol": 0.99,
+      "relVol": 0.95,
       "score": 65.1,
       "scoreCoverage": 5
     },
@@ -1382,7 +1382,7 @@
       "ret1m": -7.48,
       "ret3m": -18.55,
       "pctFromHigh": -22.81,
-      "relVol": 0.86,
+      "relVol": 0.75,
       "score": 64.1,
       "scoreCoverage": 5
     },
@@ -1411,7 +1411,7 @@
       "ret1m": 0.54,
       "ret3m": 18.38,
       "pctFromHigh": -9.35,
-      "relVol": 1.26,
+      "relVol": 0.94,
       "score": 63.7,
       "scoreCoverage": 5
     },
@@ -1527,7 +1527,7 @@
       "ret1m": 3.03,
       "ret3m": 10.01,
       "pctFromHigh": -21.41,
-      "relVol": 1.12,
+      "relVol": 1.54,
       "score": 61.7,
       "scoreCoverage": 5
     },
@@ -1556,7 +1556,7 @@
       "ret1m": 14.1,
       "ret3m": 23.51,
       "pctFromHigh": -4.06,
-      "relVol": 0.49,
+      "relVol": 0.46,
       "score": 61.5,
       "scoreCoverage": 5
     },
@@ -1614,7 +1614,7 @@
       "ret1m": 0.0,
       "ret3m": -2.97,
       "pctFromHigh": -28.32,
-      "relVol": 0.8,
+      "relVol": 0.99,
       "score": 60.7,
       "scoreCoverage": 5
     },
@@ -1730,7 +1730,7 @@
       "ret1m": -4.13,
       "ret3m": -2.41,
       "pctFromHigh": -16.48,
-      "relVol": 1.01,
+      "relVol": 1.15,
       "score": 59.9,
       "scoreCoverage": 5
     },
@@ -1759,7 +1759,7 @@
       "ret1m": 13.38,
       "ret3m": 18.47,
       "pctFromHigh": -14.71,
-      "relVol": 0.9,
+      "relVol": 1.05,
       "score": 59.8,
       "scoreCoverage": 5
     },
@@ -1817,7 +1817,7 @@
       "ret1m": 7.25,
       "ret3m": 15.51,
       "pctFromHigh": -4.39,
-      "relVol": 0.8,
+      "relVol": 0.72,
       "score": 59.5,
       "scoreCoverage": 5
     },
@@ -1846,7 +1846,7 @@
       "ret1m": 0.89,
       "ret3m": 11.95,
       "pctFromHigh": -11.83,
-      "relVol": 0.79,
+      "relVol": 0.66,
       "score": 58.8,
       "scoreCoverage": 5
     },
@@ -1875,7 +1875,7 @@
       "ret1m": 5.6,
       "ret3m": 54.73,
       "pctFromHigh": -10.52,
-      "relVol": 1.04,
+      "relVol": 1.24,
       "score": 58.6,
       "scoreCoverage": 5
     },
@@ -1927,7 +1927,7 @@
       "netMargin": 29.71,
       "netIncome": 10011100160,
       "ma50": 1667.5862,
-      "ma200": 1325.1803,
+      "ma200": 1325.1802,
       "rsi14": 48.2,
       "atrPct": 5.77,
       "ret1m": 7.73,
@@ -1962,7 +1962,7 @@
       "ret1m": 8.04,
       "ret3m": 0.58,
       "pctFromHigh": -6.35,
-      "relVol": 1.78,
+      "relVol": 1.26,
       "score": 58.2,
       "scoreCoverage": 5
     },
@@ -2020,7 +2020,7 @@
       "ret1m": -5.72,
       "ret3m": 13.82,
       "pctFromHigh": -19.78,
-      "relVol": 0.75,
+      "relVol": 1.27,
       "score": 57.7,
       "scoreCoverage": 5
     },
@@ -2165,7 +2165,7 @@
       "ret1m": -3.6,
       "ret3m": -12.22,
       "pctFromHigh": -27.52,
-      "relVol": 1.15,
+      "relVol": 1.69,
       "score": 57.1,
       "scoreCoverage": 5
     },
@@ -2252,7 +2252,7 @@
       "ret1m": 47.15,
       "ret3m": 74.67,
       "pctFromHigh": 0.0,
-      "relVol": 1.08,
+      "relVol": 0.8,
       "score": 56.9,
       "scoreCoverage": 4
     },
@@ -2281,7 +2281,7 @@
       "ret1m": -8.54,
       "ret3m": -4.83,
       "pctFromHigh": -25.87,
-      "relVol": 0.96,
+      "relVol": 0.74,
       "score": 56.7,
       "scoreCoverage": 5
     },
@@ -2339,7 +2339,7 @@
       "ret1m": 1.08,
       "ret3m": 20.02,
       "pctFromHigh": -5.52,
-      "relVol": 1.47,
+      "relVol": 1.07,
       "score": 56.2,
       "scoreCoverage": 5
     },
@@ -2397,7 +2397,7 @@
       "ret1m": 0.74,
       "ret3m": -0.37,
       "pctFromHigh": -15.14,
-      "relVol": 1.21,
+      "relVol": 1.04,
       "score": 56.1,
       "scoreCoverage": 5
     },
@@ -2455,7 +2455,7 @@
       "ret1m": 6.82,
       "ret3m": 29.98,
       "pctFromHigh": -1.12,
-      "relVol": 1.03,
+      "relVol": 1.1,
       "score": 55.8,
       "scoreCoverage": 5
     },
@@ -2484,7 +2484,7 @@
       "ret1m": -3.8,
       "ret3m": -12.35,
       "pctFromHigh": -26.86,
-      "relVol": 0.7,
+      "relVol": 0.96,
       "score": 55.8,
       "scoreCoverage": 5
     },
@@ -2513,7 +2513,7 @@
       "ret1m": 2.41,
       "ret3m": -2.41,
       "pctFromHigh": -36.46,
-      "relVol": 1.38,
+      "relVol": 1.39,
       "score": 55.6,
       "scoreCoverage": 5
     },
@@ -2687,7 +2687,7 @@
       "ret1m": -4.71,
       "ret3m": -17.33,
       "pctFromHigh": -36.08,
-      "relVol": 1.03,
+      "relVol": 0.99,
       "score": 55.2,
       "scoreCoverage": 5
     },
@@ -2716,7 +2716,7 @@
       "ret1m": -2.1,
       "ret3m": -2.73,
       "pctFromHigh": -17.73,
-      "relVol": 1.12,
+      "relVol": 1.47,
       "score": 55.0,
       "scoreCoverage": 5
     },
@@ -2803,7 +2803,7 @@
       "ret1m": -6.19,
       "ret3m": 4.52,
       "pctFromHigh": -16.4,
-      "relVol": 1.02,
+      "relVol": 0.72,
       "score": 54.4,
       "scoreCoverage": 5
     },
@@ -2861,7 +2861,7 @@
       "ret1m": 5.96,
       "ret3m": 29.1,
       "pctFromHigh": -4.88,
-      "relVol": 1.46,
+      "relVol": 1.32,
       "score": 54.3,
       "scoreCoverage": 5
     },
@@ -2890,7 +2890,7 @@
       "ret1m": -6.02,
       "ret3m": -0.59,
       "pctFromHigh": -24.27,
-      "relVol": 1.37,
+      "relVol": 0.53,
       "score": 54.1,
       "scoreCoverage": 5
     },
@@ -3064,7 +3064,7 @@
       "ret1m": -9.61,
       "ret3m": -1.57,
       "pctFromHigh": -17.16,
-      "relVol": 1.19,
+      "relVol": 0.56,
       "score": 53.3,
       "scoreCoverage": 5
     },
@@ -3122,7 +3122,7 @@
       "ret1m": -10.39,
       "ret3m": 14.23,
       "pctFromHigh": -14.57,
-      "relVol": 1.03,
+      "relVol": 0.7,
       "score": 52.9,
       "scoreCoverage": 5
     },
@@ -3151,7 +3151,7 @@
       "ret1m": 4.08,
       "ret3m": 13.65,
       "pctFromHigh": -11.75,
-      "relVol": 1.4,
+      "relVol": 2.11,
       "score": 52.8,
       "scoreCoverage": 5
     },
@@ -3180,7 +3180,7 @@
       "ret1m": -6.45,
       "ret3m": -12.67,
       "pctFromHigh": -35.31,
-      "relVol": 0.89,
+      "relVol": 0.77,
       "score": 52.7,
       "scoreCoverage": 5
     },
@@ -3209,7 +3209,7 @@
       "ret1m": -9.71,
       "ret3m": -11.17,
       "pctFromHigh": -24.71,
-      "relVol": 0.77,
+      "relVol": 0.76,
       "score": 52.6,
       "scoreCoverage": 5
     },
@@ -3226,7 +3226,7 @@
       "volume": 238585,
       "marketCap": 49278689280,
       "pe": 46.68,
-      "pb": 9.8,
+      "pb": 9.23,
       "roe": 21.8,
       "debtToEquity": 35.86,
       "netMargin": 7.18,
@@ -3412,7 +3412,7 @@
       "ret1m": -2.55,
       "ret3m": 7.74,
       "pctFromHigh": -10.43,
-      "relVol": 1.03,
+      "relVol": 1.19,
       "score": 51.3,
       "scoreCoverage": 5
     },
@@ -3499,7 +3499,7 @@
       "ret1m": 1.42,
       "ret3m": 1.14,
       "pctFromHigh": -16.26,
-      "relVol": 1.17,
+      "relVol": 1.26,
       "score": 51.1,
       "scoreCoverage": 4
     },
@@ -3644,7 +3644,7 @@
       "ret1m": -0.28,
       "ret3m": 3.56,
       "pctFromHigh": -9.13,
-      "relVol": 1.14,
+      "relVol": 1.19,
       "score": 50.5,
       "scoreCoverage": 5
     },
@@ -3963,7 +3963,7 @@
       "ret1m": 9.89,
       "ret3m": 28.44,
       "pctFromHigh": -13.75,
-      "relVol": 0.57,
+      "relVol": 0.47,
       "score": 48.5,
       "scoreCoverage": 5
     },
@@ -3992,7 +3992,7 @@
       "ret1m": 2.75,
       "ret3m": 12.41,
       "pctFromHigh": -13.33,
-      "relVol": 1.0,
+      "relVol": 0.85,
       "score": 48.4,
       "scoreCoverage": 5
     },
@@ -4094,7 +4094,7 @@
       "prevClose": 230.7,
       "changePct": 0.44,
       "volume": 24599756,
-      "marketCap": 202874421248,
+      "marketCap": 202699915264,
       "pe": 79.63,
       "pb": 11.14,
       "roe": 16.03,
@@ -4166,7 +4166,7 @@
       "ret1m": 13.52,
       "ret3m": 11.68,
       "pctFromHigh": 0.0,
-      "relVol": 1.67,
+      "relVol": 2.52,
       "score": 47.2,
       "scoreCoverage": 5
     },
@@ -4195,7 +4195,7 @@
       "ret1m": -8.1,
       "ret3m": -8.4,
       "pctFromHigh": -30.5,
-      "relVol": 1.06,
+      "relVol": 0.61,
       "score": 47.2,
       "scoreCoverage": 4
     },
@@ -4311,7 +4311,7 @@
       "ret1m": -9.72,
       "ret3m": -27.23,
       "pctFromHigh": -40.76,
-      "relVol": 0.96,
+      "relVol": 0.94,
       "score": 46.6,
       "scoreCoverage": 4
     },
@@ -4340,7 +4340,7 @@
       "ret1m": 10.86,
       "ret3m": 8.4,
       "pctFromHigh": -17.85,
-      "relVol": 1.17,
+      "relVol": 1.06,
       "score": 46.5,
       "scoreCoverage": 5
     },
@@ -4456,7 +4456,7 @@
       "ret1m": 31.32,
       "ret3m": 35.28,
       "pctFromHigh": -1.39,
-      "relVol": 0.79,
+      "relVol": 1.84,
       "score": 44.8,
       "scoreCoverage": 5
     },
@@ -4572,7 +4572,7 @@
       "ret1m": -2.87,
       "ret3m": 30.66,
       "pctFromHigh": -14.47,
-      "relVol": 0.73,
+      "relVol": 0.63,
       "score": 44.2,
       "scoreCoverage": 5
     },
@@ -4601,7 +4601,7 @@
       "ret1m": -7.58,
       "ret3m": -1.68,
       "pctFromHigh": -34.6,
-      "relVol": 0.85,
+      "relVol": 0.51,
       "score": 44.0,
       "scoreCoverage": 5
     },
@@ -4717,7 +4717,7 @@
       "ret1m": 17.16,
       "ret3m": 17.16,
       "pctFromHigh": 0.0,
-      "relVol": 1.76,
+      "relVol": 1.2,
       "score": 43.3,
       "scoreCoverage": 5
     },
@@ -4732,7 +4732,7 @@
       "prevClose": 827.64,
       "changePct": 3.91,
       "volume": 4922443,
-      "marketCap": 192841416704,
+      "marketCap": 194581348352,
       "pe": 78.76,
       "pb": 176.23,
       "roe": 1787.97,
@@ -4775,7 +4775,7 @@
       "ret1m": -0.89,
       "ret3m": -2.67,
       "pctFromHigh": -12.38,
-      "relVol": 0.94,
+      "relVol": 1.16,
       "score": 43.0,
       "scoreCoverage": 5
     },
@@ -4804,7 +4804,7 @@
       "ret1m": -8.67,
       "ret3m": -8.15,
       "pctFromHigh": -29.4,
-      "relVol": 1.47,
+      "relVol": 0.95,
       "score": 42.4,
       "scoreCoverage": 5
     },
@@ -4833,7 +4833,7 @@
       "ret1m": -10.49,
       "ret3m": -20.5,
       "pctFromHigh": -41.08,
-      "relVol": 1.56,
+      "relVol": 1.92,
       "score": 42.4,
       "scoreCoverage": 4
     },
@@ -4920,7 +4920,7 @@
       "ret1m": 14.26,
       "ret3m": 19.05,
       "pctFromHigh": -2.13,
-      "relVol": 0.76,
+      "relVol": 0.87,
       "score": 41.2,
       "scoreCoverage": 5
     },
@@ -4949,7 +4949,7 @@
       "ret1m": -0.51,
       "ret3m": 25.21,
       "pctFromHigh": -10.45,
-      "relVol": 0.46,
+      "relVol": 0.68,
       "score": 41.1,
       "scoreCoverage": 5
     },
@@ -4978,7 +4978,7 @@
       "ret1m": -4.86,
       "ret3m": 1.51,
       "pctFromHigh": -16.96,
-      "relVol": 0.46,
+      "relVol": 0.71,
       "score": 40.9,
       "scoreCoverage": 2
     },
@@ -5007,7 +5007,7 @@
       "ret1m": -1.19,
       "ret3m": 1.65,
       "pctFromHigh": -24.48,
-      "relVol": 0.48,
+      "relVol": 0.67,
       "score": 40.9,
       "scoreCoverage": 4
     },
@@ -5094,7 +5094,7 @@
       "ret1m": -14.35,
       "ret3m": 5.54,
       "pctFromHigh": -28.27,
-      "relVol": 0.65,
+      "relVol": 0.64,
       "score": 39.9,
       "scoreCoverage": 5
     },
@@ -5123,7 +5123,7 @@
       "ret1m": -2.34,
       "ret3m": -8.84,
       "pctFromHigh": -17.72,
-      "relVol": 1.66,
+      "relVol": 1.06,
       "score": 39.8,
       "scoreCoverage": 5
     },
@@ -5210,7 +5210,7 @@
       "ret1m": -4.16,
       "ret3m": -15.55,
       "pctFromHigh": -43.27,
-      "relVol": 0.59,
+      "relVol": 0.64,
       "score": 38.6,
       "scoreCoverage": 5
     },
@@ -5239,7 +5239,7 @@
       "ret1m": 4.39,
       "ret3m": 0.46,
       "pctFromHigh": -26.28,
-      "relVol": 0.72,
+      "relVol": 0.64,
       "score": 38.1,
       "scoreCoverage": 4
     },
@@ -5268,7 +5268,7 @@
       "ret1m": 5.61,
       "ret3m": -8.96,
       "pctFromHigh": -30.56,
-      "relVol": 1.54,
+      "relVol": 0.42,
       "score": 37.9,
       "scoreCoverage": 5
     },
@@ -5471,7 +5471,7 @@
       "ret1m": -4.26,
       "ret3m": -10.51,
       "pctFromHigh": -32.24,
-      "relVol": 0.68,
+      "relVol": 0.63,
       "score": 36.0,
       "scoreCoverage": 5
     },
@@ -5500,7 +5500,7 @@
       "ret1m": -7.85,
       "ret3m": 35.06,
       "pctFromHigh": -15.48,
-      "relVol": 0.66,
+      "relVol": 0.67,
       "score": 35.4,
       "scoreCoverage": 5
     },
@@ -5558,7 +5558,7 @@
       "ret1m": 5.74,
       "ret3m": 39.13,
       "pctFromHigh": -2.04,
-      "relVol": 1.15,
+      "relVol": 1.25,
       "score": 34.9,
       "scoreCoverage": 5
     },
@@ -5645,7 +5645,7 @@
       "ret1m": -1.24,
       "ret3m": -2.67,
       "pctFromHigh": -32.39,
-      "relVol": 1.22,
+      "relVol": 0.98,
       "score": 34.6,
       "scoreCoverage": 5
     },
@@ -5761,7 +5761,7 @@
       "ret1m": -3.74,
       "ret3m": 9.96,
       "pctFromHigh": -16.43,
-      "relVol": 1.07,
+      "relVol": 1.04,
       "score": 33.4,
       "scoreCoverage": 5
     },
@@ -5819,7 +5819,7 @@
       "ret1m": 7.19,
       "ret3m": -15.78,
       "pctFromHigh": -25.77,
-      "relVol": 0.86,
+      "relVol": 0.9,
       "score": 33.0,
       "scoreCoverage": 5
     },
@@ -5877,7 +5877,7 @@
       "ret1m": -10.63,
       "ret3m": -7.24,
       "pctFromHigh": -36.41,
-      "relVol": 0.6,
+      "relVol": 0.31,
       "score": 30.9,
       "scoreCoverage": 4
     },
@@ -5906,7 +5906,7 @@
       "ret1m": -9.74,
       "ret3m": -13.81,
       "pctFromHigh": -34.33,
-      "relVol": 0.58,
+      "relVol": 0.4,
       "score": 30.7,
       "scoreCoverage": 4
     },
@@ -5964,7 +5964,7 @@
       "ret1m": -10.81,
       "ret3m": -6.85,
       "pctFromHigh": -56.0,
-      "relVol": 7.03,
+      "relVol": 0.0,
       "score": 30.0,
       "scoreCoverage": 4
     },
@@ -6080,7 +6080,7 @@
       "ret1m": -24.15,
       "ret3m": 23.29,
       "pctFromHigh": -26.73,
-      "relVol": 0.41,
+      "relVol": 0.52,
       "score": 28.8,
       "scoreCoverage": 5
     },
@@ -6109,7 +6109,7 @@
       "ret1m": 1.33,
       "ret3m": 28.86,
       "pctFromHigh": -16.1,
-      "relVol": 2.17,
+      "relVol": 1.11,
       "score": 28.5,
       "scoreCoverage": 5
     },
@@ -6370,7 +6370,7 @@
       "ret1m": -1.02,
       "ret3m": 3.36,
       "pctFromHigh": -35.32,
-      "relVol": 0.78,
+      "relVol": 9.5,
       "score": 24.0,
       "scoreCoverage": 5
     },
@@ -6457,7 +6457,7 @@
       "ret1m": -41.15,
       "ret3m": -46.95,
       "pctFromHigh": -89.2,
-      "relVol": 0.22,
+      "relVol": 0.19,
       "score": 23.6,
       "scoreCoverage": 4
     },
@@ -6486,7 +6486,7 @@
       "ret1m": -24.07,
       "ret3m": -15.83,
       "pctFromHigh": -36.91,
-      "relVol": 1.47,
+      "relVol": 0.52,
       "score": 22.8,
       "scoreCoverage": 4
     },
@@ -6660,7 +6660,7 @@
       "ret1m": -7.88,
       "ret3m": -27.35,
       "pctFromHigh": -39.21,
-      "relVol": 0.58,
+      "relVol": 0.5,
       "score": 18.8,
       "scoreCoverage": 5
     },
@@ -6689,7 +6689,7 @@
       "ret1m": -4.43,
       "ret3m": 69.75,
       "pctFromHigh": -15.19,
-      "relVol": 0.89,
+      "relVol": 0.66,
       "score": 17.0,
       "scoreCoverage": 5
     },
@@ -6747,7 +6747,7 @@
       "ret1m": -26.42,
       "ret3m": 4.35,
       "pctFromHigh": -37.47,
-      "relVol": 0.52,
+      "relVol": 0.63,
       "score": 16.5,
       "scoreCoverage": 4
     },
@@ -6776,7 +6776,7 @@
       "ret1m": -0.48,
       "ret3m": -6.27,
       "pctFromHigh": -36.35,
-      "relVol": 0.49,
+      "relVol": 0.48,
       "score": 10.6,
       "scoreCoverage": 5
     },
@@ -6805,7 +6805,7 @@
       "ret1m": -2.27,
       "ret3m": 1.52,
       "pctFromHigh": -20.01,
-      "relVol": 1.33,
+      "relVol": 12.4,
       "score": 6.2,
       "scoreCoverage": 4
     },
@@ -6834,7 +6834,7 @@
       "ret1m": -7.65,
       "ret3m": 18.24,
       "pctFromHigh": -23.41,
-      "relVol": 0.54,
+      "relVol": 0.64,
       "score": 5.9,
       "scoreCoverage": 4
     },
