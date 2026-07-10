@@ -238,6 +238,7 @@
     window.SUPA_ANON='sb_publishable_M-QnplymNuUQVcbHQr0_RQ_wLh2YFOp';
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
 
@@ -530,6 +531,22 @@
     <section class="view card" id="v-detail">
       <button class="back" id="detailBack">← geri</button>
       <div class="dhead" id="detailHead"></div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px">
+          <div class="seg" id="chTf">
+            <button data-tf="1G">1G</button><button data-tf="1H">1H</button><button class="on" data-tf="1A">1A</button><button data-tf="1Y">1Y</button><button data-tf="5Y">5Y</button>
+          </div>
+          <div class="seg" id="chType"><button class="on" data-ct="candle">Mum</button><button data-ct="line">Çizgi</button></div>
+          <div class="seg" id="chTool"><button class="on" data-tool="cursor">🖱 İmleç</button><button data-tool="trend">✏️ Trend</button><button data-tool="fib">φ Fib</button></div>
+          <button class="ghost" id="chUndo">↩ Son çizim</button>
+          <button class="ghost" id="chClear">Çizimleri temizle</button>
+        </div>
+        <div id="chBox" style="position:relative; height:360px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)">
+          <canvas id="chOv" style="position:absolute; inset:0; pointer-events:none; z-index:5"></canvas>
+          <div id="chMsg" class="empty" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:6; background:var(--surface)">grafik yükleniyor…</div>
+        </div>
+        <div class="hint" style="margin-top:8px">Sürükle: kaydır · tekerlek / iki parmak: zoom · <b>Trend</b>: iki noktaya tıkla · <b>Fib</b>: önce tepeye sonra dibe tıkla (ya da tersi) · <b>Esc</b>: yarım çizimi iptal · çizimler hisseye kaydedilir ve bulutla eşitlenir.</div>
+      </div>
       <div class="metrics" id="detailMetrics"></div>
       <button class="miniact" id="detailToSim" style="padding:10px 16px; margin-bottom:18px">Simülatöre gönder</button>
       <h3 style="font-size:16px; margin:0 0 8px">Bu hisse için notlarım</h3>
@@ -929,6 +946,17 @@ function commOf(m){ var c=costCfg().comm||{}; var v=parseFloat(c[m]); return isN
 function fillPx(m, side, px){ var sp=spreadPct()/100; return side==='buy' ? px*(1+sp) : px*(1-sp); }
 function pnlCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
 function chCls(v){ if(v==null) return 'na'; if(v>0) return 'up'; if(v<0) return 'down'; return 'neutral'; }
+/* detay kartları: renkli dönem getirisi + RSI bölge etiketi */
+function pchg(v,d){ d=(d==null?1:d); return v==null?'—':'<span class="'+chCls(v)+'">'+(v>0?'+':'')+fmt(v,d)+'%</span>'; }
+function rsiTag(r){
+  if(r==null) return '';
+  if(r>78) return ' <span class="cov down">çok aşırı alım</span>';
+  if(r>70) return ' <span class="cov down">aşırı alım</span>';
+  if(r>=55) return ' <span class="cov up">güçlü</span>';
+  if(r>=45) return ' <span class="cov">nötr</span>';
+  if(r>=30) return ' <span class="cov">zayıf</span>';
+  return ' <span class="cov up">aşırı satım</span>';
+}
 function find(sym){ for(var i=0;i<STOCKS.length;i++) if(STOCKS[i].symbol===sym) return STOCKS[i]; return null; }
 /* metrik kalite isareti: yesil=iyi, amber=orta, kirmizi=zayif */
 function qDot(metric,v){
@@ -1115,6 +1143,7 @@ S.botPos = S.botPos || {}; S.botCool = S.botCool || {}; S.botOn = S.botOn || {};
 if(S.botTP===undefined) S.botTP=2.5;
 if(!S.cost) S.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
 if(!S.cost.comm) S.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
+S.chartDrawings = S.chartDrawings || {};
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
 function ensureShape(st){
@@ -1129,6 +1158,7 @@ function ensureShape(st){
   if(st.botTP===undefined) st.botTP=2.5;
   if(!st.cost) st.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
   if(!st.cost.comm) st.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
+  st.chartDrawings = st.chartDrawings || {};
   return st;
 }
 function save(){ if(typeof scheduleSync==='function') scheduleSync(); }
@@ -1549,6 +1579,13 @@ function openStock(sym){
     ['Fiyat', s.price==null?'—':ccySym(s.market)+fmt(s.price)],
     ['Önceki Kapanış', s.prevClose==null?'—':ccySym(s.market)+fmt(s.prevClose)],
     ['Günlük %', s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%'],
+    ['RSI (14g)', s.rsi14==null?'—':fmt(s.rsi14,0)+rsiTag(s.rsi14)],
+    ['1 Hafta', pchg(s.ret1w)],
+    ['1 Ay', pchg(s.ret1m)],
+    ['3 Ay', pchg(s.ret3m)],
+    ['6 Ay', pchg(s.ret6m)],
+    ['1 Yıl', pchg(s.ret1y)],
+    ['5 Yıl', pchg(s.ret5y,0)],
     ['Hacim', fmtInt(s.volume)],
     ['Piyasa Değeri', s.marketCap==null?'—':shortNum(s.marketCap)],
     ['F/K', s.pe==null?'—':qDot('pe',s.pe)+fmt(s.pe)], ['P/D', s.pb==null?'—':qDot('pb',s.pb)+fmt(s.pb)],
@@ -1565,6 +1602,7 @@ function openStock(sym){
   ta.oninput=function(){ S.stockNotes[sym]=ta.value; save(); };
   $('detailToSim').onclick=function(){ selectInSim(sym); };
   goView('detail');
+  setTimeout(function(){ initDetailChart(sym); }, 0);
 }
 $('detailBack').onclick=function(){ goView(lastView); };
 
@@ -2062,6 +2100,174 @@ wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnM
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
 updateBotBtn();
 if(anyBot()){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
+
+/* ================= HİSSE DETAY GRAFİĞİ (lightweight-charts) =================
+   Veri: history.js (fetch_data.py v3 üretir) — i: 15m/5g gün içi, d: günlük ~1y, w: haftalık 5y.
+   Çizimler zaman+fiyat koordinatında saklanır → zoom/kaydırma/periyot değişiminde yerinde kalır,
+   S.chartDrawings[sembol] içinde tutulur → buluta eşitlenir. */
+var HIST=null, HIST_LOADING=false, HIST_ERR=false;
+var CH={chart:null,candle:null,line:null,sym:null,tf:'1A',type:'candle',tool:'cursor',pending:null,hover:null,note:''};
+function loadHistory(cb){
+  if(HIST){ cb(true); return; }
+  if(HIST_ERR){ cb(false); return; }
+  if(HIST_LOADING){ setTimeout(function(){loadHistory(cb);},300); return; }
+  HIST_LOADING=true;
+  var url='history.js'+(location.protocol.indexOf('http')===0?('?t='+Math.floor(Date.now()/600000)):'');
+  var s=document.createElement('script'); s.src=url; s.async=true;
+  s.onload=function(){ HIST=window.STOCK_HISTORY||null; HIST_LOADING=false; if(!HIST) HIST_ERR=true; cb(!!HIST); if(s.parentNode)s.parentNode.removeChild(s); };
+  s.onerror=function(){ HIST_LOADING=false; HIST_ERR=true; cb(false); if(s.parentNode)s.parentNode.removeChild(s); };
+  document.head.appendChild(s);
+}
+function chDrawings(){ if(!S.chartDrawings) S.chartDrawings={}; return S.chartDrawings[CH.sym]=(S.chartDrawings[CH.sym]||[]); }
+function chMsg(t){ var m=$('chMsg'); if(!m) return; if(t){ m.textContent=t; m.style.display='flex'; } else m.style.display='none'; }
+function tfBars(h, tf){
+  CH.note='';
+  if(tf==='1G'){
+    var i=h.i||[];
+    if(!i.length){ CH.note='gün içi veri yok — Actions yeni fetch_data.py ile çalışınca gelir'; return (h.d||[]).slice(-2); }
+    var day=Math.floor(i[i.length-1][0]/86400);
+    return i.filter(function(a){return Math.floor(a[0]/86400)===day;});
+  }
+  if(tf==='1H'){
+    var ii=h.i||[];
+    if(!ii.length){ CH.note='gün içi veri yok — günlük gösteriliyor'; return (h.d||[]).slice(-5); }
+    return ii;
+  }
+  if(tf==='1A') return (h.d||[]).slice(-22);
+  if(tf==='1Y') return (h.d||[]).slice(-260);
+  return (h.w&&h.w.length)?h.w:(h.d||[]);   // 5Y
+}
+function toCandles(arr){ return arr.map(function(a){return {time:a[0], open:a[1], high:a[2], low:a[3], close:a[4]};}); }
+function toLine(arr){ return arr.map(function(a){return {time:a[0], value:a[4]};}); }
+function activeSeries(){ return CH.type==='candle'?CH.candle:CH.line; }
+function ensureChart(){
+  if(CH.chart||!window.LightweightCharts) return !!CH.chart;
+  var el=$('chBox'); if(!el) return false;
+  CH.chart=LightweightCharts.createChart(el,{
+    width:el.clientWidth, height:el.clientHeight,
+    layout:{background:{color:'transparent'}, textColor:'#9aa6b2',
+      fontFamily:'"Plus Jakarta Sans",system-ui,sans-serif', fontSize:11},
+    grid:{vertLines:{color:'#f1f4f8'}, horzLines:{color:'#f1f4f8'}},
+    rightPriceScale:{borderColor:'#e9edf2'},
+    timeScale:{borderColor:'#e9edf2', timeVisible:true, secondsVisible:false},
+    crosshair:{mode:0}
+  });
+  CH.candle=CH.chart.addCandlestickSeries({upColor:'#10b981', downColor:'#f0556b',
+    wickUpColor:'#10b981', wickDownColor:'#f0556b', borderVisible:false});
+  CH.line=CH.chart.addLineSeries({color:'#0bbfa6', lineWidth:2, visible:false});
+  CH.chart.subscribeClick(function(p){
+    if(CH.tool==='cursor'||!p.point) return;
+    var ser=activeSeries();
+    var pr=ser.coordinateToPrice(p.point.y);
+    var t=(p.time!=null)?p.time:CH.chart.timeScale().coordinateToTime(p.point.x);
+    if(pr==null||t==null) return;
+    if(!CH.pending){ CH.pending={t:t,p:pr}; }
+    else { chDrawings().push({type:(CH.tool==='fib'?'fib':'trend'), a:CH.pending, b:{t:t,p:pr}}); CH.pending=null; CH.hover=null; save(); }
+    redrawOverlay();
+  });
+  CH.chart.subscribeCrosshairMove(function(p){
+    if(!CH.pending){ if(CH.hover){CH.hover=null; redrawOverlay();} return; }
+    if(!p.point) return;
+    var ser=activeSeries();
+    var pr=ser.coordinateToPrice(p.point.y);
+    var t=(p.time!=null)?p.time:CH.chart.timeScale().coordinateToTime(p.point.x);
+    if(pr==null||t==null) return;
+    CH.hover={t:t,p:pr}; redrawOverlay();
+  });
+  CH.chart.timeScale().subscribeVisibleLogicalRangeChange(function(){ redrawOverlay(); });
+  if(window.ResizeObserver){
+    new ResizeObserver(function(){
+      if(!CH.chart) return;
+      CH.chart.applyOptions({width:el.clientWidth, height:el.clientHeight});
+      redrawOverlay();
+    }).observe(el);
+  }
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&CH.pending){ CH.pending=null; CH.hover=null; redrawOverlay(); } });
+  return true;
+}
+function applyTF(){
+  if(!CH.chart||!HIST) return;
+  var h=HIST[CH.sym];
+  if(!h){ CH.candle.setData([]); CH.line.setData([]); chMsg('bu hisse için grafik verisi yok'); redrawOverlay(); return; }
+  var bars=tfBars(h, CH.tf)||[];
+  if(!bars.length){ CH.candle.setData([]); CH.line.setData([]); chMsg('bu periyot için veri yok'); redrawOverlay(); return; }
+  CH.candle.setData(toCandles(bars));
+  CH.line.setData(toLine(bars));
+  CH.chart.timeScale().fitContent();
+  chMsg(CH.note||'');
+  if(!CH.note) chMsg('');
+  redrawOverlay();
+}
+function redrawOverlay(){
+  var cv=$('chOv'), el=$('chBox');
+  if(!cv||!el||!CH.chart) return;
+  var w=el.clientWidth, hh=el.clientHeight, dpr=window.devicePixelRatio||1;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(hh*dpr)){
+    cv.width=Math.round(w*dpr); cv.height=Math.round(hh*dpr);
+    cv.style.width=w+'px'; cv.style.height=hh+'px';
+  }
+  var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,hh);
+  var ser=activeSeries(), ts=CH.chart.timeScale();
+  function xOf(t){ var x=ts.timeToCoordinate(t); return (x==null)?null:x; }
+  function yOf(p){ var y=ser.priceToCoordinate(p); return (y==null)?null:y; }
+  function drawOne(dw){
+    var xa=xOf(dw.a.t), xb=xOf(dw.b.t), ya=yOf(dw.a.p), yb=yOf(dw.b.p);
+    ctx.setLineDash(dw.preview?[5,4]:[]);
+    if(dw.type==='trend'){
+      if(xa==null||xb==null||ya==null||yb==null) return;
+      ctx.strokeStyle='#7c5cff'; ctx.lineWidth=1.6;
+      ctx.beginPath(); ctx.moveTo(xa,ya); ctx.lineTo(xb,yb); ctx.stroke();
+      ctx.fillStyle='#7c5cff';
+      [[xa,ya],[xb,yb]].forEach(function(pt){ ctx.beginPath(); ctx.arc(pt[0],pt[1],3,0,7); ctx.fill(); });
+    } else { // fib
+      var x0=(xa!=null&&xb!=null)?Math.min(xa,xb):0;
+      var LV=[0,0.236,0.382,0.5,0.618,0.786,1];
+      ctx.lineWidth=1; ctx.font='10px "Plus Jakarta Sans",sans-serif'; ctx.textBaseline='bottom';
+      LV.forEach(function(r){
+        var p=dw.a.p+(dw.b.p-dw.a.p)*r; var y=yOf(p); if(y==null) return;
+        var strong=(r===0||r===1||r===0.5);
+        ctx.strokeStyle=strong?'rgba(11,191,166,.85)':'rgba(11,191,166,.45)';
+        ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(w-58,y); ctx.stroke();
+        ctx.fillStyle='#5d6b7a';
+        ctx.fillText((r*100).toFixed(1).replace('.0','')+'%  '+fmt(p), x0+4, y-2);
+      });
+    }
+    ctx.setLineDash([]);
+  }
+  chDrawings().forEach(drawOne);
+  if(CH.pending&&CH.hover) drawOne({type:(CH.tool==='fib'?'fib':'trend'), a:CH.pending, b:CH.hover, preview:true});
+}
+function segWire(id, attr, cb){
+  var box=$(id); if(!box) return;
+  box.querySelectorAll('button').forEach(function(b){
+    b.onclick=function(){
+      box.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); cb(b.dataset[attr]);
+    };
+  });
+}
+segWire('chTf','tf',function(v){ CH.tf=v; CH.pending=null; applyTF(); });
+segWire('chType','ct',function(v){
+  CH.type=v;
+  if(CH.candle) CH.candle.applyOptions({visible:v==='candle'});
+  if(CH.line) CH.line.applyOptions({visible:v==='line'});
+  redrawOverlay();
+});
+segWire('chTool','tool',function(v){ CH.tool=v; CH.pending=null; CH.hover=null; redrawOverlay(); });
+(function(){
+  var u=$('chUndo'); if(u) u.onclick=function(){ var a=chDrawings(); if(a.length){ a.pop(); save(); redrawOverlay(); } };
+  var c=$('chClear'); if(c) c.onclick=function(){ if(chDrawings().length && confirm('Bu hissedeki tüm çizimler silinsin mi?')){ S.chartDrawings[CH.sym]=[]; save(); redrawOverlay(); } };
+})();
+function initDetailChart(sym){
+  CH.sym=sym; CH.pending=null; CH.hover=null;
+  chMsg('grafik yükleniyor…');
+  if(!window.LightweightCharts){ chMsg('grafik kütüphanesi yüklenemedi (internet/CDN engeli)'); return; }
+  loadHistory(function(okHist){
+    if(!okHist){ chMsg('history.js bulunamadı — fetch_data.py v3 ile Actions bir kez çalışmalı'); return; }
+    if(!ensureChart()){ chMsg('grafik başlatılamadı'); return; }
+    applyTF();
+  });
+}
 
 /* ================= SUPABASE BULUT SENKRON ================= */
 var SB=null, SB_USER=null, SB_REV=0, syncTimer=null, realtimeCh=null, suppressSync=false, sbInitTries=0;
