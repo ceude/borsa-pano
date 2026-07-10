@@ -1,387 +1,295 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-borsa-pano veri cekici
------------------------
-yfinance ile BIST + DAX hisselerinin fiyat, hacim ve temel oranlarini ceker,
-seffaf bir "parlaklik skoru" hesaplar ve panonun okudugu data.js dosyasini yazar.
+Borsa Pano — veri çekici (TAM SÜRÜM v3)
+======================================
+Üretilenler:
+  data.js     -> window.STOCK_DATA   : fiyat + temeller + teknikler (pano her 10 dk indirir)
+  history.js  -> window.STOCK_HISTORY: grafik serileri (15m/5g gün içi, günlük 1y, haftalık 5y)
 
-KULLANIM:
-    pip install yfinance
-    python fetch_data.py
+Yenilikler (v3):
+  - 5 yıllık günlük geçmiş (tek toplu istek, hızlı)
+  - ret1w / ret6m / ret1y / ret5y  (detay kartları)
+  - earningsGrowth / revenueGrowth (Orta/Uzun skorda büyüme metrikleri)
+  - history.js: hisse detayındaki etkileşimli grafik için OHLC serileri
 
-Gunde 1 kere elle calistir, sonra index.html'i tarayicida yenile.
-
-NOT: Skor bir DEGER/KALITE skorudur. "Ucuz ve saglam mi" sorusunu cevaplar,
-"yarin yukselir mi" sorusunu DEGIL. Kisa vadeli fiyat tahmini yapmaz.
+GitHub Actions notu: workflow'un commit adımına history.js'i de ekle
+(örn. `git add data.js history.js`).
 """
 
-import json
-import time
-import sys
-import os
-from datetime import datetime, timezone
+import json, math, time, datetime
+import yfinance as yf
+import pandas as pd
 
-try:
-    import yfinance as yf
-except ImportError:
-    print("HATA: yfinance kurulu degil. Kur: pip install yfinance")
-    sys.exit(1)
-
-HERE = os.path.dirname(os.path.abspath(__file__))
-
-# ---- Skor agirliklari (toplami onemli degil, oransal kullanilir) ----
-# Her metrik 0-1 arasi yuzdeliğe cevrilir (evren icinde siralama),
-# sonra agirlikli ortalama alinir -> 0-100 skor.
-WEIGHTS = {
-    "pe":     1.0,   # F/K  - dusuk daha iyi
-    "pb":     1.0,   # P/D  - dusuk daha iyi
-    "roe":    1.5,   # ozsermaye karliligi - yuksek daha iyi
-    "de":     1.0,   # borc/ozsermaye - dusuk daha iyi
-    "margin": 1.0,   # net kar marji - yuksek daha iyi
+# =====================================================================
+#  SEMBOL LİSTELERİ — KENDİ LİSTELERİNLE DEĞİŞTİR
+#  (mevcut fetch_data.py'ndaki listeleri aynen buraya yapıştır)
+# =====================================================================
+SYMBOLS = {
+    "DAX": [
+        "ADS.DE","AIR.DE","ALV.DE","BAS.DE","BAYN.DE","BEI.DE","BMW.DE","BNR.DE",
+        "CBK.DE","CON.DE","1COV.DE","DTG.DE","DBK.DE","DB1.DE","DHL.DE","DTE.DE",
+        "EOAN.DE","FRE.DE","HNR1.DE","HEI.DE","HEN3.DE","IFX.DE","MBG.DE","MRK.DE",
+        "MTX.DE","MUV2.DE","P911.DE","PAH3.DE","QIA.DE","RHM.DE","RWE.DE","SAP.DE",
+        "SRT3.DE","SIE.DE","ENR.DE","SHL.DE","SY1.DE","VNA.DE","VOW3.DE","ZAL.DE",
+    ],
+    "NASDAQ": [
+        "AAPL","MSFT","NVDA","AMZN","META","GOOGL","AVGO","TSLA","COST","NFLX",
+        "AMD","PEP","ADBE","CSCO","QCOM","TMUS","INTC","INTU","TXN","AMAT",
+        "CMCSA","HON","AMGN","BKNG","ISRG","SBUX","VRTX","GILD","ADI","MDLZ",
+        "ADP","PDD","REGN","LRCX","MU","PANW","SNPS","KLAC","CDNS","MELI",
+        "ASML","CRWD","ABNB","MAR","CSX","ORLY","NXPI","MRVL","FTNT","PYPL",
+        "WDAY","ROP","MNST","ADSK","DASH","AEP","KDP","PCAR","CHTR","PAYX",
+        "ROST","CPRT","ODFL","FAST","DDOG","EA","GEHC","KHC","EXC","CTAS",
+        "VRSK","XEL","AZN","LULU","CCEP","TTWO","IDXX","CSGP","ZS","TEAM",
+        "DXCM","MCHP","BIIB","ON","WBD","GFS","MDB","CEG","ARM","SMCI",
+    ],
+    "BIST": [
+        "THYAO.IS","ASELS.IS","AKBNK.IS","GARAN.IS","ISCTR.IS","YKBNK.IS","SISE.IS",
+        "EREGL.IS","KCHOL.IS","SAHOL.IS","TUPRS.IS","BIMAS.IS","FROTO.IS","TOASO.IS",
+        "TCELL.IS","TTKOM.IS","PGSUS.IS","EKGYO.IS","PETKM.IS","KRDMD.IS","ARCLK.IS",
+        "ENKAI.IS","HEKTS.IS","SASA.IS","KOZAL.IS","KOZAA.IS","GUBRF.IS","ALARK.IS",
+        "VESTL.IS","ODAS.IS",
+    ],
 }
 
-REQUEST_SLEEP = 0.4  # tickerlar arasi bekleme (saniye) - rate limit dostu
+BENCH = {"DAX": "^GDAXI", "NASDAQ": "^NDX", "BIST": "XU100.IS"}
 
+OUT_DATA    = "data.js"
+OUT_HISTORY = "history.js"
 
-def read_tickers(path, market):
-    out = []
-    if not os.path.exists(path):
-        print(f"UYARI: {path} bulunamadi, atlaniyor.")
-        return out
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            s = line.strip()
-            if not s or s.startswith("#"):
-                continue
-            out.append((s, market))
-    return out
-
-
-def safe(d, *keys):
-    """info sozlugunden ilk dolu degeri dondur."""
-    for k in keys:
-        v = d.get(k)
-        if v is not None and v != 0 and not (isinstance(v, float) and v != v):
-            return v
-    return None
-
-
-def compute_technicals(h):
-    """Gunluk geçmişten (1y) kisa-orta vade teknik gostergeleri hesapla."""
-    out = {"ma50": None, "ma200": None, "rsi14": None, "atrPct": None,
-           "ret1m": None, "ret3m": None, "pctFromHigh": None, "relVol": None}
+# =====================================================================
+#  yardımcılar
+# =====================================================================
+def r2(x, d=2):
     try:
-        closes = [float(x) for x in h["Close"].dropna().tolist()]
-        highs = [float(x) for x in h["High"].dropna().tolist()]
-        lows = [float(x) for x in h["Low"].dropna().tolist()]
-        vols = [float(x) for x in h["Volume"].dropna().tolist()]
+        if x is None: return None
+        f = float(x)
+        if math.isnan(f) or math.isinf(f): return None
+        return round(f, d)
     except Exception:
-        return out
-    n = len(closes)
-    if n < 2:
-        return out
-    price = closes[-1]
-    if n >= 50:
-        out["ma50"] = round(sum(closes[-50:]) / 50, 4)
-    if n >= 200:
-        out["ma200"] = round(sum(closes[-200:]) / 200, 4)
-    if n >= 22:
-        out["ret1m"] = round((price / closes[-22] - 1) * 100, 2)
-    if n >= 64:
-        out["ret3m"] = round((price / closes[-64] - 1) * 100, 2)
-    window = closes[-252:] if n >= 252 else closes
-    hi = max(window)
-    if hi > 0:
-        out["pctFromHigh"] = round((price / hi - 1) * 100, 2)
-    # RSI(14)
-    if n >= 15:
-        gains = losses = 0.0
-        for i in range(n - 14, n):
-            ch = closes[i] - closes[i - 1]
-            if ch >= 0:
-                gains += ch
-            else:
-                losses -= ch
-        ag, al = gains / 14, losses / 14
-        out["rsi14"] = 100.0 if al == 0 else round(100 - 100 / (1 + ag / al), 1)
-    # ATR(14) yuzde
-    if n >= 15 and len(highs) == n and len(lows) == n:
-        trs = []
-        for i in range(n - 14, n):
-            trs.append(max(highs[i] - lows[i],
-                           abs(highs[i] - closes[i - 1]),
-                           abs(lows[i] - closes[i - 1])))
-        atr = sum(trs) / len(trs)
-        if price > 0:
-            out["atrPct"] = round(atr / price * 100, 2)
-    # Bagil hacim (son gun / 20 gun ort)
-    if len(vols) >= 21:
-        avg20 = sum(vols[-21:-1]) / 20
-        if avg20 > 0:
-            out["relVol"] = round(vols[-1] / avg20, 2)
+        return None
+
+def px_round(x):
+    """Fiyat yuvarlama: küçük fiyatlarda daha çok hane (history.js boyutu için)."""
+    if x is None: return None
+    f = float(x)
+    if math.isnan(f) or math.isinf(f): return None
+    if f >= 1000: return round(f, 1)
+    if f >= 10:   return round(f, 2)
+    return round(f, 4)
+
+def rsi14(closes: pd.Series):
+    if closes is None or len(closes) < 20: return None
+    delta = closes.diff()
+    gain = delta.clip(lower=0.0)
+    loss = (-delta).clip(lower=0.0)
+    avg_g = gain.ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+    avg_l = loss.ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+    last_g, last_l = avg_g.iloc[-1], avg_l.iloc[-1]
+    if pd.isna(last_g) or pd.isna(last_l): return None
+    if last_l == 0: return 100.0
+    rs = last_g / last_l
+    return r2(100 - 100 / (1 + rs), 1)
+
+def atr_pct(df: pd.DataFrame, price):
+    if df is None or len(df) < 16 or not price: return None
+    h, l, c = df["High"], df["Low"], df["Close"]
+    pc = c.shift(1)
+    tr = pd.concat([(h - l), (h - pc).abs(), (l - pc).abs()], axis=1).max(axis=1)
+    atr = tr.rolling(14).mean().iloc[-1]
+    if pd.isna(atr): return None
+    return r2(atr / price * 100, 2)
+
+def ret_n(closes: pd.Series, n: int):
+    if closes is None or len(closes) <= n: return None
+    base = closes.iloc[-1 - n]
+    if not base or pd.isna(base) or base <= 0: return None
+    return r2((closes.iloc[-1] / base - 1) * 100, 2)
+
+def bars_from(df: pd.DataFrame):
+    """[t, o, h, l, c] listesi (t = unix saniye)."""
+    out = []
+    if df is None or df.empty: return out
+    for ts, row in df.iterrows():
+        o, h, l, c = row.get("Open"), row.get("High"), row.get("Low"), row.get("Close")
+        if pd.isna(o) or pd.isna(h) or pd.isna(l) or pd.isna(c): continue
+        t = int(ts.timestamp()) if hasattr(ts, "timestamp") else int(ts)
+        out.append([t, px_round(o), px_round(h), px_round(l), px_round(c)])
     return out
 
-
-def fetch_index_ret1m(sym):
-    """Endeksin 1 aylik (~22 gun) getirisi - bagil guc icin."""
+def sub_df(batch: pd.DataFrame, sym: str):
+    """yf.download group_by='ticker' çıktısından tek sembolün DataFrame'i."""
     try:
-        h = yf.Ticker(sym).history(period="3mo", interval="1d")
-        c = [float(x) for x in h["Close"].dropna().tolist()]
-        if len(c) >= 22:
-            return round((c[-1] / c[-22] - 1) * 100, 2)
-    except Exception as e:
-        print(f"  ! {sym} endeks hatasi: {e}")
-    return None
+        if isinstance(batch.columns, pd.MultiIndex):
+            df = batch[sym].dropna(how="all")
+        else:
+            df = batch.dropna(how="all")
+        return df if not df.empty else None
+    except Exception:
+        return None
 
-
-def fetch_one(symbol, market):
-    t = yf.Ticker(symbol)
-    info = {}
+def safe_info(tk):
     try:
-        info = t.info or {}
-    except Exception as e:
-        print(f"  ! {symbol} info hatasi: {e}")
+        info = tk.info or {}
+        return info if isinstance(info, dict) else {}
+    except Exception:
+        return {}
 
-    # Fiyat / onceki kapanis / hacim
-    price = safe(info, "currentPrice", "regularMarketPrice", "regularMarketPreviousClose")
-    prev = safe(info, "regularMarketPreviousClose", "previousClose")
-    volume = safe(info, "regularMarketVolume", "volume", "averageVolume")
+# =====================================================================
+#  1) toplu indirme — günlük 5y + gün içi 15m/5g
+# =====================================================================
+ALL = [s for lst in SYMBOLS.values() for s in lst]
+print(f"{len(ALL)} sembol · günlük 5y indiriliyor…")
+daily_batch = yf.download(ALL, period="5y", interval="1d",
+                          group_by="ticker", auto_adjust=True,
+                          threads=True, progress=False)
 
-    # fast_info yedek
-    if price is None or prev is None or volume is None:
+print("gün içi 15m/5g indiriliyor…")
+try:
+    intra_batch = yf.download(ALL, period="5d", interval="15m",
+                              group_by="ticker", auto_adjust=True,
+                              threads=True, progress=False)
+except Exception as e:
+    print("gün içi indirilemedi:", e)
+    intra_batch = None
+
+print("kurlar ve endeksler…")
+fx = yf.download(["EURTRY=X", "USDTRY=X"], period="5d", interval="1d",
+                 group_by="ticker", progress=False)
+bench_batch = yf.download(list(BENCH.values()), period="3mo", interval="1d",
+                          group_by="ticker", progress=False)
+
+def last_close(batch, sym):
+    df = sub_df(batch, sym)
+    if df is None or "Close" not in df: return None
+    s = df["Close"].dropna()
+    return float(s.iloc[-1]) if len(s) else None
+
+rates = {"EURTRY": r2(last_close(fx, "EURTRY=X"), 4),
+         "USDTRY": r2(last_close(fx, "USDTRY=X"), 4)}
+
+benchmarks = {}
+for mkt, idx in BENCH.items():
+    df = sub_df(bench_batch, idx)
+    c = df["Close"].dropna() if df is not None and "Close" in df else None
+    benchmarks[mkt] = ret_n(c, 21) if c is not None else None
+
+# =====================================================================
+#  2) sembol döngüsü
+# =====================================================================
+stocks, history, market_times = [], {}, {}
+
+for market, syms in SYMBOLS.items():
+    for sym in syms:
         try:
-            fi = t.fast_info
-            price = price or getattr(fi, "last_price", None)
-            prev = prev or getattr(fi, "previous_close", None)
-            volume = volume or getattr(fi, "last_volume", None)
-        except Exception:
-            pass
+            d = sub_df(daily_batch, sym)
+            if d is None or "Close" not in d or len(d["Close"].dropna()) < 5:
+                print(f"  atlandı (günlük veri yok): {sym}")
+                continue
+            d = d.dropna(subset=["Close"])
+            closes = d["Close"]
 
-    # history yedek (degisim icin)
-    if price is None or prev is None:
-        try:
-            h = t.history(period="5d")
-            if len(h) >= 1:
-                price = price or float(h["Close"].iloc[-1])
-            if len(h) >= 2:
-                prev = prev or float(h["Close"].iloc[-2])
-        except Exception:
-            pass
+            tk = yf.Ticker(sym)
+            info = safe_info(tk)
 
-    # 1 yillik gecmis -> teknik gostergeler (ayni veriyle fiyat/hacim yedegi)
-    tech = {"ma50": None, "ma200": None, "rsi14": None, "atrPct": None,
-            "ret1m": None, "ret3m": None, "pctFromHigh": None, "relVol": None}
-    try:
-        h1 = t.history(period="1y", interval="1d")
-        if len(h1) > 0:
-            tech = compute_technicals(h1)
-            if price is None:
-                price = float(h1["Close"].iloc[-1])
-            if prev is None and len(h1) >= 2:
-                prev = float(h1["Close"].iloc[-2])
-            if volume is None:
-                volume = float(h1["Volume"].iloc[-1])
-    except Exception as e:
-        print(f"  ! {symbol} teknik hatasi: {e}")
+            # --- fiyat / önceki kapanış / hacim (info -> fallback geçmiş) ---
+            price = info.get("currentPrice") or info.get("regularMarketPrice")
+            if not price: price = float(closes.iloc[-1])
+            prev = info.get("regularMarketPreviousClose") or info.get("previousClose")
+            if not prev and len(closes) >= 2: prev = float(closes.iloc[-2])
+            volume = info.get("regularMarketVolume") or info.get("volume")
+            if not volume and "Volume" in d:
+                v = d["Volume"].dropna()
+                volume = int(v.iloc[-1]) if len(v) else None
+            change = r2((price / prev - 1) * 100, 2) if (price and prev) else None
 
-    change_pct = None
-    if price is not None and prev:
-        change_pct = (price - prev) / prev * 100.0
+            # --- teknikler (günlük 5y serisinin kuyruğundan) ---
+            ma50  = r2(closes.tail(50).mean(), 4)  if len(closes) >= 50  else None
+            ma200 = r2(closes.tail(200).mean(), 4) if len(closes) >= 200 else None
+            rel_vol = None
+            if "Volume" in d:
+                v = d["Volume"].dropna()
+                if len(v) >= 21:
+                    base = v.iloc[-21:-1].mean()
+                    if base and base > 0:
+                        rel_vol = r2(float(v.iloc[-1]) / base, 2)
+            high52 = closes.tail(252).max() if len(closes) else None
+            pct_from_high = r2((price / high52 - 1) * 100, 2) if (price and high52) else None
 
-    # Temel oranlar
-    pe = safe(info, "trailingPE", "forwardPE")
-    pb = safe(info, "priceToBook")
-    roe = safe(info, "returnOnEquity")          # 0.18 = %18
-    de = safe(info, "debtToEquity")             # 50 = %50
-    margin = safe(info, "profitMargins")        # 0.12 = %12
-    net_income = safe(info, "netIncomeToCommon")
-    mcap = safe(info, "marketCap")
-    name = info.get("shortName") or info.get("longName") or symbol
-    sector = info.get("sector") or info.get("industry") or "-"
-    currency = info.get("currency") or ("TRY" if market == "BIST" else "USD" if market == "NASDAQ" else "EUR")
-    mkt_time = info.get("regularMarketTime")  # son fiyat zamani (epoch saniye) veya None
+            rec = {
+                "symbol": sym, "market": market,
+                "name": info.get("shortName") or info.get("longName") or sym,
+                "sector": info.get("sector"),
+                "currency": info.get("currency") or ("TRY" if market == "BIST" else "USD" if market == "NASDAQ" else "EUR"),
+                "price": r2(price, 4), "prevClose": r2(prev, 4),
+                "changePct": change, "volume": volume,
+                "marketCap": info.get("marketCap"),
+                # temeller
+                "pe": r2(info.get("trailingPE")),
+                "pb": r2(info.get("priceToBook")),
+                "roe": r2((info.get("returnOnEquity") or 0) * 100) if info.get("returnOnEquity") is not None else None,
+                "debtToEquity": r2(info.get("debtToEquity")),
+                "netMargin": r2((info.get("profitMargins") or 0) * 100) if info.get("profitMargins") is not None else None,
+                "netIncome": info.get("netIncomeToCommon"),
+                "earningsGrowth": r2((info.get("earningsGrowth") or 0) * 100) if info.get("earningsGrowth") is not None else None,
+                "revenueGrowth": r2((info.get("revenueGrowth") or 0) * 100) if info.get("revenueGrowth") is not None else None,
+                # teknikler
+                "ma50": ma50, "ma200": ma200,
+                "atrPct": atr_pct(d, price), "relVol": rel_vol,
+                "rsi14": rsi14(closes), "pctFromHigh": pct_from_high,
+                # dönem getirileri
+                "ret1w": ret_n(closes, 5),
+                "ret1m": ret_n(closes, 21),
+                "ret3m": ret_n(closes, 63),
+                "ret6m": ret_n(closes, 126),
+                "ret1y": ret_n(closes, 252),
+                "ret5y": ret_n(closes, len(closes) - 1) if len(closes) >= 750 else None,
+            }
+            stocks.append(rec)
 
-    return {
-        "symbol": symbol,
-        "market": market,
-        "name": name,
-        "sector": sector,
-        "currency": currency,
-        "priceTime": int(mkt_time) if mkt_time else None,
-        "price": round(price, 4) if price is not None else None,
-        "prevClose": round(prev, 4) if prev is not None else None,
-        "changePct": round(change_pct, 2) if change_pct is not None else None,
-        "volume": int(volume) if volume is not None else None,
-        "marketCap": int(mcap) if mcap is not None else None,
-        "pe": round(pe, 2) if pe is not None else None,
-        "pb": round(pb, 2) if pb is not None else None,
-        "roe": round(roe * 100, 2) if roe is not None else None,      # yuzde
-        "debtToEquity": round(de, 2) if de is not None else None,
-        "netMargin": round(margin * 100, 2) if margin is not None else None,  # yuzde
-        "netIncome": int(net_income) if net_income is not None else None,
-        # --- teknik (kisa-orta vade) ---
-        "ma50": tech["ma50"], "ma200": tech["ma200"],
-        "rsi14": tech["rsi14"], "atrPct": tech["atrPct"],
-        "ret1m": tech["ret1m"], "ret3m": tech["ret3m"],
-        "pctFromHigh": tech["pctFromHigh"], "relVol": tech["relVol"],
-    }
+            # --- grafik serileri ---
+            entry = {}
+            entry["d"] = bars_from(d.tail(260))                       # günlük ~1 yıl
+            w = d.resample("W-FRI").agg({"Open": "first", "High": "max",
+                                         "Low": "min", "Close": "last"}).dropna()
+            entry["w"] = bars_from(w)                                 # haftalık 5 yıl
+            if intra_batch is not None:
+                di = sub_df(intra_batch, sym)
+                entry["i"] = bars_from(di) if di is not None else []  # 15m / 5 gün
+            else:
+                entry["i"] = []
+            history[sym] = entry
 
-
-def percentile_rank(values):
-    """Liste icindeki her degerin yuzdelik sirasini dondur (0-1).
-    None degerler None kalir. Ayni degerler ortalama sira alir."""
-    idx = [i for i, v in enumerate(values) if v is not None]
-    if not idx:
-        return [None] * len(values)
-    ordered = sorted(idx, key=lambda i: values[i])
-    ranks = [None] * len(values)
-    n = len(ordered)
-    # yuzdelik: en kucuk -> 0, en buyuk -> 1
-    for pos, i in enumerate(ordered):
-        ranks[i] = pos / (n - 1) if n > 1 else 0.5
-    return ranks
-
-
-def compute_scores(rows):
-    # Skoru HER PIYASA KENDI ICINDE yuzdelik sirala (BIST ve DAX farkli
-    # valuasyon rejimleri; birlikte siralarsak BIST hep "ucuz" cikar).
-    groups = {}
-    for r in rows:
-        groups.setdefault(r.get("market"), []).append(r)
-    for grp in groups.values():
-        _score_group(grp)
-
-
-def _score_group(rows):
-    pe = [r["pe"] if (r["pe"] is not None and r["pe"] > 0) else None for r in rows]
-    pb = [r["pb"] if (r["pb"] is not None and r["pb"] > 0) else None for r in rows]
-    roe = [r["roe"] for r in rows]
-    de = [r["debtToEquity"] if (r["debtToEquity"] is not None and r["debtToEquity"] >= 0) else None for r in rows]
-    margin = [r["netMargin"] for r in rows]
-
-    # yuzdelikler
-    pe_r = percentile_rank(pe)      # dusuk iyi -> sonra ters cevir
-    pb_r = percentile_rank(pb)      # dusuk iyi -> ters
-    roe_r = percentile_rank(roe)    # yuksek iyi
-    de_r = percentile_rank(de)      # dusuk iyi -> ters
-    margin_r = percentile_rank(margin)  # yuksek iyi
-
-    for i, r in enumerate(rows):
-        components = {
-            "pe": (1 - pe_r[i]) if pe_r[i] is not None else None,
-            "pb": (1 - pb_r[i]) if pb_r[i] is not None else None,
-            "roe": roe_r[i],
-            "de": (1 - de_r[i]) if de_r[i] is not None else None,
-            "margin": margin_r[i],
-        }
-        wsum, vsum = 0.0, 0.0
-        for k, v in components.items():
-            if v is not None:
-                wsum += WEIGHTS[k]
-                vsum += WEIGHTS[k] * v
-        score = round((vsum / wsum) * 100, 1) if wsum > 0 else None
-        r["score"] = score
-        # kac metrikten hesaplandi (guvenilirlik gostergesi)
-        r["scoreCoverage"] = sum(1 for v in components.values() if v is not None)
-
-
-def fetch_rate(pair):
-    """pair orn 'EURTRY=X' -> guncel kur (float) veya None."""
-    try:
-        t = yf.Ticker(pair)
-        try:
-            v = t.fast_info.last_price
-            if v: return round(float(v), 4)
-        except Exception:
-            pass
-        info = t.info or {}
-        v = safe(info, "regularMarketPrice", "previousClose")
-        if v: return round(float(v), 4)
-        h = t.history(period="5d")
-        if len(h):
-            return round(float(h["Close"].iloc[-1]), 4)
-    except Exception as e:
-        print(f"  ! {pair} kur hatasi: {e}")
-    return None
-
-
-def main():
-    tickers = []
-    tickers += read_tickers(os.path.join(HERE, "bist_tickers.txt"), "BIST")
-    tickers += read_tickers(os.path.join(HERE, "dax_tickers.txt"), "DAX")
-    tickers += read_tickers(os.path.join(HERE, "nasdaq_tickers.txt"), "NASDAQ")
-
-    if not tickers:
-        print("HATA: hic ticker bulunamadi.")
-        sys.exit(1)
-
-    print(f"{len(tickers)} hisse cekilecek...\n")
-    rows = []
-    for n, (sym, market) in enumerate(tickers, 1):
-        print(f"[{n}/{len(tickers)}] {sym} ({market})")
-        try:
-            rows.append(fetch_one(sym, market))
+            if entry["i"]:
+                t = entry["i"][-1][0]
+                market_times[market] = max(market_times.get(market, 0), t)
         except Exception as e:
-            print(f"  ! {sym} basarisiz: {e}")
-        time.sleep(REQUEST_SLEEP)
+            print(f"  hata {sym}: {e}")
+        time.sleep(0.05)  # nazik ol
 
-    compute_scores(rows)
+# marketTimes yedek: gün içi yoksa günlük son bar
+for market, syms in SYMBOLS.items():
+    if market not in market_times:
+        for sym in syms:
+            if sym in history and history[sym]["d"]:
+                market_times[market] = history[sym]["d"][-1][0]
+                break
 
-    # skora gore sirala (None'lar sona)
-    rows.sort(key=lambda r: (r["score"] is None, -(r["score"] or 0)))
+# =====================================================================
+#  3) çıktılar
+# =====================================================================
+data = {
+    "updatedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    "rates": rates,
+    "benchmarks": benchmarks,
+    "marketTimes": market_times,
+    "stocks": stocks,
+}
+with open(OUT_DATA, "w", encoding="utf-8") as f:
+    f.write("window.STOCK_DATA=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";")
 
-    print("\nKurlar cekiliyor (EUR/TRY, USD/TRY)...")
-    rates = {
-        "EURTRY": fetch_rate("EURTRY=X"),
-        "USDTRY": fetch_rate("USDTRY=X"),
-    }
-    print(f"  EUR/TRY={rates['EURTRY']}  USD/TRY={rates['USDTRY']}")
+with open(OUT_HISTORY, "w", encoding="utf-8") as f:
+    f.write("window.STOCK_HISTORY=" + json.dumps(history, ensure_ascii=False, separators=(",", ":")) + ";")
 
-    print("Endeks getirileri cekiliyor (DAX, BIST)...")
-    benchmarks = {
-        "DAX": fetch_index_ret1m("^GDAXI"),
-        "BIST": fetch_index_ret1m("XU100.IS"),
-        "NASDAQ": fetch_index_ret1m("^NDX"),
-    }
-    print(f"  DAX 1A={benchmarks['DAX']}  BIST 1A={benchmarks['BIST']}  NASDAQ 1A={benchmarks['NASDAQ']}")
-
-    # Piyasa basina en son veri zamani (epoch) = o piyasadaki hisselerin en yeni priceTime'i
-    market_times = {}
-    for r in rows:
-        pt = r.get("priceTime")
-        if pt:
-            m = r["market"]
-            if market_times.get(m) is None or pt > market_times[m]:
-                market_times[m] = pt
-    print(f"  Son veri zamanlari (epoch): {market_times}")
-
-    payload = {
-        "updatedAt": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
-        "count": len(rows),
-        "weights": WEIGHTS,
-        "rates": rates,
-        "benchmarks": benchmarks,
-        "marketTimes": market_times,
-        "stocks": rows,
-    }
-
-    # 1) data.js  -> index.html bunu <script> ile okur (CORS yok, cift tikla calisir)
-    js_path = os.path.join(HERE, "data.js")
-    with open(js_path, "w", encoding="utf-8") as f:
-        f.write("window.STOCK_DATA = ")
-        json.dump(payload, f, ensure_ascii=False, indent=2)
-        f.write(";\n")
-
-    # 2) data.json -> ileride lazim olursa
-    with open(os.path.join(HERE, "data.json"), "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
-
-    ok = sum(1 for r in rows if r["price"] is not None)
-    print(f"\nBitti. {ok}/{len(rows)} hissede fiyat var.")
-    print(f"Yazildi: {js_path}")
-    print("Simdi index.html'i tarayicida yenile.")
-
-
-if __name__ == "__main__":
-    main()
+import os
+print(f"tamam: {len(stocks)} hisse · data.js {os.path.getsize(OUT_DATA)//1024} KB · history.js {os.path.getsize(OUT_HISTORY)//1024} KB")
