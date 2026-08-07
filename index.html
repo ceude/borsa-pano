@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Borsa Pano</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='42' fill='%230bbfa6'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='50' r='34' fill='%230bbfa6'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="dx.png">
+<link rel="icon" href="dx.ico" sizes="any">
+<link rel="apple-touch-icon" href="dx.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -40,6 +41,15 @@
   .tphelp{font-size:11px; color:var(--faint); margin-top:4px; line-height:1.45}
   .botbar{background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:14px 0}
   .bottag{font-size:11px; color:var(--brand); background:rgba(124,92,255,.12); border-radius:6px; padding:1px 6px; margin-left:4px}
+  .csvbtn{font-size:12px; padding:3px 9px; margin-left:8px; cursor:pointer; border:1px solid var(--line); background:var(--bg); border-radius:8px; color:var(--ink); font-weight:600; vertical-align:middle}
+  .summ-fixed{position:fixed; top:150px; right:20px; width:250px; z-index:30; background:var(--surface);
+    border:1px solid var(--line); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow); display:none}
+  .summ-fixed.show{display:block}
+  .summ-fixed h4{margin:0 0 8px; font-size:13px}
+  .summ-fixed .row{display:flex; justify-content:space-between; font-size:12.5px; padding:2px 0}
+  .summ-fixed .sec{display:flex; justify-content:space-between; font-size:12px; padding:2px 0}
+  .summ-fixed .lbl{color:var(--faint); font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; margin:9px 0 3px}
+  @media(max-width:1740px){ .summ-fixed.show{display:none} }
   .docov{position:fixed; inset:0; background:rgba(15,18,28,.55); display:none; z-index:200; padding:20px; overflow:auto}
   .docov.open{display:block}
   .doccard{background:var(--surface); border:1px solid var(--line); border-radius:16px; max-width:820px; margin:0 auto; padding:24px 28px; box-shadow:0 24px 70px rgba(0,0,0,.28)}
@@ -166,6 +176,7 @@
     font-family:"Plus Jakarta Sans"; vertical-align:middle}
   .b-bist{background:var(--brand-bg); color:var(--bist)}
   .b-dax{background:#e8f0fe; color:var(--dax)}
+  .b-nasdaq{background:#e6f1ff; color:#0a84ff}
   .scorebar{display:inline-flex; align-items:center; gap:8px; justify-content:flex-end}
   .bar{width:60px; height:7px; background:var(--line); border-radius:5px; overflow:hidden}
   .bar i{display:block; height:100%; background:linear-gradient(90deg,#7be0c8,var(--brand))}
@@ -286,6 +297,7 @@
 
 <!-- APP -->
 <div id="app" style="display:none">
+  <div id="mktSummary" class="summ-fixed"></div>
   <a class="adbanner" id="adBanner" target="_blank" rel="noopener">
     <img id="adLogo" alt="SprachSnack">
     <div class="adt">
@@ -321,6 +333,7 @@
     <button class="tab" data-v="all">Tüm Liste</button>
     <button class="tab" data-v="movers">En Çok Artan/Azalan</button>
     <button class="tab" data-v="sim">Simülatör</button>
+    <button class="tab" data-v="backtest">Geçmişte Test</button>
     <button class="tab" data-v="real">Gerçek Portföy</button>
     <button class="tab" data-v="notes">Notlar</button>
   </nav>
@@ -464,7 +477,7 @@
             </div>
           </div>
           <div class="scroll" id="simHold"></div>
-          <h3 style="font-size:16px; margin:20px 0 8px">İşlem Geçmişi <span class="cov" id="simLogCount" style="font-weight:400"></span></h3>
+          <h3 style="font-size:16px; margin:20px 0 8px">İşlem Geçmişi <span class="cov" id="simLogCount" style="font-weight:400"></span> <button class="csvbtn" id="simCsvBtn">⤓ CSV</button></h3>
           <div class="log scroll" id="simLog" style="max-height:230px"></div>
         </div>
       </div>
@@ -473,6 +486,47 @@
         <button class="ghost" id="simSaveDay">Günü grafiğe kaydet</button>
       </div>
       <div id="simChart"></div>
+    </section>
+
+    <section class="view card" id="v-backtest">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap">
+        <button class="ghost" id="docBtnBT">📄 Bu sayfa nasıl çalışır?</button>
+      </div>
+      <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
+        <b>Önce oku.</b> Bu test <b>günlük</b> mumlarla ve <b>şu anki endeks üyeleri</b> üzerinde çalışır → <b>hayatta kalma yanlılığı</b> vardır (endeksten düşmüş hisseler listede yok, sonuç olduğundan iyi çıkar). Temettü, vergi, gün içi doluluk ve piyasa etkisi hesaba katılmaz. Ayarları en iyi sonucu verene göre seçmek <b>aşırı uydurma</b>dır — geçmişe uydurulan ayar gelecekte çalışmaz. Geçmiş performans geleceği <b>garanti etmez</b>. Yatırım tavsiyesi değildir.
+      </div>
+      <div class="simgrid">
+        <div class="trade">
+          <h3>Test ayarları</h3>
+          <div class="lead">Seçili piyasada (<b id="btMkt"></b>) geçmiş günlük verilerle şeffaf bir trend stratejisini çalıştırır.</div>
+          <div class="tpfield"><label>Dönem (kaç işlem günü geriye)</label>
+            <input class="fld" id="btPeriod" type="number" value="250" min="60" step="10">
+            <div class="tphelp">250 ≈ 1 yıl. history.js'te ne kadar veri varsa o kadarı kullanılır.</div></div>
+          <div class="tpfield"><label>Başlangıç sermayesi</label>
+            <input class="fld" id="btCash" type="number" value="10000" step="1000"></div>
+          <div class="tpfield"><label>İşlem başına risk (%)</label>
+            <input class="fld" id="btRisk" type="number" value="1" step="0.1"></div>
+          <div class="tpfield"><label>Hareketli ortalama (gün)</label>
+            <input class="fld" id="btMa" type="number" value="50" step="5">
+            <div class="tphelp">Giriş sinyali: kapanış bu ortalamayı <b>yukarı keserse</b> al.</div></div>
+          <div class="tpfield"><label>Stop genişliği (ATR çarpanı)</label>
+            <input class="fld" id="btAtr" type="number" value="1.5" step="0.1"></div>
+          <div class="tpfield"><label>Kâr hedefi (R katı)</label>
+            <input class="fld" id="btTargetR" type="number" value="2" step="0.5"></div>
+          <div class="tpfield"><label>En fazla eşzamanlı pozisyon</label>
+            <input class="fld" id="btMaxPos" type="number" value="5" min="1" step="1"></div>
+          <label class="hint" style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+            <input type="checkbox" id="btCosts" checked> spread + komisyonu uygula (Simülatördeki ayarlar)</label>
+          <button class="go buy" id="btRun" style="width:100%">Testi çalıştır</button>
+        </div>
+        <div>
+          <div id="btStats"><div class="empty">Ayarları gir ve "Testi çalıştır"a bas.</div></div>
+          <h3 style="font-size:16px; margin:18px 0 8px">Özkaynak eğrisi</h3>
+          <div id="btChart"></div>
+          <h3 style="font-size:16px; margin:18px 0 8px">İşlemler</h3>
+          <div class="log scroll" id="btLog" style="max-height:260px"></div>
+        </div>
+      </div>
     </section>
 
     <section class="view card" id="v-real">
@@ -511,7 +565,7 @@
             </div>
           </div>
           <div class="scroll" id="realHold"></div>
-          <h3 style="font-size:16px; margin:20px 0 8px">İşlem Geçmişi</h3>
+          <h3 style="font-size:16px; margin:20px 0 8px">İşlem Geçmişi <button class="csvbtn" id="realCsvBtn">⤓ CSV</button></h3>
           <div class="log scroll" id="realLog" style="max-height:230px"></div>
         </div>
       </div>
@@ -724,7 +778,7 @@
       <p>Bu sayfa <b>swing / kısa-orta vade</b> (birkaç gün–hafta) için aday üretir: yükselen trendde, piyasayı yenen, sağlıklı momentumlu hisseleri bir "Kısa Vade Skor"u ile sıralar. Aşağıda filtre, skor ve her sütun açıklanıyor.</p>
       <div class="warn"><b>Önce oku:</b> Bu bir <b>aday/araştırma listesidir</b>, "al" listesi değil. Veri ~15 dk gecikmeli ve günlüktür → gerçek <b>gün içi</b> işleme uygun değildir. Momentum stratejilerinin sert düşüş dönemleri olur. Yatırım tavsiyesi değildir; önce Simülatörde test et.</div>
 
-      <h2>1. Veri & gecikme & güncelleme</h2>
+      <h2>1. Veri &amp; gecikme &amp; güncelleme</h2>
       <ul>
         <li>Kaynak: Yahoo Finance (<code>yfinance</code>). Fiyat ~<b>15 dk gecikmeli</b> (BIST/DAX/NASDAQ hepsi).</li>
         <li>Güncelleme: cron-job.org her ~15 dk → <code>fetch_data.py</code> → <code>data.js</code>; tarayıcı 10 dk'da bir indirir.</li>
@@ -753,8 +807,8 @@
         <tr><td>RSI</td><td>55–70 → 100 · 70–78 → 60 · &gt;78 → 25 · 45–55 → 65 · 40–45 → 45 · &lt;40 → 20</td></tr>
         <tr><td>Volatilite (ATR%)</td><td>%1.5–4 → 100 · %1–1.5 → 70 · %4–6 → 55 · &lt;%1 → 25 · &gt;%6 → 30</td></tr>
         <tr><td>Zirveye yakınlık</td><td><code>((zirveye_uzaklık% + 30)/30)×100</code>, 0–100'e kırp. Zirvede (0%) → 100 · −%30 → 0</td></tr>
-        <tr><td><b>Uzama (yeni)</b></td><td>fiyat MA50'nin %0–8 üstünde → 100 (pullback/taban bölgesi, sağlıklı giriş) · %8–15 → 60 · &gt;%15 → 60'tan hızla düşer (alt sınır 10) · MA50 altı → 20</td></tr>
-        <tr><td><b>3A teyidi (yeni)</b></td><td><code>r3</code> = 3 aylık getiri. r3≤0: <code>50+2·r3</code> (0–50) · r3&gt;0: <code>50+(r3/25)×50</code> (50–100, +%25'te tavan). Orta vade momentum da aynı yönde mi diye bakar.</td></tr>
+        <tr><td><b>Uzama</b></td><td>fiyat MA50'nin %0–8 üstünde → 100 (pullback/taban bölgesi, sağlıklı giriş) · %8–15 → 60 · &gt;%15 → 60'tan hızla düşer (alt sınır 10) · MA50 altı → 20</td></tr>
+        <tr><td><b>3A teyidi</b></td><td><code>r3</code> = 3 aylık getiri. r3≤0: <code>50+2·r3</code> (0–50) · r3&gt;0: <code>50+(r3/25)×50</code> (50–100, +%25'te tavan). Orta vade momentum da aynı yönde mi diye bakar.</td></tr>
         <tr><td>Değer/kalite</td><td>Orta/Uzun Vade skorunu (0–100) aynen kullanır; yoksa düşülür</td></tr>
       </table>
 
@@ -812,7 +866,7 @@ Skor = 799.1 / 8.9 ≈ 90</pre>
       <p>Bu sayfa bir <b>değer/kalite taramasıdır</b>: "hisse ucuz ve şirket sağlam mı?" sorusunu, temel oranları birleştiren 0–100 bir skorla yanıtlar. <b>"Yükselir mi"yi ölçmez</b> — ucuzluğu ve bilanço sağlamlığını ölçer. v2'den itibaren skor <b>tarayıcıda</b> hesaplanır (data.js'teki sunucu skoru geçersiz kılınır), böylece kurallar bu dokümanla her zaman birebir aynıdır.</p>
       <div class="warn"><b>Önce oku:</b> Bu bir araştırma/tarama aracıdır, "al" listesi değil. Temel oranlar gecikmeli/eksik olabilir. Yatırım tavsiyesi değildir.</div>
 
-      <h2>1. Veri & güncelleme</h2>
+      <h2>1. Veri &amp; güncelleme</h2>
       <ul>
         <li>Kaynak: Yahoo Finance (<code>yfinance</code>). Fiyat ve Gün % ~<b>15 dk gecikmeli</b>.</li>
         <li><b>Temel oranlar</b> (F/K, P/D, ROE, borç, marj) şirket finansallarından gelir; bunlar gün içinde değişmez, <b>çeyreklik</b> güncellenir ve bazı şirketlerde eksik olabilir.</li>
@@ -824,8 +878,8 @@ Skor = 799.1 / 8.9 ≈ 90</pre>
 
       <h3>Adım 1 — Metrikler ve geçerlilik</h3>
       <p>Temel beş metrik: F/K, P/D, ROE, Borç/Özsr, Net Marj. Şu değerler <b>geçersiz</b> sayılıp o metrikten düşülür: F/K ≤ 0, P/D ≤ 0, Borç/Özsr &lt; 0 (zarar/anlamsız durumlar).</p>
-      <p><b>Yeni — finans istisnası:</b> Banka, sigorta ve finansal hizmet hisselerinde <b>Borç/Özsr skora katılmaz</b>. Kaldıraç bankacılığın iş modelinin kendisidir; bir bankayı sanayi şirketiyle aynı borç cetveline koymak skoru sistematik olarak bozar (eski sürümde bankalar bu yüzden haksız yere düşük puan alıyordu).</p>
-      <p><b>Yeni — büyüme metrikleri (opsiyonel):</b> <code>data.js</code>'te <code>earningsGrowth</code> (kâr büyümesi) ve <code>revenueGrowth</code> (ciro büyümesi) alanları varsa skora katılırlar. Değer tek başına yeterli değildir — ucuz ama küçülen şirket "değer tuzağı"dır; büyüme bileşeni bunu ayıklar. Bu alanları etkinleştirmek için <code>fetch_data.py</code>'ye yfinance <code>info</code> sözlüğünden <code>earningsGrowth</code> ve <code>revenueGrowth</code> alanlarını eklemen yeterli (×100 ile yüzdeye çevirerek); yoksa skor eski 5 metrikle çalışmaya devam eder.</p>
+      <p><b>Finans istisnası:</b> Banka, sigorta ve finansal hizmet hisselerinde <b>Borç/Özsr skora katılmaz</b>. Kaldıraç bankacılığın iş modelinin kendisidir; bir bankayı sanayi şirketiyle aynı borç cetveline koymak skoru sistematik olarak bozar.</p>
+      <p><b>Büyüme metrikleri (opsiyonel):</b> <code>data.js</code>'te <code>earningsGrowth</code> (kâr büyümesi) ve <code>revenueGrowth</code> (ciro büyümesi) alanları varsa skora katılırlar. Değer tek başına yeterli değildir — ucuz ama küçülen şirket "değer tuzağı"dır; büyüme bileşeni bunu ayıklar.</p>
 
       <h3>Adım 2 — Piyasa-içi yüzdelik sıra</h3>
       <p>Her metrik, <b>kendi piyasası içinde</b> (BIST'i BIST'le, NASDAQ'ı NASDAQ'la — değerleme rejimleri farklı olduğu için) küçükten büyüğe sıralanır. Her hisseye 0–1 arası sıra verilir:</p>
@@ -857,7 +911,7 @@ en küçük değer → 0.0     en büyük değer → 1.0     (tek değer → 0.5
         <tr><td><b>Toplam</b></td><td><b>5.5 temel · 7.2 büyümeyle</b></td><td></td></tr>
       </table>
       <pre>Skor = ( Σ ağırlık × puan ) / ( Σ ağırlık ) × 100</pre>
-      <p>Eksik metrik varsa ağırlığı toplamdan düşülür; kalanlar otomatik yeniden ölçeklenir. <b>Veri</b> sütunu kaç metrik kullanıldığını gösterir (finans hisselerinde temel metrik en fazla 4'tür; büyüme verisi varsa 7'ye kadar çıkar).</p>
+      <p>Eksik metrik varsa ağırlığı toplamdan düşülür; kalanlar otomatik yeniden ölçeklenir.</p>
 
       <h3>Örnek hesap</h3>
       <p>Bir hisse (finans dışı), piyasası içinde şu sıralarda olsun: F/K yüzdelik 0.2 (çok ucuz), P/D 0.3, ROE 0.8, Borç 0.1, Marj 0.7. Büyüme verisi yok.</p>
@@ -880,13 +934,56 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
         <tr><td>Marj %</td><td>Net kâr marjı. &gt;%15 iyi · %5–15 orta · &lt;%5 zayıf.</td></tr>
         <tr><td>Veri</td><td>Skorun kaç metrikten çıktığı. Finans hisselerinde Borç/Özsr sayılmaz; büyüme verisi varsa 7'ye kadar çıkar.</td></tr>
       </table>
-      <p><b>Arama & filtre & sıralama:</b> üstten sembol/şirket ara; her sütunun altındaki filtre satırına koşul yaz (örn. <code>&lt;10</code>); başlığa tıklayarak sırala.</p>
+      <p><b>Arama &amp; filtre &amp; sıralama:</b> üstten sembol/şirket ara; her sütunun altındaki filtre satırına koşul yaz (örn. <code>&lt;10</code>); başlığa tıklayarak sırala.</p>
 
       <h2>5. Sınırlar</h2>
       <ul>
-        <li>Skor "ucuz & sağlam mı"yı ölçer; fiyatın yükseleceğini <b>söylemez</b>.</li>
+        <li>Skor "ucuz &amp; sağlam mı"yı ölçer; fiyatın yükseleceğini <b>söylemez</b>.</li>
         <li>Temel veriler eksik/eski olabilir; "Veri" sütununa bak.</li>
         <li>Eşikler sektöre göre değişir. Yatırım tavsiyesi değildir.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="docov" id="docOvBT">
+  <div class="doccard">
+    <button class="docclose">✕ Kapat</button>
+    <div class="doc">
+      <h1>Geçmişte Test — nasıl çalışır?</h1>
+      <p>Bir stratejiyi <b>geçmiş günlük fiyatlar</b> üzerinde çalıştırıp "bu kuralları uygulasaydım ne olurdu" sorusunu yanıtlar. Veri kaynağı <code>history.js</code> — hisse detayındaki grafiğin kullandığı günlük OHLC serisi. Ekstra veri çekmene gerek yoktur.</p>
+      <div class="warn"><b>Bu bir kâr vaadi değildir.</b> İyi bir geçmiş sonuç, kuralın gelecekte çalışacağını <b>kanıtlamaz</b>. Aşağıdaki sınırları okumadan sonuca güvenme.</div>
+
+      <h2>1. Test edilen kural</h2>
+      <ul>
+        <li><b>Giriş:</b> kapanış, seçtiğin hareketli ortalamayı (vars. MA50) <b>yukarı keserse</b> o kapanıştan alınır.</li>
+        <li><b>Stop:</b> giriş − (ATR çarpanı × 14 günlük ATR).</li>
+        <li><b>Hedef:</b> giriş + (R katı × stop mesafesi). R = riske ettiğin mesafe.</li>
+        <li><b>Trend çıkışı:</b> kapanış ortalamanın altına düşerse pozisyon kapanır.</li>
+        <li><b>Pozisyon boyutu:</b> özkaynağın risk%'i ÷ stop mesafesi; tek pozisyon en çok özkaynağın %25'i, nakit kadar.</li>
+        <li>Aynı gün hem stop hem hedef vurulmuşsa <b>stop varsayılır</b> (kötümser, gerçekçi taraf).</li>
+        <li>Aday çoksa <b>ortalamaya en yakın</b> olanlar önce alınır (uzamışı kovalamamak için).</li>
+        <li>Dönem sonunda açık kalan pozisyonlar son kapanıştan kapatılır ("test sonu").</li>
+      </ul>
+
+      <h2>2. Sonuç metrikleri</h2>
+      <table><tr><th>Metrik</th><th>Anlamı</th></tr>
+        <tr><td>Toplam getiri</td><td>Dönem sonu özkaynak / başlangıç − 1.</td></tr>
+        <tr><td>Al&amp;tut ortalaması</td><td>Aynı dönemde hisseleri alıp hiç dokunmasaydın: eşit ağırlıklı ortalama getiri. <b>Kıyas çizgin budur</b> — stratejin bunu geçemiyorsa uğraşmaya değmiyor demektir.</td></tr>
+        <tr><td>Kazanma oranı</td><td>Kârla kapanan işlem yüzdesi. Tek başına anlamsızdır; ortalama R ile birlikte oku.</td></tr>
+        <tr><td>Ortalama R</td><td>İşlem başına, riske ettiğinin kaç katını kazandın. +0,2R bile uzun vadede iyidir.</td></tr>
+        <tr><td>Kâr faktörü</td><td>Toplam kâr ÷ toplam zarar. 1'in altı = zarar eden sistem.</td></tr>
+        <tr><td>Maks. düşüş</td><td>Zirveden en derin geri çekilme. <b>Dayanabileceğin</b> sayı bu — getiriden daha önemlidir.</td></tr>
+      </table>
+
+      <h2>3. Sınırlar (dürüst liste)</h2>
+      <ul>
+        <li><b>Hayatta kalma yanlılığı:</b> test yalnız <b>bugünkü</b> endeks üyeleriyle çalışır. Batmış/endeksten düşmüş hisseler yok → sonuç sistematik olarak <b>olduğundan iyi</b> çıkar.</li>
+        <li><b>Kapanış fiyatından doluluk:</b> gerçekte sinyali kapanışta görüp o fiyattan alamazsın; gün içi kayma bunu kötüleştirir.</li>
+        <li><b>Temettü, vergi ve bölünme etkisi</b> hesaba katılmaz.</li>
+        <li><b>Aşırı uydurma (overfitting):</b> ayarları en iyi sonucu verene göre seçersen geçmişin gürültüsüne uymuş olursun. Bulduğun ayarı <b>başka bir piyasada / başka bir dönemde</b> de dene.</li>
+        <li><b>Az işlem = anlamsız istatistik.</b> 20'den az işlemde çıkan sonuç büyük ölçüde şanstır.</li>
+        <li>Bu test panodaki <b>Gün İçi Skor</b>'u ölçmez — o skor relatif hacim gibi gün içi verilere dayanır ve geçmişi saklanmıyor. Burada test edilen, ona benzeyen ama daha basit bir <b>günlük trend</b> kuralıdır.</li>
       </ul>
     </div>
   </div>
@@ -988,12 +1085,7 @@ function sektorTR(s){
     'Real Estate':'Emlak','Communication Services':'İletişim'};
   return m[s]||s||'—';
 }
-/* ---------- ORTA/UZUN VADE SKORU — istemci tarafı v2 ----------
-   data.js'ten gelen sunucu skoru burada yeniden hesaplanıp geçersiz kılınır.
-   Farklar: (1) finans hisselerinde Borç/Özsr skora katılmaz (kaldıraç bankanın
-   iş modelidir; sanayi cetveliyle ölçmek skoru bozar), (2) data.js'te
-   earningsGrowth / revenueGrowth alanları varsa büyüme metrikleri devreye
-   girer ("değer tuzağı" ayıklaması). Piyasa-içi yüzdelik sıralama korunur. */
+/* ---------- ORTA/UZUN VADE SKORU — istemci tarafı v2 ---------- */
 var FIN_SECTORS={'Financial Services':1,'Banks':1,'Insurance':1};
 var QMETRICS=[
   {k:'pe',             inv:true,  w:1.0, valid:function(v){return v!=null&&!isNaN(v)&&v>0;}},
@@ -1030,43 +1122,31 @@ function computeQualityScores(){
   });
 }
 computeQualityScores();
-/* GÜNÜN HİSSELERİ — v2 (trend + momentum + göreli güç + RSI + volatilite + likidite + uzama)
-   Mantık: uptrend (fiyat>MA50) + ölü olmayan volatilite + likidite + aşırı uzamamış gate'i;
-   sonra şeffaf 0-100 "Setup Skoru" ile sırala, sektör çeşitliliği uygula. */
+/* GÜNÜN HİSSELERİ — v2 */
 function clampN(x,a,b){return Math.max(a,Math.min(b,x));}
 function fSetup(s, bench){
-  // her bileşen 0-100; veri yoksa null (ağırlıktan düşülür)
   var p={};
-  // Trend: fiyat>MA50>MA200 en güçlü
   if(s.ma50!=null && s.price!=null){
     if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200) p.trend=100;
     else if(s.price>s.ma50) p.trend=65;
     else if(s.ma200!=null && s.price>s.ma200) p.trend=40;
     else p.trend=10;
   } else p.trend=null;
-  // Göreli güç: hissenin 1A getirisi − endeks 1A
   if(s.ret1m!=null){ var rs=s.ret1m-(bench!=null?bench:0); p.rs=clampN((rs+10)/20*100,0,100); } else p.rs=null;
-  // Momentum: pozitif ama aşırı uzamamış
   if(s.ret1m!=null){ var r=s.ret1m;
     p.mom = r<=0 ? clampN(40+r*4,0,40) : (r<=12 ? clampN(40+(r/12)*60,40,100) : clampN(100-(r-12)*3,30,100));
   } else p.mom=null;
-  // RSI: 55-70 ideal, >78 aşırı alım
   if(s.rsi14!=null){ var q=s.rsi14;
     p.rsi = (q>=55&&q<=70)?100:(q>70&&q<=78)?60:(q>78)?25:(q>=45)?65:(q>=40)?45:20;
   } else p.rsi=null;
-  // Volatilite: %1.5-4 tatlı nokta; <%1 makas tuzağı; >%6 fazla riskli
   if(s.atrPct!=null){ var a=s.atrPct;
     p.vol=(a>=1.5&&a<=4)?100:(a>=1&&a<1.5)?70:(a>4&&a<=6)?55:(a<1)?25:30;
   } else p.vol=null;
-  // Zirveye yakınlık (52h): 0 en iyi, -%30 en kötü
   if(s.pctFromHigh!=null) p.high=clampN((s.pctFromHigh+30)/30*100,0,100); else p.high=null;
-  // Uzama: MA50'ye mesafe — %0–8 pullback/taban bölgesi ideal, >%15 aşırı uzamış (kovalamaca)
   if(s.ma50!=null && s.price!=null){ var ext=(s.price/s.ma50-1)*100;
     p.ext = ext<0?20 : ext<=8?100 : ext<=15?60 : clampN(60-(ext-15)*5,10,60);
   } else p.ext=null;
-  // 3 aylık teyit: orta vade momentum da aynı yönde mi
   if(s.ret3m!=null){ var r3=s.ret3m; p.mom3 = r3<=0 ? clampN(50+r3*2,0,50) : clampN(50+(r3/25)*50,50,100); } else p.mom3=null;
-  // Değer/kalite (küçük ağırlık — çöp almamak için)
   p.quality = (typeof s.score==='number')?s.score:null;
   var W={trend:1.6, rs:1.6, mom:1.0, rsi:0.9, vol:1.0, high:0.7, ext:1.0, mom3:0.6, quality:0.5};
   var ws=0, vs=0;
@@ -1076,34 +1156,26 @@ function fSetup(s, bench){
 function gununHisseleri(tumHisseler, opts){
   opts = opts || {};
   var limit = opts.limit!=null ? opts.limit : 8;
-  var bench = opts.bench!=null ? opts.bench : null;   // endeks 1A getirisi (göreli güç için)
-
-  // Piyasa ortalaması (bilgi amaçlı; artık işlemi engellemiyor)
+  var bench = opts.bench!=null ? opts.bench : null;
   var withCh = tumHisseler.filter(function(s){ return typeof s.changePct==='number'; });
   var avgCh = withCh.length ? withCh.reduce(function(a,s){return a+s.changePct;},0)/withCh.length : 0;
-
-  // Teknik veri var mı? (eski data.js'te yok)
   var hasTech = tumHisseler.some(function(s){ return s.ma50!=null || s.ret1m!=null; });
   if(!hasTech) return { trade:true, avgChange:avgCh, manual:false, stocks:[], hasTech:false };
-
-  // Gate: uptrend (fiyat>MA50) + ölü olmayan volatilite + likidite + aşırı uzamamış
   var pool = tumHisseler.filter(function(s){
     if(s.price==null || s.ma50==null || s.ret1m==null) return false;
-    if(s.price <= s.ma50) return false;                       // sadece yükselen trend
-    if(s.atrPct!=null && s.atrPct < 0.8) return false;        // hareket yok → makas tuzağı
-    if(s.relVol!=null && s.relVol < 0.4) return false;        // çok düşük işlem
-    if((s.price/s.ma50-1)*100 > 25) return false;             // aşırı uzamış → kovalamaca, eleniyor
+    if(s.price <= s.ma50) return false;
+    if(s.atrPct!=null && s.atrPct < 0.8) return false;
+    if(s.relVol!=null && s.relVol < 0.4) return false;
+    if((s.price/s.ma50-1)*100 > 25) return false;
     return true;
   });
-
   pool.forEach(function(s){ var r=fSetup(s,bench); s._setup=r.score; s._parts=r.parts; s._rs=(s.ret1m!=null?s.ret1m-(bench||0):null); });
   pool = pool.filter(function(s){ return s._setup!=null; });
-
   function sectorCap(list, n){
     var bySector={}, out=[];
     list.forEach(function(s){ var k=s.sector||'Diğer'; (bySector[k]=bySector[k]||[]).push(s); });
     Object.keys(bySector).forEach(function(k){
-      bySector[k].sort(function(a,b){return b._setup-a._setup;});  // en yüksek setup önce
+      bySector[k].sort(function(a,b){return b._setup-a._setup;});
       out = out.concat(bySector[k].slice(0,n));
     });
     return out;
@@ -1117,7 +1189,6 @@ function gununHisseleri(tumHisseler, opts){
   return { trade:true, avgChange:avgCh, manual:manual, stocks:pool, hasTech:true };
 }
 function eurOf(tryAmt, rate){ rate = rate || EURTRY; return rate? tryAmt/rate : null; }
-/* amount with EUR sub-line for BIST */
 function amt(m, val, rateAtTime){
   var s = ccySym(m)+fmt(val);
   if(m==='BIST'){ var e=eurOf(val,rateAtTime); return s + '<span class="sub">'+(e!=null?'≈ €'+fmt(e):'')+'</span>'; }
@@ -1128,9 +1199,7 @@ function shortNum(v){ var a=Math.abs(v);
   if(a>=1e3) return (v/1e3).toFixed(0)+'K'; return ''+Math.round(v); }
 
 /* ---------- storage ---------- */
-/* Kalıcılık YALNIZ Supabase'te. Tarayıcıda hiçbir veri saklanmaz —
-   aynı tarayıcıda başka hesapla girilse bile önceki hesabın verisi görünmez. */
-var MEM_BAK=[];              // oturum içi güvenlik yedekleri (buluttan veri almadan önce)
+var MEM_BAK=[];
 var S = {};
 S.sim = S.sim || {}; S.real = S.real || {}; S.stockNotes = S.stockNotes || {};
 S.notes = S.notes || ''; S.simHist = S.simHist || {}; S.realHist = S.realHist || {};
@@ -1166,13 +1235,13 @@ function simFor(m){
   var start=(m==='BIST'?100000:10000);
   if(!S.sim[m]) S.sim[m]={cash:start, deposited:start, holdings:{}, log:[]};
   var r=S.sim[m];
-  if(r.deposited===undefined){ r.deposited=start; save(); } // eski sim'ler: varsayılan başlangıç = yatırılan
+  if(r.deposited===undefined){ r.deposited=start; save(); }
   return r;
 }
 function realFor(m){
   if(!S.real[m]) S.real[m]={deposited:0, log:[]};
   var r=S.real[m];
-  if(r.lots && !r._migrated){            // eski 'lots' modelinden işlem geçmişine göç
+  if(r.lots && !r._migrated){
     r.log = r.log || [];
     r.lots.forEach(function(l){
       var t = l.date ? new Date(l.date+'T12:00:00').getTime() : (Date.now());
@@ -1182,18 +1251,16 @@ function realFor(m){
   }
   if(!r.log) r.log=[];
   if(r.holdings) delete r.holdings;
-  if(r.deposited===undefined){          // mevcut işlemlerin net yatırımı kadar başlat
+  if(r.deposited===undefined){
     var net=0; r.log.forEach(function(e){ net += (e.side==='buy'?1:-1)*e.px*e.qty; });
     r.deposited = net>0?net:0; save();
   }
   return r;
 }
-/* gerçek portföy nakit = yatırılan + (satış geliri − alış maliyeti) */
 function realCash(real){
   var flow=0; real.log.forEach(function(e){ flow += (e.side==='sell'?1:-1)*e.px*e.qty; });
   return (real.deposited||0)+flow;
 }
-/* gerçek portföy: işlem geçmişini kronolojik oynatıp pozisyonları hesapla (ortalama maliyet) */
 function computeRealHoldings(real){
   var h={};
   real.log.slice().sort(function(a,b){return a.t-b.t;}).forEach(function(e){
@@ -1267,6 +1334,7 @@ function goView(v){
   document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('active', x.dataset.v===v);});
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
   $('v-'+v).classList.add('active');
+  var _ms=$('mktSummary'); if(_ms) _ms.classList.toggle('show', v==='trade');
 }
 document.querySelectorAll('.tab').forEach(function(t){ t.onclick=function(){goView(t.dataset.v);}; });
 
@@ -1285,7 +1353,6 @@ var COLS=[
   {k:'act',t:''}
 ];
 var qScreen='', sortK='score', sortDir=-1, colFilters={};
-/* sütun filtresi: "<10", ">5", "<=2", "1,5", "10-20" gibi ifadeleri ayrıştır */
 function parseCond(expr){
   expr=(''+(expr||'')).trim().replace(',','.'); if(!expr) return null;
   var m;
@@ -1329,39 +1396,29 @@ function trendIcon(s){
   if(s.price>s.ma50) return '<b class="up">↑</b>';
   return '<b class="down">↓</b>';
 }
-/* ===== GÜNLÜK TRADE (gecikmeli gün içi izleme + risk hesaplayıcı) ===== */
-/* Gün İçi Skor v2 — ATR'ye normalize: "bugün kendi normaline göre kaç birim hareket etti?"
-   Eski sürüm sabit %3.5'e tavan puan veriyordu → hareketi çoktan yapmışı kovalatıyordu.
-   v2: rMove = Gün% / ATR%. İdeal bölge 0.25–1.0 ATR (anlamlı ama uzamamış);
-   1.5 ATR üstü parabolik sayılır ve sert cezalanır. Hacim tabanı 1.0×'e çekildi
-   (ortalama-altı hacimli yükseliş güvenilmez). Trend bileşenine "giriş bölgesi"
-   eklendi: MA50'ye yakın fiyat ödüllü, MA50'den %15+ uzaklaşmış fiyat cezalı. */
+/* ===== GÜNLÜK TRADE ===== */
 function gunIciSkoru(s, mktAvg){
   if(s.changePct==null) return null;
   var ch=s.changePct, sc=0;
-  var atr=(s.atrPct!=null && s.atrPct>0)?s.atrPct:2.0;   // ATR yoksa %2 varsay
-  var rMove=ch/atr;                                       // bugünkü hareket, ATR cinsinden
-  // 1) Hareket kalitesi (30)
+  var atr=(s.atrPct!=null && s.atrPct>0)?s.atrPct:2.0;
+  var rMove=ch/atr;
   if(ch>0){
     if(rMove<=0.25)      sc += (rMove/0.25)*12;
-    else if(rMove<=1.0)  sc += 12 + ((rMove-0.25)/0.75)*18;   // 12→30: ideal bölge
-    else if(rMove<=1.5)  sc += 30 - ((rMove-1.0)/0.5)*12;     // 30→18: uzamaya başladı
-    else                 sc += Math.max(4, 18-(rMove-1.5)*10); // parabolik → sert ceza
+    else if(rMove<=1.0)  sc += 12 + ((rMove-0.25)/0.75)*18;
+    else if(rMove<=1.5)  sc += 30 - ((rMove-1.0)/0.5)*12;
+    else                 sc += Math.max(4, 18-(rMove-1.5)*10);
   }
-  // 2) Relatif hacim (30): 1.0×'ten itibaren, 2.2×'te tavan
   if(s.relVol!=null) sc += clampN((s.relVol-1.0)*25, 0, 30);
-  // 3) Bugün piyasaya göre güç (20)
   if(mktAvg!=null) sc += clampN((ch-mktAvg)*8, 0, 20);
-  // 4) Trend uyumu + giriş bölgesi (20)
   if(s.ma50!=null && s.price!=null){
     if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200) sc+=14; else if(s.price>s.ma50) sc+=8;
     var ext=(s.price/s.ma50-1)*100;
-    if(ext>=0 && ext<=6) sc+=6;        // tabana yakın = sağlıklı giriş bölgesi
-    else if(ext>15) sc-=6;             // MA50'den fazla kopmuş = uzamış
+    if(ext>=0 && ext<=6) sc+=6;
+    else if(ext>15) sc-=6;
   }
   return Math.round(clampN(sc,0,100));
 }
-/* --- tıklanabilir sütun sıralaması (Günlük Trade + Kısa Vade) --- */
+/* --- tıklanabilir sütun sıralaması --- */
 var sortKT='_gi', sortDirT=-1, sortKG='_setup', sortDirG=-1;
 function trendRank(s){ if(s.ma50==null||s.price==null) return null; if(s.price>s.ma50){ return (s.ma200!=null && s.ma50>s.ma200)?2:1; } return 0; }
 function cmpVal(a,b,k,dir,getter){ var va=getter(a,k), vb=getter(b,k);
@@ -1397,7 +1454,37 @@ var GCOLS=[
   {k:'act',t:''}
 ];
 function valG(s,k){ if(k==='_tr')return trendRank(s); if(k==='_rs')return s._rs; if(k==='_setup')return s._setup; if(k==='symbol')return s.symbol; if(k==='sector')return sektorTR(s.sector); return s[k]; }
+/* ---------- piyasa özeti kartı ---------- */
+function renderMarketSummary(){
+  var el=$('mktSummary'); if(!el) return;
+  var list=marketStocks().filter(function(s){return typeof s.changePct==='number';});
+  if(!list.length){ el.innerHTML=''; return; }
+  var up=0,down=0,sum=0;
+  list.forEach(function(s){ sum+=s.changePct; if(s.changePct>0)up++; else if(s.changePct<0)down++; });
+  var avg=sum/list.length, sec={};
+  list.forEach(function(s){ var k=sektorTR(s.sector)||'Diğer'; (sec[k]=sec[k]||[]).push(s.changePct); });
+  var secArr=Object.keys(sec).map(function(k){ var a=sec[k]; return {k:k,n:a.length,avg:a.reduce(function(x,y){return x+y;},0)/a.length}; })
+    .filter(function(x){return x.n>=2;}).sort(function(a,b){return b.avg-a.avg;});
+  function pct(v){ return (v>0?'+':'')+fmt(v,2)+'%'; }
+  function rows(arr){ return arr.length? arr.map(function(x){ return '<div class="sec"><span>'+x.k+' <span style="color:var(--faint)">('+x.n+')</span></span><b class="'+chCls(x.avg)+'">'+pct(x.avg)+'</b></div>'; }).join('') : '<div class="sec"><span>—</span></div>'; }
+  el.innerHTML='<h4>'+MK+' piyasa özeti</h4>'+
+    '<div class="row"><span>Ortalama gün %</span><b class="'+chCls(avg)+'">'+pct(avg)+'</b></div>'+
+    '<div class="row"><span>Yükselen / Düşen</span><b><span class="up">'+up+'</span> / <span class="down">'+down+'</span></b></div>'+
+    '<div class="row"><span>İzlenen</span><b>'+list.length+' hisse</b></div>'+
+    '<div class="lbl">En güçlü sektörler</div>'+rows(secArr.slice(0,3))+
+    '<div class="lbl">En zayıf sektörler</div>'+rows(secArr.slice(-3).reverse());
+}
+/* ---------- CSV dışa aktarma ---------- */
+function toCSV(rows){ return rows.map(function(r){ return r.map(function(c){ var v=(c==null?'':String(c)); if(/[";\n]/.test(v)) v='"'+v.replace(/"/g,'""')+'"'; return v; }).join(';'); }).join('\r\n'); }
+function downloadCSV(name,csv){ var b=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); var u=URL.createObjectURL(b); var a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(u);},600); }
+function logToRows(log){ var rows=[['Tarih','İşlem','Sembol','Adet','Dolum Fiyatı','Ham Fiyat','Ücret','Tutar','K/Z','K/Z %','Bot','Sebep']];
+  (log||[]).forEach(function(e){ rows.push([ new Date(e.t).toLocaleString('tr-TR'), e.side==='buy'?'AL':'SAT', clean(e.sym), e.qty, fmt(e.px), (e.rawPx!=null?fmt(e.rawPx):''), (e.fee!=null?fmt(e.fee):''), fmt(e.px*e.qty), e.pnl!=null?fmt(e.pnl):'', e.pnlPct!=null?fmt(e.pnlPct,2):'', e.bot?'evet':'', e.reason||'' ]); });
+  return rows; }
+function exportSimCSV(){ var s=simFor(MK); if(!s.log||!s.log.length){ alert('İşlem geçmişi boş.'); return; } downloadCSV('borsa-pano-'+MK+'-sim-islemler.csv', toCSV(logToRows(s.log))); }
+function exportRealCSV(){ var r=realFor(MK); if(!r.log||!r.log.length){ alert('İşlem geçmişi boş.'); return; } downloadCSV('borsa-pano-'+MK+'-gercek-islemler.csv', toCSV(logToRows(r.log))); }
 function renderTrade(){
+  renderMarketSummary();
+  var _bm=$('btMkt'); if(_bm) _bm.textContent=MK;
   var ms=marketStocks();
   var withCh=ms.filter(function(s){return typeof s.changePct==='number';});
   var mktAvg=withCh.length? withCh.reduce(function(a,s){return a+s.changePct;},0)/withCh.length : null;
@@ -1434,7 +1521,6 @@ function renderTrade(){
     };});
     $('tradeBody').querySelectorAll('[data-tradesim]').forEach(function(b){b.onclick=function(){ selectInSim(b.dataset.tradesim); };});
   }
-  // dropdown
   $('tpSym').innerHTML = ms.filter(function(s){return s.price!=null;})
     .sort(function(a,b){return a.symbol.localeCompare(b.symbol);})
     .map(function(s){return '<option value="'+s.symbol+'">'+clean(s.symbol)+' — '+(s.name||'').slice(0,24)+'</option>';}).join('');
@@ -1453,7 +1539,7 @@ function tpCalc(){
   var riskAmt=acct*riskPct/100;
   var shares=perShare>0? Math.floor(riskAmt/perShare):0;
   var posVal=shares*entry;
-  var tp15=entry+1.5*perShare, tp2=entry+2*perShare;   // R-katı kâr hedefleri
+  var tp15=entry+1.5*perShare, tp2=entry+2*perShare;
   var notes=[];
   if(shares<1) notes.push('Risk bütçen bu stop mesafesi için 1 adet bile almıyor — ya risk %\'ni artır ya stop\'u daralt (daha düşük ATR×).');
   if(posVal>acct) notes.push('Pozisyon değeri hesabından büyük — bu işlem kaldıraç gerektirir; dikkat.');
@@ -1521,7 +1607,7 @@ function renderScreen(){
     if(va==null&&vb==null)return 0; if(va==null)return 1; if(vb==null)return -1; return sortDir*(va-vb);
   });
   $('screenBody').innerHTML = rows.map(function(s){
-    var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':'b-dax';
+    var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':s.market==='NASDAQ'?'b-nasdaq':'b-dax';
     var sc=s.score==null?'<span class="na">—</span>':'<div class="scorebar"><div class="bar"><i style="width:'+s.score+'%"></i></div><b>'+fmt(s.score,0)+'</b></div>';
     function na(v){return v==null?'<span class="na">—</span>':v;}
     return '<tr>'+
@@ -1551,7 +1637,7 @@ function renderAllList(){
   var rows=marketStocks().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);});
   if(qAll){var q=qAll.toLowerCase(); rows=rows.filter(function(s){return s.symbol.toLowerCase().indexOf(q)>=0||(s.name||'').toLowerCase().indexOf(q)>=0;});}
   $('allBody').innerHTML = rows.map(function(s){
-    var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':'b-dax';
+    var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':s.market==='NASDAQ'?'b-nasdaq':'b-dax';
     return '<tr><td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,40)+'</div></td>'+
       '<td>'+(s.price==null?'<span class="na">—</span>':fmt(s.price))+'</td>'+
       '<td class="'+c+'">'+(s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</td>'+
@@ -1568,7 +1654,7 @@ var lastView='screen';
 function openStock(sym){
   var s=find(sym); if(!s) return;
   lastView = document.querySelector('.tab.active') ? document.querySelector('.tab.active').dataset.v : 'screen';
-  var badge=s.market==='BIST'?'b-bist':'b-dax';
+  var badge=s.market==='BIST'?'b-bist':s.market==='NASDAQ'?'b-nasdaq':'b-dax';
   $('detailHead').innerHTML =
     '<div><h2 style="margin:0; font-size:24px">'+clean(s.symbol)+' <span class="badge '+badge+'">'+s.market+'</span></h2>'+
     '<div class="nm" style="font-size:14px; margin-top:4px">'+(s.name||'')+' · '+(s.sector||'-')+'</div></div>'+
@@ -1636,7 +1722,7 @@ function trade(side){
   var sim=simFor(MK); var rate=(MK==='BIST'?EURTRY:null); var pnl=null, pnlPct=null;
   var comm=commOf(MK); var fill=fillPx(MK, side, s.price);
   if(side==='buy'){
-    var cost=fill*q + comm;                          // spread'li dolum + komisyon
+    var cost=fill*q + comm;
     if(cost>sim.cash){ alert('Yetersiz nakit (ücretler dahil). Gerekli '+ccySym(MK)+fmt(cost)+' / Mevcut '+ccySym(MK)+fmt(sim.cash)); return; }
     sim.cash-=cost; var h=sim.holdings[s.symbol]||{qty:0,cost:0,eurCost:0};
     h.cost+=cost; h.qty+=q; if(MK==='BIST') h.eurCost=(h.eurCost||0)+(rate?cost/rate:0); sim.holdings[s.symbol]=h;
@@ -1644,7 +1730,7 @@ function trade(side){
   } else {
     var h2=sim.holdings[s.symbol]; if(!h2||h2.qty<q){ alert('Yeterli pozisyon yok.'); return; }
     var avg=h2.cost/h2.qty;
-    var proceeds=fill*q - comm;                      // spread'li dolum − komisyon
+    var proceeds=fill*q - comm;
     pnl=proceeds-avg*q; pnlPct=avg>0?(proceeds/q/avg-1)*100:0;
     h2.cost-=avg*q; if(MK==='BIST'){var ea=(h2.eurCost||0)/h2.qty; h2.eurCost=(h2.eurCost||0)-ea*q;} h2.qty-=q; sim.cash+=proceeds;
     if(h2.qty<=0) delete sim.holdings[s.symbol];
@@ -1664,7 +1750,6 @@ $('setCash').onclick=function(){
   save(); renderSim();
 };
 $('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ var start=(MK==='BIST'?100000:10000); S.sim[MK]={cash:start,deposited:start,holdings:{},log:[]}; S.botPos[MK]={}; S.botCool[MK]={}; save(); renderSim(); } };
-/* sim: günü grafiğe kaydet */
 function simTotalVal(){
   var sim=simFor(MK), holdVal=0;
   Object.keys(sim.holdings).forEach(function(sym){var s=find(sym); if(s&&s.price!=null) holdVal+=s.price*sim.holdings[sym].qty;});
@@ -1747,7 +1832,7 @@ function resolveSym(input){
   var suf=MK==='BIST'?'.IS':'.DE';
   if(find(input)) return input;
   if(find(input+suf)) return input+suf;
-  return input+suf; // izin ver: listede olmasa da ekle
+  return input+suf;
 }
 function realTrade(side){
   var sym=resolveSym($('rSym').value); if(!sym){alert('Sembol gir.');return;}
@@ -1784,7 +1869,6 @@ function updateRealCost(){
 }
 ['rSym','rPrice','rQty'].forEach(function(id){ var el=$(id); if(el) el.oninput=updateRealCost; });
 $('resetReal').onclick=function(){ if(confirm('Bu piyasanın gerçek portföyü ve işlem geçmişi silinsin mi?')){ S.real[MK]={deposited:0,log:[]}; save(); renderReal(); renderScreen(); renderAllList(); } };
-/* gerçek portföy: günü grafiğe kaydet */
 function realTotalNow(){
   var real=realFor(MK), h=computeRealHoldings(real), hv=0;
   Object.keys(h).forEach(function(sym){ var s=find(sym); if(s&&s.price!=null) hv+=s.price*h[sym].qty; });
@@ -1839,9 +1923,9 @@ function renderReal(){
   }).join('') : '<div class="empty">işlem yok</div>';
 }
 
-/* ---------- line chart (sim + gerçek portföy) ---------- */
+/* ---------- line chart ---------- */
 function lineChart(points, color){
-  if(!points.length) return '<div class="empty">veri yok — aşağıdan içe aktar</div>';
+  if(!points.length) return '<div class="empty">veri yok</div>';
   var W=760,H=280,Pl=68,Pr=18,Pt=18,Pb=36;
   var ys=points.map(function(p){return p.y;});
   var lo=Math.min.apply(null,ys), hi=Math.max.apply(null,ys); var pad=(hi-lo)*0.08||1; lo-=pad; hi+=pad;
@@ -1869,7 +1953,6 @@ $('notesArea').value=S.notes||'';
 $('notesArea').oninput=function(){ S.notes=$('notesArea').value; save(); };
 
 /* ---------- ad banner ---------- */
-/* App Store linkini buraya yapistir (su an arama sayfasina gidiyor): */
 var AD_URL  = 'https://apps.apple.com/app/id6755360072';
 var AD_LOGO = 'https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/42/b4/36/42b43605-401c-4aa2-b956-2b888a0e8235/Placeholder.mill/400x400bb-75.webp';
 (function initAd(){
@@ -1903,23 +1986,12 @@ function renderMovers(){
   document.querySelectorAll('#v-movers .sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
 }
 
-/* ---------- render all ---------- */
-/* ===== OTO-TRADER v2 (yalnız simülasyon; tarayıcı açıkken çalışır) =====
-   Eski sürümün sorunu: hedef 2R = ~3×ATR (%5-6+) uzaktaydı, gecikmeli veriyle
-   neredeyse hiç vurulmuyordu; pozisyonlar kârı geri verip "trend kırıldı" ile
-   (çoğu zaman ekside) kapanıyordu. v2 gün içi mantığa uygun çıkış merdiveni:
-   1) +1R'de pozisyonun yarısı satılır, stop başabaşa çekilir → işlem artık kaybedemez
-   2) kalan için sabit % kâr-al hedefi (vars. %2.5 — gün içi için gerçekçi)
-   3) kısmi satıştan sonra iz süren (trailing) stop kârı kilitler
-   4) kapanışa ~15 dk kala tüm bot pozisyonları kapatılır (geceye taşınmaz)
-   5) açılışın ilk 15 dk'sında ve kapanışa <45 dk kala yeni giriş yok
-   6) en fazla 4 eşzamanlı pozisyon (konsantrasyon sınırı) */
+/* ===== OTO-TRADER v2 (yalnız simülasyon) ===== */
 var BOT = { scoreMin:70, riskPct:1.0, atrMult:1.5, tp1R:1.0, maxPos:4, maxPosPct:25, regimeMin:-0.5, coolMs:3*3600*1000 };
 var MARKETS = ['BIST','DAX','NASDAQ'];
 var MHOURS = { BIST:{tz:'Europe/Istanbul', open:10*60, close:18*60},
                DAX:{tz:'Europe/Berlin', open:9*60, close:17*60+30},
                NASDAQ:{tz:'America/New_York', open:9*60+30, close:16*60} };
-/* piyasa yerel saati: açılıştan bu yana / kapanışa kalan dakika + hafta sonu */
 function mktClock(m){
   var cfg=MHOURS[m]; if(!cfg) return null;
   try{
@@ -1945,7 +2017,6 @@ function botBuy(m,sym,qty,px,stop,tp1,target){
   S.botPos[m][sym]={qty:qty,entry:px,stop:stop,tp1:tp1,target:target,half:false,t:Date.now()};
   return true;
 }
-/* kısmi/tam satış: keepPos=true ise pozisyon kaydı korunur (kısmi kâr alımı) */
 function botSellQty(m,sym,px,qty,reason,keepPos){
   var sim=simFor(m); var h=sim.holdings[sym]; var bp=S.botPos[m][sym];
   if(!h||!bp||px==null){ delete S.botPos[m][sym]; return; }
@@ -1968,15 +2039,13 @@ function botTick(){
     var list=(STOCKS||[]).filter(function(s){return s.market===m;}); if(!list.length) return;
     var sim=simFor(m);
     var ck=mktClock(m);
-    var eod=(ck && !ck.weekend && ck.toClose<=15 && ck.toClose>=-90);  // kapanışa ≤15 dk / hemen sonrası
-    // 1) açık pozisyon yönetimi (çıkış merdiveni)
+    var eod=(ck && !ck.weekend && ck.toClose<=15 && ck.toClose>=-90);
     Object.keys(S.botPos[m]).forEach(function(sym){
       var bp=S.botPos[m][sym]; if(!sim.holdings[sym]){ delete S.botPos[m][sym]; return; }
       var s=bySym(list,sym); if(!s||s.price==null) return; var px=s.price;
       if(eod){ botSell(m,sym,px,'gün sonu'); acted=true; return; }
       if(px<=bp.stop){ botSell(m,sym,px, bp.half?'iz süren stop':'stop'); acted=true; return; }
       if(px>=bp.target){ botSell(m,sym,px,'kâr al (+'+botTPpct()+'%)'); acted=true; return; }
-      // +1R'de yarısını sat, stop'u başabaşa çek → işlem artık kaybedemez
       if(!bp.half && bp.tp1!=null && px>=bp.tp1){
         var half=Math.floor(bp.qty/2);
         if(half>=1) botSellQty(m,sym,px,half,'kısmi kâr (1R)',true);
@@ -1984,20 +2053,17 @@ function botTick(){
         if(bp2){ bp2.half=true; bp2.stop=Math.max(bp2.stop, bp2.entry); }
         acted=true; return;
       }
-      // kısmi satış sonrası iz süren (trailing) stop: kârı kilitle
       if(bp.half && s.atrPct!=null){
         var trail=px*(1-BOT.atrMult*s.atrPct/100);
         if(trail>bp.stop) bp.stop=trail;
       }
       if(s.ma50!=null && px<s.ma50){ botSell(m,sym,px,'trend kırıldı'); acted=true; }
     });
-    // 2) rejim + zaman filtresi
     var withCh=list.filter(function(s){return typeof s.changePct==='number';});
     var avgCh=withCh.length? withCh.reduce(function(a,s){return a+s.changePct;},0)/withCh.length : 0;
-    if(avgCh<BOT.regimeMin) return;                                   // kırmızı zemin → yeni alım yok
-    if(ck && (ck.weekend || ck.sinceOpen<15 || ck.toClose<45)) return; // hafta sonu / açılış gürültüsü / kapanışa yakın → giriş yok
+    if(avgCh<BOT.regimeMin) return;
+    if(ck && (ck.weekend || ck.sinceOpen<15 || ck.toClose<45)) return;
     var openCount=Object.keys(S.botPos[m]).length; if(openCount>=BOT.maxPos) return;
-    // 3) aday giriş: Gün İçi Skor (v2) yüksek olanlar
     var cands=list.map(function(s){ s._gi=gunIciSkoru(s,avgCh); return s; })
       .filter(function(s){ return s._gi!=null && s._gi>=thr && s.changePct>0 && s.price!=null && s.atrPct!=null
         && !S.botPos[m][s.symbol] && !sim.holdings[s.symbol]
@@ -2009,8 +2075,8 @@ function botTick(){
       var equity=botEquity(sim,list); var riskAmt=equity*BOT.riskPct/100;
       var shares=Math.min(Math.floor(riskAmt/perShare), Math.floor((equity*BOT.maxPosPct/100)/px), Math.floor(sim.cash/px));
       if(shares<1) continue;
-      var tp1=px+BOT.tp1R*perShare;                 // kısmi kâr seviyesi (+1R)
-      var target=px*(1+botTPpct()/100);             // tam kâr-al hedefi (vars. +%2.5)
+      var tp1=px+BOT.tp1R*perShare;
+      var target=px*(1+botTPpct()/100);
       if(botBuy(m,s.symbol,shares,px,stopPrice,tp1,target)){ openCount++; acted=true; }
     }
   });
@@ -2036,6 +2102,150 @@ function setBot(m,on){
   if(anyBot()){ botTick(); botTimer=setInterval(botTick, 60*1000); }
   updateBotBtn();
 }
+
+/* ================= GEÇMİŞTE TEST (backtest) =================
+   Veri: history.js → HIST[sym].d = [zaman, açılış, yüksek, düşük, kapanış] günlük.
+   Kural: kapanış MA'yı yukarı keserse al · stop = giriş − ATRçarpanı×ATR14 ·
+   hedef = giriş + R katı · kapanış MA altına düşerse çık. */
+function btPrep(bars, maN){
+  var n=bars.length, close=[], ma=[], atr=[], trs=[], i;
+  for(i=0;i<n;i++) close.push(bars[i][4]);
+  var s=0;
+  for(i=0;i<n;i++){ s+=close[i]; if(i>=maN) s-=close[i-maN]; ma.push(i>=maN-1? s/maN : null); }
+  for(i=0;i<n;i++){ var h=bars[i][2], l=bars[i][3], pc=i?close[i-1]:close[i];
+    trs.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc))); }
+  var s2=0;
+  for(i=0;i<n;i++){ s2+=trs[i]; if(i>=14) s2-=trs[i-14]; atr.push(i>=13? s2/14 : null); }
+  return {close:close, ma:ma, atr:atr};
+}
+function btLabel(t){ return new Date(t*1000).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'}); }
+function btCfg(){
+  return {
+    bars:    Math.max(60, parseInt($('btPeriod').value,10)||250),
+    cash:    parseFloat($('btCash').value) || (MK==='BIST'?100000:10000),
+    risk:    parseFloat($('btRisk').value)||1,
+    atrMult: parseFloat($('btAtr').value)||1.5,
+    targetR: parseFloat($('btTargetR').value)||2,
+    maN:     Math.max(5, parseInt($('btMa').value,10)||50),
+    maxPos:  Math.max(1, parseInt($('btMaxPos').value,10)||5),
+    costs:   $('btCosts').checked
+  };
+}
+function btExecute(){
+  var cfg=btCfg();
+  var sp   = cfg.costs? spreadPct()/100 : 0;
+  var comm = cfg.costs? commOf(MK) : 0;
+  var syms=marketStocks().map(function(s){return s.symbol;})
+    .filter(function(sym){ var h=HIST[sym]; return h && h.d && h.d.length>cfg.maN+25; });
+  if(!syms.length){ $('btStats').innerHTML='<div class="hint down">Bu piyasada geçmiş veri bulunamadı (history.js içinde bu semboller yok).</div>'; return; }
+  var D={}, dset={};
+  syms.forEach(function(sym){
+    var bars=HIST[sym].d.slice(-cfg.bars);
+    D[sym]={bars:bars, p:btPrep(bars,cfg.maN), idx:{}};
+    bars.forEach(function(b,i){ D[sym].idx[b[0]]=i; dset[b[0]]=1; });
+  });
+  var days=Object.keys(dset).map(Number).sort(function(a,b){return a-b;});
+  if(days.length<30){ $('btStats').innerHTML='<div class="hint down">Yeterli gün yok.</div>'; return; }
+  var cash=cfg.cash, pos={}, trades=[], eq=[], peak=0, maxDD=0, openCount=0;
+  function sell(sym, price, t, why){
+    var P=pos[sym]; if(!P) return;
+    var fill=price*(1-sp), proceeds=fill*P.qty-comm;
+    cash+=proceeds;
+    var pnl=proceeds-P.cost;
+    trades.push({sym:sym,tIn:P.t,tOut:t,qty:P.qty,inPx:P.fill,outPx:fill,pnl:pnl,
+                 r:(P.risk>0? pnl/P.risk : null), why:why});
+    delete pos[sym]; openCount--;
+  }
+  days.forEach(function(t){
+    Object.keys(pos).forEach(function(sym){
+      var d=D[sym], i=d.idx[t]; if(i==null) return;
+      var b=d.bars[i], P=pos[sym];
+      if(b[3]<=P.stop)        sell(sym,P.stop,t,'stop');
+      else if(b[2]>=P.target) sell(sym,P.target,t,'hedef');
+      else if(d.p.ma[i]!=null && b[4]<d.p.ma[i]) sell(sym,b[4],t,'trend kırıldı');
+    });
+    var mv=0;
+    Object.keys(pos).forEach(function(sym){ var d=D[sym], i=d.idx[t];
+      mv += (i!=null? d.bars[i][4]*pos[sym].qty : pos[sym].cost); });
+    var equity=cash+mv;
+    eq.push({y:equity, label:btLabel(t)});
+    if(equity>peak) peak=equity;
+    if(peak>0){ var dd=(peak-equity)/peak*100; if(dd>maxDD) maxDD=dd; }
+    if(openCount<cfg.maxPos){
+      var cands=[];
+      syms.forEach(function(sym){
+        if(pos[sym]) return;
+        var d=D[sym], i=d.idx[t]; if(i==null||i<1) return;
+        var ma=d.p.ma[i], mp=d.p.ma[i-1], a=d.p.atr[i];
+        if(ma==null||mp==null||a==null||a<=0) return;
+        var c=d.p.close[i], cp=d.p.close[i-1];
+        if(cp<=mp && c>ma) cands.push({sym:sym,c:c,atr:a,ext:(c/ma-1)*100});
+      });
+      cands.sort(function(a,b){return a.ext-b.ext;});
+      for(var k=0;k<cands.length && openCount<cfg.maxPos;k++){
+        var x=cands[k];
+        var stop=x.c-cfg.atrMult*x.atr, per=x.c-stop; if(per<=0) continue;
+        var fill=x.c*(1+sp);
+        var qty=Math.min(Math.floor(equity*cfg.risk/100/per),
+                         Math.floor(equity*0.25/fill),
+                         Math.floor((cash-comm)/fill));
+        if(qty<1) continue;
+        var cost=fill*qty+comm; if(cost>cash) continue;
+        cash-=cost; openCount++;
+        pos[x.sym]={qty:qty, fill:fill, cost:cost, stop:stop,
+                    target:x.c+cfg.targetR*per, risk:per*qty, t:t};
+      }
+    }
+  });
+  var lastT=days[days.length-1];
+  Object.keys(pos).forEach(function(sym){
+    var d=D[sym], i=d.idx[lastT];
+    sell(sym, (i!=null? d.bars[i][4] : pos[sym].fill), lastT, 'test sonu');
+  });
+  var finalEq=cash;
+  eq.push({y:finalEq, label:btLabel(lastT)});
+  var bh=0, bhN=0;
+  syms.forEach(function(sym){ var b=D[sym].bars; if(b.length>1){ bh+=(b[b.length-1][4]/b[0][4]-1)*100; bhN++; } });
+  bh = bhN? bh/bhN : null;
+  btRender(cfg, eq, trades, maxDD, finalEq, bh, days.length, syms.length);
+}
+function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
+  var ret=(finalEq/cfg.cash-1)*100;
+  var wins=trades.filter(function(t){return t.pnl>0;});
+  var loss=trades.filter(function(t){return t.pnl<=0;});
+  var gp=wins.reduce(function(a,t){return a+t.pnl;},0);
+  var gl=Math.abs(loss.reduce(function(a,t){return a+t.pnl;},0));
+  var pf=gl>0? gp/gl : null;
+  var rs=trades.filter(function(t){return t.r!=null;}).map(function(t){return t.r;});
+  var avgR=rs.length? rs.reduce(function(a,b){return a+b;},0)/rs.length : null;
+  var c=ccySym(MK);
+  $('btStats').innerHTML=
+    '<div class="metrics">'+
+    '<div class="metric"><div class="k">Toplam getiri</div><div class="v '+pnlCls(ret)+'">'+(ret>0?'+':'')+fmt(ret,1)+'%</div></div>'+
+    '<div class="metric"><div class="k">Son özkaynak</div><div class="v">'+c+fmt(finalEq,0)+'</div></div>'+
+    '<div class="metric"><div class="k">Al&amp;tut ortalaması</div><div class="v '+pnlCls(bh)+'">'+(bh==null?'—':(bh>0?'+':'')+fmt(bh,1)+'%')+'</div></div>'+
+    '<div class="metric"><div class="k">İşlem sayısı</div><div class="v">'+trades.length+'</div></div>'+
+    '<div class="metric"><div class="k">Kazanma oranı</div><div class="v">'+(trades.length? Math.round(wins.length/trades.length*100)+'%':'—')+'</div></div>'+
+    '<div class="metric"><div class="k">Ortalama R</div><div class="v '+pnlCls(avgR)+'">'+(avgR==null?'—':(avgR>0?'+':'')+fmt(avgR,2)+'R')+'</div></div>'+
+    '<div class="metric"><div class="k">Kâr faktörü</div><div class="v">'+(pf==null?'—':fmt(pf,2))+'</div></div>'+
+    '<div class="metric"><div class="k">Maks. düşüş</div><div class="v down">−'+fmt(maxDD,1)+'%</div></div>'+
+    '</div>'+
+    '<div class="hint" style="margin-top:8px">'+nSyms+' hisse · '+nDays+' işlem günü · MA'+cfg.maN+
+    ' · stop '+cfg.atrMult+'×ATR · hedef '+cfg.targetR+'R · risk %'+cfg.risk+
+    ' · en fazla '+cfg.maxPos+' pozisyon · maliyet '+(cfg.costs?'açık':'kapalı')+
+    '. <b>Al&amp;tut ortalamasını geçemiyorsa</b> bu kural uğraşmaya değmiyor demektir.</div>';
+  var step=Math.max(1, Math.ceil(eq.length/70));
+  var pts=eq.filter(function(_,i){return i%step===0 || i===eq.length-1;});
+  $('btChart').innerHTML=lineChart(pts, ret>=0?'#0bbfa6':'#f0556b');
+  $('btLog').innerHTML = trades.length? trades.slice().sort(function(a,b){return b.tOut-a.tOut;}).map(function(t){
+    return '<div class="e"><span><b class="'+(t.pnl>0?'up':'down')+'">'+(t.pnl>0?'+':'')+c+fmt(t.pnl)+'</b> '+
+      clean(t.sym)+' × '+t.qty+' · '+fmt(t.inPx)+' → '+fmt(t.outPx)+
+      (t.r!=null?' <span class="cov">('+(t.r>0?'+':'')+fmt(t.r,2)+'R)</span>':'')+
+      ' <span class="bottag">'+t.why+'</span></span>'+
+      '<span class="t">'+btLabel(t.tIn)+' → '+btLabel(t.tOut)+'</span></div>';
+  }).join('') : '<div class="empty">bu ayarlarla hiç işlem açılmadı — MA süresini kısalt ya da dönemi uzat</div>';
+}
+
 function renderAll(){
   syncSwitch(); renderMeta(); renderTicker(); fillSimSelect(); fillSymList();
   if(window.__refreshCostInputs) window.__refreshCostInputs();
@@ -2043,7 +2253,7 @@ function renderAll(){
   renderTrade();
 }
 
-/* ---------- otomatik yenileme (Yol A) ---------- */
+/* ---------- otomatik yenileme ---------- */
 var autoTimer=null;
 function refreshData(){
   var url='data.js'+(location.protocol.indexOf('http')===0?('?t='+Date.now()):'');
@@ -2073,7 +2283,7 @@ function setAuto(on){
   updateAutoBtn();
 }
 $('autoBtn').onclick=function(){ setAuto(!S.auto); };
-if(S.auto===undefined) S.auto=true;   // varsayilan: acik
+if(S.auto===undefined) S.auto=true;
 setAuto(S.auto);
 MARKETS.forEach(function(m){
   $('botBtn'+m).onclick=function(){ setBot(m, !S.botOn[m]); };
@@ -2096,15 +2306,25 @@ MARKETS.forEach(function(m){
   tp.onchange=function(){ var v=parseFloat(this.value); if(isNaN(v)||v<=0) v=2.5; S.botTP=Math.min(20,Math.max(0.5,v)); this.value=S.botTP; save(); };
 })();
 function wireDoc(btnId, ovId){ var ov=$(ovId); if(!ov) return; var b=$(btnId); if(b) b.onclick=function(){ ov.classList.add('open'); }; var c=ov.querySelector('.docclose'); if(c) c.onclick=function(){ ov.classList.remove('open'); }; ov.onclick=function(e){ if(e.target===ov) ov.classList.remove('open'); }; }
-wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnMid','docOvMid');
-document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
+wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnMid','docOvMid'); wireDoc('docBtnBT','docOvBT');
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid','docOvBT'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
+if($('simCsvBtn')) $('simCsvBtn').onclick=exportSimCSV;
+if($('realCsvBtn')) $('realCsvBtn').onclick=exportRealCSV;
+(function(){
+  var b=$('btRun'); if(!b) return;
+  b.onclick=function(){
+    $('btStats').innerHTML='<div class="hint">geçmiş veri yükleniyor…</div>';
+    $('btChart').innerHTML=''; $('btLog').innerHTML='';
+    loadHistory(function(ok){
+      if(!ok){ $('btStats').innerHTML='<div class="hint down">history.js bulunamadı — grafik verisi üreten fetch_data.py sürümüyle Actions bir kez çalışmalı.</div>'; return; }
+      setTimeout(btExecute,10);
+    });
+  };
+})();
 updateBotBtn();
 if(anyBot()){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
 
-/* ================= HİSSE DETAY GRAFİĞİ (lightweight-charts) =================
-   Veri: history.js (fetch_data.py v3 üretir) — i: 15m/5g gün içi, d: günlük ~1y, w: haftalık 5y.
-   Çizimler zaman+fiyat koordinatında saklanır → zoom/kaydırma/periyot değişiminde yerinde kalır,
-   S.chartDrawings[sembol] içinde tutulur → buluta eşitlenir. */
+/* ================= HİSSE DETAY GRAFİĞİ (lightweight-charts) ================= */
 var HIST=null, HIST_LOADING=false, HIST_ERR=false;
 var CH={chart:null,candle:null,line:null,sym:null,tf:'1A',type:'candle',tool:'cursor',pending:null,hover:null,note:''};
 function loadHistory(cb){
@@ -2135,7 +2355,7 @@ function tfBars(h, tf){
   }
   if(tf==='1A') return (h.d||[]).slice(-22);
   if(tf==='1Y') return (h.d||[]).slice(-260);
-  return (h.w&&h.w.length)?h.w:(h.d||[]);   // 5Y
+  return (h.w&&h.w.length)?h.w:(h.d||[]);
 }
 function toCandles(arr){ return arr.map(function(a){return {time:a[0], open:a[1], high:a[2], low:a[3], close:a[4]};}); }
 function toLine(arr){ return arr.map(function(a){return {time:a[0], value:a[4]};}); }
@@ -2219,7 +2439,7 @@ function redrawOverlay(){
       ctx.beginPath(); ctx.moveTo(xa,ya); ctx.lineTo(xb,yb); ctx.stroke();
       ctx.fillStyle='#7c5cff';
       [[xa,ya],[xb,yb]].forEach(function(pt){ ctx.beginPath(); ctx.arc(pt[0],pt[1],3,0,7); ctx.fill(); });
-    } else { // fib
+    } else {
       var x0=(xa!=null&&xb!=null)?Math.min(xa,xb):0;
       var LV=[0,0.236,0.382,0.5,0.618,0.786,1];
       ctx.lineWidth=1; ctx.font='10px "Plus Jakarta Sans",sans-serif'; ctx.textBaseline='bottom';
@@ -2276,11 +2496,9 @@ function sbReady(){ return !!(SB && SB_USER); }
 function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
 function hhmm(){ return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
 function setSyncStatus(t){ var el=$('authSync'); if(el) el.textContent=t; var b=$('cloudBtn'); if(b && sbReady()) b.title=t; }
-
 function backupLocal(){
   try{ MEM_BAK.unshift({t:Date.now(), data:JSON.stringify(S)}); MEM_BAK=MEM_BAK.slice(0,5); }catch(e){}
 }
-/* gerçek işlem geçmişini asla kaybetme: iki taraftaki gerçek işlemleri birleştir */
 function mergeRealLogs(incoming, local){
   ['BIST','DAX','NASDAQ'].forEach(function(m){
     var l=local.real && local.real[m]; if(!l||!l.log) return;
@@ -2311,7 +2529,7 @@ function adoptRemote(data){
     mergeRealLogs(incoming, S);
     S=ensureShape(incoming);
   }catch(e){ console.warn('adopt hata', e); }
-  if(!MK && S.lastMarket) MK=S.lastMarket;   // buluttan gelen son piyasa tercihi
+  if(!MK && S.lastMarket) MK=S.lastMarket;
   reinitUIFromState();
   if(MK && $('app').style.display!=='none'){ renderAll(); }
   suppressSync=false;
@@ -2352,16 +2570,13 @@ function afterLogin(){
     if(!allowed){
       var m=$('lgMsg'); if(m) m.innerHTML='<b>Bekleme listesine girdiniz</b> — kısa bir süre sonra girebileceksiniz. Onay verildiğinde aynı e-posta ve şifreyle giriş yapman yeterli.';
       afterLoginBusy=false;
-      SB.auth.signOut();            // onay gelmeden oturum açık kalmaz
+      SB.auth.signOut();
       if(typeof showLogin==='function') showLogin();
       return;
     }
     loadCloud();
   });
 }
-/* pano_access: satır yoksa bekleme listesine ekle (allowed=false).
-   Onayı yalnız sen verirsin: Supabase → Table Editor → pano_access → allowed = TRUE.
-   Client tarafında UPDATE politikası yok → kimse kendini onaylayamaz. */
 function checkAccess(cb){
   SB.from('pano_access').select('allowed').eq('user_id',SB_USER.id).maybeSingle().then(function(res){
     if(res.error){ var m=$('lgMsg'); if(m) m.innerHTML='<span class="down">Erişim kontrolü hatası: '+res.error.message+' (pano_access tablosu kurulu mu?)</span>'; cb(false); return; }
@@ -2383,7 +2598,7 @@ function updateAuthBar(){
   var b=$('cloudBtn'); var so=$('authSignedOut'), si=$('authSignedIn');
   if(!cloudCfgOk()){
     if(b){ b.textContent='☁ Bulut (kapalı)'; b.style.color=''; b.style.borderColor=''; }
-    if(so){ so.style.display='block'; so.innerHTML='<h1>Bulut kapalı</h1><p>Cihazlar arası eşitleme için dosyanın en üstündeki <code>SUPA_URL</code> ve <code>SUPA_ANON</code> değerlerini Supabase projenden doldurup dosyayı yeniden yükle. Kurulum adımlarını sana ayrıca verdim.</p>'; }
+    if(so){ so.style.display='block'; so.innerHTML='<h1>Bulut kapalı</h1><p>Cihazlar arası eşitleme için dosyanın en üstündeki <code>SUPA_URL</code> ve <code>SUPA_ANON</code> değerlerini Supabase projenden doldurup dosyayı yeniden yükle.</p>'; }
     if(si) si.style.display='none';
     return;
   }
@@ -2433,7 +2648,7 @@ function initSupabase(){
   SB=window.supabase.createClient(window.SUPA_URL, window.SUPA_ANON, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:false}});
   SB.auth.getSession().then(function(res){
     SB_USER=(res.data && res.data.session)?res.data.session.user:null;
-    if(SB_USER){ afterLogin(); }   // içeri alma kararını onay kontrolü verir
+    if(SB_USER){ afterLogin(); }
     updateAuthBar();
   });
   SB.auth.onAuthStateChange(function(_evt, session){
@@ -2443,7 +2658,6 @@ function initSupabase(){
     else {
       stopRealtime(); SB_REV=0;
       if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
-      // çıkışta bellek tamamen temizlenir — sonraki hesaba tek satır veri sızmaz
       suppressSync=true; S=ensureShape({}); MK=null; MEM_BAK=[]; reinitUIFromState(); suppressSync=false;
       if(typeof showLogin==='function') showLogin();
     }
@@ -2493,7 +2707,7 @@ showLogin();
 }
 function loadData(cb){
   var url='data.js';
-  if(location.protocol.indexOf('http')===0) url+='?t='+Date.now(); // Pages/GitHub: cache kir, dosyada: duz
+  if(location.protocol.indexOf('http')===0) url+='?t='+Date.now();
   var s=document.createElement('script'); s.src=url; s.async=false;
   s.onload=function(){cb();};
   s.onerror=function(){ window.__DATA_ERR=true; cb(); };
