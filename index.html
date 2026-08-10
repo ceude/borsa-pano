@@ -516,6 +516,7 @@
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
         <b>Önce oku.</b> Bu test <b>günlük</b> mumlarla ve <b>şu anki endeks üyeleri</b> üzerinde çalışır → <b>hayatta kalma yanlılığı</b> vardır (endeksten düşmüş hisseler listede yok, sonuç olduğundan iyi çıkar). Temettü, vergi, gün içi doluluk ve piyasa etkisi hesaba katılmaz. Ayarları en iyi sonucu verene göre seçmek <b>aşırı uydurma</b>dır — geçmişe uydurulan ayar gelecekte çalışmaz. Geçmiş performans geleceği <b>garanti etmez</b>. Yatırım tavsiyesi değildir.
+        <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--down)"><b>Neden Orta/Uzun Vade skoru burada yok?</b> O skor F/K, P/D, ROE gibi <b>temel</b> verilere dayanır ve elimizde yalnızca <b>bugünkü</b> değerleri var; geçmiş çeyreklerin bilançoları saklanmıyor. Bugünkü orana bakıp geçmişte alım yapmış gibi simüle etmek <b>ileriye bakma yanlılığı</b> olurdu — sonuç sistematik olarak harika çıkar ama hiçbir şey kanıtlamaz. Bu yüzden yalnız <b>fiyattan hesaplanabilen</b> stratejiler test edilebiliyor. (Günlük Trade skoru da test edilemez: relatif hacim gerektirir, geçmiş hacim saklanmıyor.)</div>
       </div>
       <div class="simgrid">
         <div class="trade">
@@ -537,6 +538,22 @@
             <input class="fld" id="btTargetR" type="number" value="2" step="0.5"></div>
           <div class="tpfield"><label>En fazla eşzamanlı pozisyon</label>
             <input class="fld" id="btMaxPos" type="number" value="5" min="1" step="1"></div>
+          <div class="tpfield"><label>Strateji</label>
+            <select id="btStrat">
+              <option value="ma">MA kesişimi (fiyat ortalamayı yukarı keserse)</option>
+              <option value="short">Kısa Vade skoru (fiyat bileşenleri)</option>
+            </select>
+            <div class="tphelp"><b>Kısa Vade skoru:</b> Kısa Vade sekmesindeki puanın yalnız fiyattan hesaplanan bileşenleri (trend, 1A/3A momentum, göreli güç, RSI, volatilite, uzama, zirveye yakınlık). <b>Değer/kalite bileşeni yoktur</b> — geçmiş bilanço verisi saklanmadığı için test edilemez.</div></div>
+          <div class="tpfield"><label>Skor eşiği (yalnız Kısa Vade stratejisinde)</label>
+            <input class="fld" id="btScoreMin" type="number" value="70" min="0" max="100" step="5">
+            <div class="tphelp">Skor bu eşiği <b>yeni aştığında</b> alım yapılır (her gün tekrar değil).</div></div>
+          <label class="hint" style="display:flex; align-items:center; gap:8px; margin:14px 0 8px">
+            <input type="checkbox" id="btFib"> <b>Fibonacci filtresi ekle</b></label>
+          <div class="tphelp" style="margin:-4px 0 10px">Açıkken yalnız <b>yukarı bacakta</b> ve 0.382/0.5/0.618/0.786 destek seviyelerinden birine yakınken alım yapılır. Sinyal sayısını çok azaltır.</div>
+          <div class="qtyrow">
+            <label class="hint" style="flex:1">pencere (gün)<input class="fld" id="btFibLook" type="number" value="120" min="30" step="10" style="width:100%"></label>
+            <label class="hint" style="flex:1">yakınlık %<input class="fld" id="btFibNear" type="number" value="5" min="0.5" step="0.5" style="width:100%"></label>
+          </div>
           <label class="hint" style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
             <input type="checkbox" id="btCosts" checked> spread + komisyonu uygula (Simülatördeki ayarlar)</label>
           <button class="go buy" id="btRun" style="width:100%">Testi çalıştır</button>
@@ -2192,7 +2209,71 @@ function btPrep(bars, maN){
     trs.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc))); }
   var s2=0;
   for(i=0;i<n;i++){ s2+=trs[i]; if(i>=14) s2-=trs[i-14]; atr.push(i>=13? s2/14 : null); }
-  return {close:close, ma:ma, atr:atr};
+  // --- Kısa Vade skoru için ek seriler (hepsi yalnız fiyattan; ileriye bakma yok) ---
+  function sma(p){ var out=[], t=0; for(var j=0;j<n;j++){ t+=close[j]; if(j>=p) t-=close[j-p]; out.push(j>=p-1? t/p : null); } return out; }
+  var ma50=(maN===50?ma:sma(50)), ma200=sma(200);
+  var gain=0, loss=0, rsi=[];
+  for(i=0;i<n;i++){
+    if(i===0){ rsi.push(null); continue; }
+    var ch=close[i]-close[i-1];
+    gain+=Math.max(ch,0); loss+=Math.max(-ch,0);
+    if(i>14){ var oc=close[i-14]-close[i-15]; gain-=Math.max(oc,0); loss-=Math.max(-oc,0); }
+    rsi.push(i>=14 ? (loss<=0?100:100-100/(1+(gain/14)/(loss/14))) : null);
+  }
+  var ret1m=[], ret3m=[], hi252=[];
+  for(i=0;i<n;i++){
+    ret1m.push(i>=21 ? (close[i]/close[i-21]-1)*100 : null);
+    ret3m.push(i>=64 ? (close[i]/close[i-64]-1)*100 : null);
+    var w=Math.min(252,i+1), mx=-Infinity;
+    for(var k=i-w+1;k<=i;k++) if(bars[k][2]>mx) mx=bars[k][2];
+    hi252.push(mx);
+  }
+  return {close:close, ma:ma, atr:atr, ma50:ma50, ma200:ma200, rsi:rsi, ret1m:ret1m, ret3m:ret3m, hi252:hi252};
+}
+/* Kısa Vade skorunun FİYAT bileşenleri (kalite hariç — geçmiş temel veri yok).
+   Canlı sekmedeki fSetup ile aynı kurallar; göreli güç piyasa ortalamasına karşı. */
+function btShortScore(P, i, mktR1){
+  var p={}, c=P.close[i], m50=P.ma50[i], m200=P.ma200[i];
+  if(m50!=null&&c!=null){
+    if(m200!=null && c>m50 && m50>m200) p.trend=100;
+    else if(c>m50) p.trend=65;
+    else if(m200!=null && c>m200) p.trend=40;
+    else p.trend=10;
+  } else return null;
+  var r=P.ret1m[i]; if(r==null) return null;
+  p.rs = (mktR1!=null)? clampN((r-mktR1+10)/20*100,0,100) : null;
+  p.mom = r<=0 ? clampN(40+r*4,0,40) : (r<=12 ? clampN(40+(r/12)*60,40,100) : clampN(100-(r-12)*3,30,100));
+  var q=P.rsi[i];
+  p.rsi = q==null?null:((q>=55&&q<=70)?100:(q>70&&q<=78)?60:(q>78)?25:(q>=45)?65:(q>=40)?45:20);
+  var a=(P.atr[i]!=null&&c>0)?P.atr[i]/c*100:null;
+  p.vol = a==null?null:((a>=1.5&&a<=4)?100:(a>=1&&a<1.5)?70:(a>4&&a<=6)?55:(a<1)?25:30);
+  var pfh=(P.hi252[i]>0)?(c/P.hi252[i]-1)*100:null;
+  p.high = pfh==null?null:clampN((pfh+30)/30*100,0,100);
+  var ext=(m50>0)?(c/m50-1)*100:null;
+  p.ext = ext==null?null:(ext<0?20 : ext<=8?100 : ext<=15?60 : clampN(60-(ext-15)*5,10,60));
+  var r3=P.ret3m[i];
+  p.mom3 = r3==null?null:(r3<=0 ? clampN(50+r3*2,0,50) : clampN(50+(r3/25)*50,50,100));
+  var W={trend:1.6, rs:1.6, mom:1.0, rsi:0.9, vol:1.0, high:0.7, ext:1.0, mom3:0.6};
+  var ws=0, vs=0;
+  for(var k in W){ if(p[k]!=null){ ws+=W[k]; vs+=W[k]*p[k]; } }
+  return ws>0? Math.round(vs/ws) : null;
+}
+/* Fibonacci filtresi: o güne kadarki pencerede yukarı bacak + destek seviyesine yakınlık */
+function btFibOk(bars, i, look, thresh){
+  var start=Math.max(0,i-look+1), hi=-Infinity, lo=Infinity, hiI=-1, loI=-1;
+  for(var j=start;j<=i;j++){
+    if(bars[j][2]>hi){ hi=bars[j][2]; hiI=j; }
+    if(bars[j][3]<lo){ lo=bars[j][3]; loI=j; }
+  }
+  if(hiI<0||loI<0||hi<=lo) return false;
+  if(loI>hiI) return false;                       // aşağı bacak → alım bölgesi değil
+  var c=bars[i][4]; if(c<lo) return false;        // dip kırılmış
+  var rs=[0.382,0.5,0.618,0.786];
+  for(var k=0;k<rs.length;k++){
+    var lv=hi-(hi-lo)*rs[k];
+    if(Math.abs(c-lv)/lv*100<=thresh) return true;
+  }
+  return false;
 }
 function btLabel(t){ return new Date(t*1000).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'}); }
 function btCfg(){
@@ -2204,6 +2285,11 @@ function btCfg(){
     targetR: parseFloat($('btTargetR').value)||2,
     maN:     Math.max(5, parseInt($('btMa').value,10)||50),
     maxPos:  Math.max(1, parseInt($('btMaxPos').value,10)||5),
+    strat:   $('btStrat').value,
+    scoreMin:Math.max(0, parseInt($('btScoreMin').value,10)||70),
+    fib:     $('btFib').checked,
+    fibLook: Math.max(30, parseInt($('btFibLook').value,10)||120),
+    fibNear: Math.max(0.5, parseFloat($('btFibNear').value)||5),
     costs:   $('btCosts').checked
   };
 }
@@ -2250,16 +2336,34 @@ function btExecute(){
     if(equity>peak) peak=equity;
     if(peak>0){ var dd=(peak-equity)/peak*100; if(dd>maxDD) maxDD=dd; }
     if(openCount<cfg.maxPos){
+      var mktR1=null;                                  // o günkü piyasa ortalama 1A getirisi (göreli güç için)
+      if(cfg.strat==='short'){
+        var sum=0, cnt=0;
+        syms.forEach(function(sym){ var d=D[sym], i=d.idx[t]; if(i==null) return;
+          var v=d.p.ret1m[i]; if(v!=null){ sum+=v; cnt++; } });
+        mktR1 = cnt? sum/cnt : null;
+      }
       var cands=[];
       syms.forEach(function(sym){
         if(pos[sym]) return;
         var d=D[sym], i=d.idx[t]; if(i==null||i<1) return;
-        var ma=d.p.ma[i], mp=d.p.ma[i-1], a=d.p.atr[i];
-        if(ma==null||mp==null||a==null||a<=0) return;
-        var c=d.p.close[i], cp=d.p.close[i-1];
-        if(cp<=mp && c>ma) cands.push({sym:sym,c:c,atr:a,ext:(c/ma-1)*100});
+        var a=d.p.atr[i]; if(a==null||a<=0) return;
+        var c=d.p.close[i], sig=false, rank=0;
+        if(cfg.strat==='short'){
+          var sc=btShortScore(d.p,i,mktR1), sp=btShortScore(d.p,i-1,mktR1);
+          if(sc==null) return;
+          sig = (sc>=cfg.scoreMin) && (sp==null || sp<cfg.scoreMin);   // eşiği yeni aşanlar
+          rank = -sc;                                                  // yüksek skor önce
+        } else {
+          var ma=d.p.ma[i], mp=d.p.ma[i-1]; if(ma==null||mp==null) return;
+          sig = (d.p.close[i-1]<=mp && c>ma);
+          rank = (c/ma-1)*100;                                         // ortalamaya yakın olan önce
+        }
+        if(!sig) return;
+        if(cfg.fib && !btFibOk(d.bars,i,cfg.fibLook,cfg.fibNear)) return;
+        cands.push({sym:sym,c:c,atr:a,rank:rank});
       });
-      cands.sort(function(a,b){return a.ext-b.ext;});
+      cands.sort(function(a,b){return a.rank-b.rank;});
       for(var k=0;k<cands.length && openCount<cfg.maxPos;k++){
         var x=cands[k];
         var stop=x.c-cfg.atrMult*x.atr, per=x.c-stop; if(per<=0) continue;
@@ -2317,8 +2421,10 @@ function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
     '<div class="metric"><div class="k">Kâr faktörü</div><div class="v">'+(pf==null?'—':fmt(pf,2))+'</div></div>'+
     '<div class="metric"><div class="k">Maks. düşüş</div><div class="v down">−'+fmt(maxDD,1)+'%</div></div>'+
     '</div>'+
-    '<div class="hint" style="margin-top:8px">'+nSyms+' hisse · '+nDays+' işlem günü · MA'+cfg.maN+
-    ' · stop '+cfg.atrMult+'×ATR · hedef '+cfg.targetR+'R · risk %'+cfg.risk+
+    '<div class="hint" style="margin-top:8px">'+nSyms+' hisse · '+nDays+' işlem günü · <b>'+
+    (cfg.strat==='short'?('Kısa Vade skoru ≥'+cfg.scoreMin):('MA'+cfg.maN+' kesişimi'))+'</b>'+
+    (cfg.fib?(' + <b>Fibonacci filtresi</b> (≤%'+fmt(cfg.fibNear,1)+', '+cfg.fibLook+'g pencere)'):'')+
+    ' · çıkış MA'+cfg.maN+' altı · stop '+cfg.atrMult+'×ATR · hedef '+cfg.targetR+'R · risk %'+cfg.risk+
     ' · en fazla '+cfg.maxPos+' pozisyon · maliyet '+(cfg.costs?'açık':'kapalı')+
     '. <b>Al&amp;tut ortalamasını geçemiyorsa</b> bu kural uğraşmaya değmiyor demektir.</div>'+
     (warn.length?'<div class="hint down" style="margin-top:6px">⚠ '+warn.join('<br>⚠ ')+'</div>':'');
