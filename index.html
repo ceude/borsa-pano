@@ -518,6 +518,14 @@
         <b>Önce oku.</b> Bu test <b>günlük</b> mumlarla ve <b>şu anki endeks üyeleri</b> üzerinde çalışır → <b>hayatta kalma yanlılığı</b> vardır (endeksten düşmüş hisseler listede yok, sonuç olduğundan iyi çıkar). Temettü, vergi, gün içi doluluk ve piyasa etkisi hesaba katılmaz. Ayarları en iyi sonucu verene göre seçmek <b>aşırı uydurma</b>dır — geçmişe uydurulan ayar gelecekte çalışmaz. Geçmiş performans geleceği <b>garanti etmez</b>. Yatırım tavsiyesi değildir.
         <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--down)"><b>Neden Orta/Uzun Vade skoru burada yok?</b> O skor F/K, P/D, ROE gibi <b>temel</b> verilere dayanır ve elimizde yalnızca <b>bugünkü</b> değerleri var; geçmiş çeyreklerin bilançoları saklanmıyor. Bugünkü orana bakıp geçmişte alım yapmış gibi simüle etmek <b>ileriye bakma yanlılığı</b> olurdu — sonuç sistematik olarak harika çıkar ama hiçbir şey kanıtlamaz. Bu yüzden yalnız <b>fiyattan hesaplanabilen</b> stratejiler test edilebiliyor. (Günlük Trade skoru da test edilemez: relatif hacim gerektirir, geçmiş hacim saklanmıyor.)</div>
       </div>
+      <div class="botbar" style="margin-top:0">
+        <div class="hint" style="margin-bottom:6px"><b>Hangi sekmenin kuralları test ediliyor?</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Kısa Vade Adayları</span><b class="up">test edilebilir ✓ — strateji listesinden seç</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Fibonacci</span><b class="up">test edilebilir ✓ — aşağıdaki filtre kutusu</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Orta/Uzun Vade Adayları</span><b class="down">test edilemez — geçmiş bilanço verisi yok</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Günlük Trade</span><b class="down">test edilemez — geçmiş hacim verisi yok</b></div>
+        <div class="hint" id="btActive" style="margin-top:8px"></div>
+      </div>
       <div class="simgrid">
         <div class="trade">
           <h3>Test ayarları</h3>
@@ -540,10 +548,10 @@
             <input class="fld" id="btMaxPos" type="number" value="5" min="1" step="1"></div>
           <div class="tpfield"><label>Strateji</label>
             <select id="btStrat">
-              <option value="ma">MA kesişimi (fiyat ortalamayı yukarı keserse)</option>
-              <option value="short">Kısa Vade skoru (fiyat bileşenleri)</option>
+              <option value="ma">MA kesişimi — bu sekmeye özel basit kural</option>
+              <option value="short">Kısa Vade Adayları kuralları (fiyat bileşenleri)</option>
             </select>
-            <div class="tphelp"><b>Kısa Vade skoru:</b> Kısa Vade sekmesindeki puanın yalnız fiyattan hesaplanan bileşenleri (trend, 1A/3A momentum, göreli güç, RSI, volatilite, uzama, zirveye yakınlık). <b>Değer/kalite bileşeni yoktur</b> — geçmiş bilanço verisi saklanmadığı için test edilemez.</div></div>
+            <div class="tphelp"><b>Kısa Vade Adayları kuralları:</b> o sekmedeki puanın yalnız fiyattan hesaplanan bileşenleri (trend, 1A/3A momentum, göreli güç, RSI, volatilite, uzama, zirveye yakınlık) — geçmişte her gün yeniden hesaplanır. <b>Değer/kalite bileşeni çıkarılmıştır</b>; geçmiş bilanço verisi saklanmadığı için test edilemez. <b>MA kesişimi</b> ise hiçbir sekmeye karşılık gelmez, referans niteliğinde sade bir trend kuralıdır.</div></div>
           <div class="tpfield"><label>Skor eşiği (yalnız Kısa Vade stratejisinde)</label>
             <input class="fld" id="btScoreMin" type="number" value="70" min="0" max="100" step="5">
             <div class="tphelp">Skor bu eşiği <b>yeni aştığında</b> alım yapılır (her gün tekrar değil).</div></div>
@@ -1386,7 +1394,10 @@ function syncSwitch(){
   });
 }
 $('mktSwitch').querySelectorAll('button').forEach(function(b){
-  b.onclick=function(){ MK=b.dataset.m; S.lastMarket=MK; save(); syncSwitch(); renderAll(); goView('trade'); };
+  b.onclick=function(){ MK=b.dataset.m; S.lastMarket=MK; save(); syncSwitch();
+    if(typeof btReset==='function') btReset();
+    fibLastMk=null; if($('fibBuy')){ $('fibBuy').innerHTML=''; $('fibSell').innerHTML=''; $('fibInfo').textContent=''; }
+    renderAll(); goView('trade'); };
 });
 
 /* header meta */
@@ -1427,7 +1438,11 @@ function goView(v){
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
   $('v-'+v).classList.add('active');
   var _ms=$('mktSummary'); if(_ms) _ms.classList.toggle('show', v==='trade');
-  if(v==='fib' && !window.__fibDone){ window.__fibDone=true; if(typeof fibGo==='function') fibGo(); }
+  if(v==='fib' && typeof fibGo==='function' && fibLastMk!==MK) fibGo();
+  if(v==='backtest'){
+    if(typeof btActiveTxt==='function') btActiveTxt();
+    if(typeof btReset==='function' && btLastMk && btLastMk!==MK) btReset();
+  }
 }
 document.querySelectorAll('.tab').forEach(function(t){ t.onclick=function(){goView(t.dataset.v);}; });
 
@@ -2394,6 +2409,7 @@ function btExecute(){
   });
   bh = bhN? bh/bhN : null;
   btRender(cfg, eq, trades, maxDD, finalEq, bh, days.length, syms.length);
+  btLastMk=MK;
 }
 function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
   var ret=(finalEq/cfg.cash-1)*100;
@@ -2445,6 +2461,7 @@ function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
    Dip önce / tepe sonra → bacak YUKARI → geri çekilme seviyeleri DESTEK (alım bölgesi).
    Tepe önce / dip sonra → bacak AŞAĞI → tepki seviyeleri DİRENÇ (satım bölgesi). */
 var FIBLV=[{r:0.236,q:45},{r:0.382,q:70},{r:0.5,q:85},{r:0.618,q:100},{r:0.786,q:60}];
+var fibLastMk=null;
 function fibLeg(bars, look){
   var n=bars.length, start=Math.max(0,n-look);
   var hi=-Infinity, lo=Infinity, hiI=-1, loI=-1;
@@ -2511,6 +2528,7 @@ function fibScan(){
   buys.sort(function(a,b){return b.sc-a.sc;});
   sells.sort(function(a,b){return b.sc-a.sc;});
   fibRender(buys, sells, scanned, look, thresh);
+  fibLastMk=MK;
 }
 function fibRender(buys, sells, scanned, look, thresh){
   $('fibInfo').innerHTML = scanned+' hissede '+look+' günlük salınım tarandı · seviyeye ≤%'+fmt(thresh,1)+
@@ -2549,6 +2567,21 @@ function fibRender(buys, sells, scanned, look, thresh){
     $(id).querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
     $(id).querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
   });
+}
+var btLastMk=null;
+function btActiveTxt(){
+  var el=$('btActive'); if(!el) return;
+  var st=$('btStrat')?$('btStrat').value:'ma';
+  var fib=$('btFib')&&$('btFib').checked;
+  el.innerHTML='Şu an seçili: <b>'+(st==='short'?'Kısa Vade Adayları kuralları':'MA kesişimi (referans kural)')+'</b>'+
+    (fib?' + <b>Fibonacci filtresi</b>':'')+' · piyasa <b>'+(MK||'—')+'</b>';
+}
+function btReset(){
+  btLastMk=null;
+  if($('btStats')) $('btStats').innerHTML='<div class="empty">Ayarları gir ve "Testi çalıştır"a bas.</div>';
+  if($('btChart')) $('btChart').innerHTML='';
+  if($('btLog')) $('btLog').innerHTML='';
+  btActiveTxt();
 }
 function fibGo(){
   $('fibInfo').textContent='geçmiş veri yükleniyor…';
@@ -2621,6 +2654,8 @@ function wireDoc(btnId, ovId){ var ov=$(ovId); if(!ov) return; var b=$(btnId); i
 wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnMid','docOvMid'); wireDoc('docBtnBT','docOvBT'); wireDoc('docBtnFib','docOvFib');
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid','docOvBT','docOvFib'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
 if($('fibRun')) $('fibRun').onclick=fibGo;
+['btStrat','btFib'].forEach(function(id){ var e=$(id); if(e) e.onchange=btActiveTxt; });
+btActiveTxt();
 if($('simCsvBtn')) $('simCsvBtn').onclick=exportSimCSV;
 if($('realCsvBtn')) $('realCsvBtn').onclick=exportRealCSV;
 (function(){
