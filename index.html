@@ -141,7 +141,7 @@
     padding:6px 11px; color:var(--dim); font-family:"Plus Jakarta Sans"}
   .upd{color:var(--faint)}
 
-  nav{max-width:1200px; margin:14px auto 0; padding:0 22px; display:flex; gap:3px; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin}
+  nav{max-width:1200px; margin:14px auto 0; padding:0 22px; display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin}
   nav::-webkit-scrollbar{height:5px}
   nav::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px}
   .tab{background:transparent; border:none; color:var(--dim); font-weight:600; font-size:13.5px;
@@ -331,13 +331,13 @@
   <nav id="nav">
     <button class="tab" data-v="trade" title="Günlük Trade — gecikmeli gün içi izleme + risk hesaplayıcı">Günlük</button>
     <button class="tab" data-v="gunun" title="Kısa Vade Adayları (swing)">Kısa Vade</button>
-    <button class="tab" data-v="fib" title="Fibonacci seviyelerine yakın hisseler">Fibonacci</button>
     <button class="tab active" data-v="screen" title="Orta/Uzun Vade Adayları — değer/kalite taraması">Orta/Uzun</button>
     <button class="tab" data-v="all" title="Tüm Liste — alfabetik">Tüm Liste</button>
     <button class="tab" data-v="movers" title="En Çok Artan/Azalan/Hacim">Artan/Azalan</button>
+    <button class="tab" data-v="fib" title="Fibonacci seviyelerine yakın hisseler">Fibonacci</button>
     <button class="tab" data-v="sim" title="Simülatör — sanal para + oto-trader">Simülatör</button>
     <button class="tab" data-v="backtest" title="Geçmişte Test — stratejinin geriye dönük testi">Geçmiş Test</button>
-    <button class="tab" data-v="real" title="Gerçek Portföy">Portföy</button>
+    <button class="tab" data-v="real" title="Gerçek Portföy">Gerçek Portföy</button>
   </nav>
 
   <main>
@@ -405,7 +405,7 @@
         <b>Önce oku.</b> Fibonacci seviyelerinin fiyatı öngördüğüne dair <b>sağlam bir kanıt yoktur</b>; çok sayıda kişi aynı seviyelere baktığı için kısmen kendini doğrulayan bir etkidir ve sık sık çalışmaz. Buradaki liste "fiyat şu an sık izlenen bir seviyenin yakınında" demektir — <b>"al" ya da "sat" sinyali değildir</b>. Güvenilirlik puanı bu <b>kurulumun</b> derli topluluğunu ölçer, kazanma olasılığını değil. Yatırım tavsiyesi değildir.
       </div>
       <div class="controls">
-        <label class="hint" style="display:flex; align-items:center; gap:6px">Salınım penceresi (gün) <input class="fld" id="fibLook" type="number" value="120" min="30" step="10" style="width:80px" title="Tepe ve dibin aranacağı geçmiş gün sayısı."></label>
+        <label class="hint" style="display:flex; align-items:center; gap:6px">Salınım penceresi (gün) <input class="fld" id="fibLook" type="number" value="120" min="30" step="10" style="width:80px" title="Tepe ve dibin aranacağı geçmiş gün sayısı. Günlük veri ~1 yıl olduğu için, bundan uzun pencerelerde otomatik olarak 5 yıllık haftalık seriye geçilir."></label>
         <label class="hint" style="display:flex; align-items:center; gap:6px">Yakınlık eşiği (%) <input class="fld" id="fibNear" type="number" value="5" min="0.5" step="0.5" style="width:70px" title="Fiyat, seviyeye bu yüzdeden yakınsa listeye girer."></label>
         <button class="ghost" id="fibRun">Yeniden tara</button>
       </div>
@@ -637,6 +637,7 @@
           <button class="ghost" id="chUndo">↩ Son çizim</button>
           <button class="ghost" id="chClear">Çizimleri temizle</button>
         </div>
+        <div id="fibAutoBar" class="hint" style="display:none; background:var(--brand-bg); border:1px solid var(--brand); color:var(--brand-ink); border-radius:10px; padding:9px 12px; margin-bottom:10px"></div>
         <div id="chBox" style="position:relative; height:360px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)">
           <canvas id="chOv" style="position:absolute; inset:0; pointer-events:none; z-index:5"></canvas>
           <div id="chMsg" class="empty" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:6; background:var(--surface)">grafik yükleniyor…</div>
@@ -2461,7 +2462,7 @@ function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
    Dip önce / tepe sonra → bacak YUKARI → geri çekilme seviyeleri DESTEK (alım bölgesi).
    Tepe önce / dip sonra → bacak AŞAĞI → tepki seviyeleri DİRENÇ (satım bölgesi). */
 var FIBLV=[{r:0.236,q:45},{r:0.382,q:70},{r:0.5,q:85},{r:0.618,q:100},{r:0.786,q:60}];
-var fibLastMk=null;
+var fibLastMk=null, FIBMAP={}, fibPending=null;
 function fibLeg(bars, look){
   var n=bars.length, start=Math.max(0,n-look);
   var hi=-Infinity, lo=Infinity, hiI=-1, loI=-1;
@@ -2487,7 +2488,8 @@ function fibScore(kind, near, leg, s, thresh){
   p.prox = clampN((1-near.dist/thresh)*100, 0, 100);
   p.level = near.q;
   p.swing = leg.legPct>=20?100 : leg.legPct>=10? 60+(leg.legPct-10)/10*40 : clampN(leg.legPct/10*60,15,60);
-  p.fresh = leg.ageBars<=40?100 : clampN(100-(leg.ageBars-40)*1.5, 20, 100);
+  var ageD=(leg.ageDays!=null?leg.ageDays:leg.ageBars);
+  p.fresh = ageD<=40?100 : clampN(100-(ageD-40)*1.5, 20, 100);
   if(kind==='buy'){
     if(s.ma50!=null&&s.ma200!=null&&s.price!=null) p.trend=(s.price>s.ma200&&s.ma50>s.ma200)?100:(s.price>s.ma200)?75:35;
     else if(s.ma50!=null&&s.price!=null) p.trend=s.price>s.ma50?75:35; else p.trend=null;
@@ -2507,12 +2509,22 @@ function fibScore(kind, near, leg, s, thresh){
 function fibScan(){
   var look=Math.max(30, parseInt($('fibLook').value,10)||120);
   var thresh=Math.max(0.5, parseFloat($('fibNear').value)||5);
-  var buys=[], sells=[], scanned=0;
+  var buys=[], sells=[], scanned=0, usedW=0, maxDay=0, maxSpan=0;
   marketStocks().forEach(function(s){
     if(s.price==null) return;
-    var h=HIST[s.symbol]; if(!h||!h.d||h.d.length<40) return;
+    var h=HIST[s.symbol]; if(!h) return;
+    var d=h.d||[], w=h.w||[];
+    if(d.length>maxDay) maxDay=d.length;
+    // İstenen pencere günlük veriden uzunsa 5 yıllık HAFTALIK seriye geç (1 bar ≈ 5 işlem günü)
+    var bars, mult, barsLook;
+    if(look<=d.length || !w.length){ bars=d; mult=1; barsLook=look; }
+    else { bars=w; mult=5; barsLook=Math.ceil(look/5); usedW++; }
+    if(bars.length<20) return;
     scanned++;
-    var leg=fibLeg(h.d, look); if(!leg) return;
+    var span=Math.min(barsLook,bars.length)*mult; if(span>maxSpan) maxSpan=span;
+    var leg=fibLeg(bars, barsLook); if(!leg) return;
+    leg.ageDays=leg.ageBars*mult;
+    leg.hiT=bars[leg.hiI][0]; leg.loT=bars[leg.loI][0]; leg.unit=(mult===1?'günlük':'haftalık');
     var near=fibNearest(leg, s.price);
     if(near.dist>thresh) return;
     if(leg.dir==='up'){
@@ -2527,12 +2539,17 @@ function fibScan(){
   });
   buys.sort(function(a,b){return b.sc-a.sc;});
   sells.sort(function(a,b){return b.sc-a.sc;});
-  fibRender(buys, sells, scanned, look, thresh);
+  fibRender(buys, sells, scanned, look, thresh, {usedW:usedW, maxDay:maxDay, maxSpan:maxSpan});
   fibLastMk=MK;
 }
-function fibRender(buys, sells, scanned, look, thresh){
-  $('fibInfo').innerHTML = scanned+' hissede '+look+' günlük salınım tarandı · seviyeye ≤%'+fmt(thresh,1)+
-    ' yakınlık · <b>'+buys.length+'</b> alım bölgesi, <b>'+sells.length+'</b> satım bölgesi adayı. Sıralama: güvenilirlik puanı (yüksekten düşüğe).';
+function fibRender(buys, sells, scanned, look, thresh, meta){
+  meta=meta||{};
+  var note='';
+  if(meta.usedW) note=' · <b>haftalık seri</b> kullanıldı ('+meta.usedW+' hissede), çünkü istenen pencere günlük veriden ('+meta.maxDay+' gün) uzun';
+  else if(meta.maxDay && look>meta.maxDay) note=' · <b class="down">istenen '+look+' gün ama en fazla '+meta.maxDay+' gün veri var</b> — fiilen '+meta.maxDay+' gün tarandı';
+  $('fibInfo').innerHTML = scanned+' hissede salınım tarandı · istenen pencere <b>'+look+' gün</b>'+
+    (meta.maxSpan?(', fiilen en çok <b>'+meta.maxSpan+' gün</b>'):'')+note+
+    ' · seviyeye ≤%'+fmt(thresh,1)+' yakınlık · <b>'+buys.length+'</b> alım bölgesi, <b>'+sells.length+'</b> satım bölgesi adayı. Sıralama: güvenilirlik puanı (yüksekten düşüğe).';
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   function table(list){
     if(!list.length) return '<div class="empty">Şu an bu koşullara uyan hisse yok.</div>';
@@ -2563,8 +2580,10 @@ function fibRender(buys, sells, scanned, look, thresh){
   }
   $('fibBuy').innerHTML=table(buys);
   $('fibSell').innerHTML=table(sells);
+  FIBMAP={};
+  buys.concat(sells).forEach(function(x){ FIBMAP[x.s.symbol]={leg:x.leg, near:x.near, sc:x.sc}; });
   ['fibBuy','fibSell'].forEach(function(id){
-    $(id).querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+    $(id).querySelectorAll('.sym').forEach(function(e){e.onclick=function(){ fibPending=e.dataset.sym; openStock(e.dataset.sym); };});
     $(id).querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
   });
 }
@@ -2780,7 +2799,7 @@ function redrawOverlay(){
   function yOf(p){ var y=ser.priceToCoordinate(p); return (y==null)?null:y; }
   function drawOne(dw){
     var xa=xOf(dw.a.t), xb=xOf(dw.b.t), ya=yOf(dw.a.p), yb=yOf(dw.b.p);
-    ctx.setLineDash(dw.preview?[5,4]:[]);
+    ctx.setLineDash(dw.preview?[5,4]:(dw.auto?[7,4]:[]));
     if(dw.type==='trend'){
       if(xa==null||xb==null||ya==null||yb==null) return;
       ctx.strokeStyle='#7c5cff'; ctx.lineWidth=1.6;
@@ -2803,6 +2822,7 @@ function redrawOverlay(){
     ctx.setLineDash([]);
   }
   chDrawings().forEach(drawOne);
+  if(CH.auto) drawOne(CH.auto);
   if(CH.pending&&CH.hover) drawOne({type:(CH.tool==='fib'?'fib':'trend'), a:CH.pending, b:CH.hover, preview:true});
 }
 function segWire(id, attr, cb){
@@ -2826,8 +2846,43 @@ segWire('chTool','tool',function(v){ CH.tool=v; CH.pending=null; CH.hover=null; 
   var u=$('chUndo'); if(u) u.onclick=function(){ var a=chDrawings(); if(a.length){ a.pop(); save(); redrawOverlay(); } };
   var c=$('chClear'); if(c) c.onclick=function(){ if(chDrawings().length && confirm('Bu hissedeki tüm çizimler silinsin mi?')){ S.chartDrawings[CH.sym]=[]; save(); redrawOverlay(); } };
 })();
+function setTfBtn(v){
+  CH.tf=v;
+  var box=$('chTf'); if(!box) return;
+  box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.tf===v); });
+}
+function fibAutoApply(sym){
+  var bar=$('fibAutoBar');
+  CH.auto=null;
+  if(!bar) return;
+  var m=FIBMAP[sym];
+  if(!m){ bar.style.display='none'; return; }
+  var leg=m.leg, near=m.near;
+  // a = tepe (oran 0), b = dip (oran 1) → seviye = tepe − (tepe−dip)×oran
+  CH.auto={type:'fib', auto:true, a:{t:leg.hiT, p:leg.hi}, b:{t:leg.loT, p:leg.lo}};
+  var spanDays=(Math.max(leg.hiT,leg.loT)-Math.min(leg.hiT,leg.loT))/86400 + (leg.ageDays||0);
+  setTfBtn(spanDays>330?'5Y':(spanDays>60?'1Y':'1A'));
+  var dt=function(t){ return new Date(t*1000).toLocaleDateString('tr-TR'); };
+  bar.style.display='block';
+  bar.innerHTML='<b>φ Fibonacci sekmesindeki hesap çiziliyor</b> ('+leg.unit+' veri) — '+
+    (leg.dir==='up'?'yukarı bacak, seviyeler <b>destek</b>':'aşağı bacak, seviyeler <b>direnç</b>')+'.<br>'+
+    'Dip <b>'+fmt(leg.lo)+'</b> ('+dt(leg.loT)+') → Tepe <b>'+fmt(leg.hi)+'</b> ('+dt(leg.hiT)+') · bacak %'+fmt(leg.legPct,1)+
+    ' · en yakın seviye <b>'+(near.r*100).toFixed(1).replace('.0','')+'% = '+fmt(near.level)+'</b> (uzaklık %'+fmt(near.dist,2)+') · güvenilirlik <b>'+m.sc+'</b>'+
+    '<div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">'+
+    '<button class="ghost" id="fibAutoSave">Bu çizimi kalıcı kaydet</button>'+
+    '<button class="ghost" id="fibAutoHide">Çizimi gizle</button></div>'+
+    '<div class="hint" style="margin-top:6px">Kesikli çizgiler otomatik hesaptır, kaydedilmez. Kalıcı kaydedersen kendi çizimlerine eklenir ve bulutla eşitlenir.</div>';
+  $('fibAutoSave').onclick=function(){
+    if(!CH.auto) return;
+    chDrawings().push({type:'fib', a:CH.auto.a, b:CH.auto.b});
+    save(); CH.auto=null; bar.style.display='none'; redrawOverlay();
+  };
+  $('fibAutoHide').onclick=function(){ CH.auto=null; bar.style.display='none'; redrawOverlay(); };
+}
 function initDetailChart(sym){
   CH.sym=sym; CH.pending=null; CH.hover=null;
+  if(fibPending===sym){ fibAutoApply(sym); fibPending=null; }
+  else { CH.auto=null; var _b=$('fibAutoBar'); if(_b) _b.style.display='none'; }
   chMsg('grafik yükleniyor…');
   if(!window.LightweightCharts){ chMsg('grafik kütüphanesi yüklenemedi (internet/CDN engeli)'); return; }
   loadHistory(function(okHist){
