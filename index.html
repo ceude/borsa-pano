@@ -635,7 +635,7 @@
             <button data-tf="1G">1G</button><button data-tf="1H">1H</button><button class="on" data-tf="1A">1A</button><button data-tf="1Y">1Y</button><button data-tf="5Y">5Y</button>
           </div>
           <div class="seg" id="chType"><button class="on" data-ct="candle">Mum</button><button data-ct="line">Çizgi</button></div>
-          <div class="seg" id="chTool"><button class="on" data-tool="cursor">🖱 İmleç</button><button data-tool="trend">✏️ Trend</button><button data-tool="fib">φ Fib</button></div>
+          <div class="seg" id="chTool"><button class="on" data-tool="cursor">🖱 İmleç</button><button data-tool="fib">φ Fib</button></div>
           <button class="ghost" id="chUndo">↩ Son çizim</button>
           <button class="ghost" id="chClear">Çizimleri temizle</button>
         </div>
@@ -673,7 +673,7 @@
         </div>
         <div id="chPane2" style="height:130px; margin-top:6px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface); display:none"></div>
         <div id="chRead" class="hint" style="margin-top:8px"></div>
-        <div class="hint" style="margin-top:8px">Sürükle: kaydır · tekerlek / iki parmak: zoom · <b>Trend</b>: iki noktaya tıkla · <b>Fib</b>: gün sayısı sorar, otomatik çizer ya da elle çizersin · <b>Esc</b>: yarım çizimi iptal · çizimler hisseye kaydedilir ve bulutla eşitlenir.</div>
+        <div class="hint" style="margin-top:8px">Sürükle: kaydır · tekerlek / iki parmak: zoom · <b>φ Fib</b>: gün sayısı sorar, salınımı bulup otomatik çizer ya da elle çizersin · <b>Esc</b>: yarım çizimi iptal · çizimler hisseye kaydedilir ve bulutla eşitlenir.</div>
       </div>
       <div class="metrics" id="detailMetrics"></div>
       <button class="miniact" id="detailToSim" style="padding:10px 16px; margin-bottom:18px">Simülatöre gönder</button>
@@ -1829,7 +1829,7 @@ function openStock(sym){
     ['Borç/Özsermaye', s.debtToEquity==null?'—':qDot('de',s.debtToEquity)+fmt(s.debtToEquity)],
     ['Net Marj', s.netMargin==null?'—':qDot('margin',s.netMargin)+fmt(s.netMargin)+'%'],
     ['Net Kâr', s.netIncome==null?'—':shortNum(s.netIncome)],
-    ['Skor', s.score==null?'—':fmt(s.score,0)+' /100'],
+    ['Orta/Uzun Vade Skor', s.score==null?'—':fmt(s.score,0)+' /100'],
     ['Veri kapsamı', (s.scoreCoverage||0)+' metrik'],
     ['Para birimi', s.currency||ccyCode(s.market)]
   ];
