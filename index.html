@@ -639,12 +639,29 @@
           <button class="ghost" id="chUndo">↩ Son çizim</button>
           <button class="ghost" id="chClear">Çizimleri temizle</button>
         </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px">
+          <span class="hint">Göstergeler:</span>
+          <div class="seg" id="chInd">
+            <button data-ind="ema20" title="20 günlük üstel hareketli ortalama — son fiyatlara daha çok ağırlık verir, kısa vade eğilim.">EMA20</button>
+            <button data-ind="ma50" title="50 günlük basit ortalama — orta vade trend.">MA50</button>
+            <button data-ind="ma200" title="200 günlük basit ortalama — uzun vade trend; üstü boğa, altı ayı kabul edilir.">MA200</button>
+            <button data-ind="bb" title="Bollinger Bantları (20 gün, ±2 standart sapma) — oynaklık zarfı. Bantlar daralınca hareket yaklaşıyor, fiyat banda değince aşırı sayılır.">Bollinger</button>
+          </div>
+          <span class="hint">Alt panel:</span>
+          <div class="seg" id="chPane">
+            <button class="on" data-pane="none">Yok</button>
+            <button data-pane="rsi" title="Göreli Güç Endeksi (14) — 70 üstü aşırı alım, 30 altı aşırı satım.">RSI</button>
+            <button data-pane="macd" title="MACD (12,26,9) — hızlı/yavaş ortalama farkı ve sinyal çizgisi; kesişimler momentum değişimi sayılır.">MACD</button>
+          </div>
+        </div>
         <div id="fibAutoBar" class="hint" style="display:none; background:var(--brand-bg); border:1px solid var(--brand); color:var(--brand-ink); border-radius:10px; padding:9px 12px; margin-bottom:10px"></div>
         <div id="chBox" style="position:relative; height:360px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)">
           <canvas id="chOv" style="position:absolute; inset:0; pointer-events:none; z-index:5"></canvas>
           <div id="chMsg" class="empty" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:6; background:var(--surface)">grafik yükleniyor…</div>
         </div>
-        <div class="hint" style="margin-top:8px">Sürükle: kaydır · tekerlek / iki parmak: zoom · <b>Trend</b>: iki noktaya tıkla · <b>Fib</b>: önce tepeye sonra dibe tıkla (ya da tersi) · <b>Esc</b>: yarım çizimi iptal · çizimler hisseye kaydedilir ve bulutla eşitlenir.</div>
+        <div id="chPane2" style="height:130px; margin-top:6px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface); display:none"></div>
+        <div id="chRead" class="hint" style="margin-top:8px"></div>
+        <div class="hint" style="margin-top:8px">Sürükle: kaydır · tekerlek / iki parmak: zoom · <b>Trend</b>: iki noktaya tıkla · <b>Fib</b>: gün sayısı sorar, otomatik çizer ya da elle çizersin · <b>Esc</b>: yarım çizimi iptal · çizimler hisseye kaydedilir ve bulutla eşitlenir.</div>
       </div>
       <div class="metrics" id="detailMetrics"></div>
       <button class="miniact" id="detailToSim" style="padding:10px 16px; margin-bottom:18px">Simülatöre gönder</button>
@@ -1089,6 +1106,11 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
     </div>
   </div>
 </div>
+<div class="docov" id="dlgOv">
+  <div class="doccard" style="max-width:430px">
+    <div class="doc" id="dlgBody"></div>
+  </div>
+</div>
 <div class="docov" id="authOv">
   <div class="doccard" style="max-width:560px">
     <button class="docclose" id="authClose">✕ Kapat</button>
@@ -1317,6 +1339,8 @@ if(S.botTP===undefined) S.botTP=2.5;
 if(!S.cost) S.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
 if(!S.cost.comm) S.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
 S.chartDrawings = S.chartDrawings || {};
+if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false};
+if(!S.chartPane) S.chartPane='none';
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
 function ensureShape(st){
@@ -1332,6 +1356,8 @@ function ensureShape(st){
   if(!st.cost) st.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
   if(!st.cost.comm) st.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
   st.chartDrawings = st.chartDrawings || {};
+  if(!st.chartInd) st.chartInd={ema20:false, ma50:true, ma200:true, bb:false};
+  if(!st.chartPane) st.chartPane='none';
   return st;
 }
 function save(){ if(typeof scheduleSync==='function') scheduleSync(); }
@@ -1441,7 +1467,6 @@ function goView(v){
   document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('active', x.dataset.v===v);});
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
   $('v-'+v).classList.add('active');
-  var _ms=$('mktSummary'); if(_ms) _ms.classList.toggle('show', v==='trade');
   if(v==='fib' && typeof fibGo==='function' && fibLastMk!==MK) fibGo();
   if(v==='backtest'){
     if(typeof btActiveTxt==='function') btActiveTxt();
@@ -1570,7 +1595,8 @@ function valG(s,k){ if(k==='_tr')return trendRank(s); if(k==='_rs')return s._rs;
 function renderMarketSummary(){
   var el=$('mktSummary'); if(!el) return;
   var list=marketStocks().filter(function(s){return typeof s.changePct==='number';});
-  if(!list.length){ el.innerHTML=''; return; }
+  if(!list.length){ el.innerHTML=''; el.classList.remove('show'); return; }
+  el.classList.add('show');
   var up=0,down=0,sum=0;
   list.forEach(function(s){ sum+=s.changePct; if(s.changePct>0)up++; else if(s.changePct<0)down++; });
   var avg=sum/list.length, sec={};
@@ -1861,7 +1887,11 @@ $('setCash').onclick=function(){
   sim.cash+=amt; sim.deposited=(sim.deposited||0)+amt;
   save(); renderSim();
 };
-$('resetSim').onclick=function(){ if(confirm('Bu piyasanın sanal portföyü silinsin mi?')){ var start=(MK==='BIST'?100000:10000); S.sim[MK]={cash:start,deposited:start,holdings:{},log:[]}; S.botPos[MK]={}; S.botCool[MK]={}; save(); renderSim(); } };
+$('resetSim').onclick=function(){
+  dlg('Simülatörü sıfırla','<p><b>'+MK+'</b> sanal portföyü, tüm pozisyonlar ve işlem geçmişi silinsin mi? Geri alınamaz.</p>',
+    [{label:'Evet, sıfırla', primary:true, fn:function(){ var start=(MK==='BIST'?100000:10000); S.sim[MK]={cash:start,deposited:start,holdings:{},log:[]}; S.botPos[MK]={}; S.botCool[MK]={}; save(); renderSim(); }},
+     {label:'Vazgeç'}]);
+};
 function simTotalVal(){
   var sim=simFor(MK), holdVal=0;
   Object.keys(sim.holdings).forEach(function(sym){var s=find(sym); if(s&&s.price!=null) holdVal+=s.price*sim.holdings[sym].qty;});
@@ -1980,7 +2010,11 @@ function updateRealCost(){
   $('rCostEst').innerHTML=(price==null||!qty)?'—':amt(MK, price*qty);
 }
 ['rSym','rPrice','rQty'].forEach(function(id){ var el=$(id); if(el) el.oninput=updateRealCost; });
-$('resetReal').onclick=function(){ if(confirm('Bu piyasanın gerçek portföyü ve işlem geçmişi silinsin mi?')){ S.real[MK]={deposited:0,log:[]}; save(); renderReal(); renderScreen(); renderAllList(); } };
+$('resetReal').onclick=function(){
+  dlg('Gerçek portföyü sıfırla','<p><b>'+MK+'</b> gerçek portföyü ve <b>tüm işlem geçmişi</b> silinsin mi? Geri alınamaz ve bulut hesabına da yansır.</p>',
+    [{label:'Evet, sıfırla', primary:true, fn:function(){ S.real[MK]={deposited:0,log:[]}; save(); renderReal(); renderScreen(); renderAllList(); }},
+     {label:'Vazgeç'}]);
+};
 function realTotalNow(){
   var real=realFor(MK), h=computeRealHoldings(real), hv=0;
   Object.keys(h).forEach(function(sym){ var s=find(sym); if(s&&s.price!=null) hv+=s.price*h[sym].qty; });
@@ -2801,6 +2835,7 @@ function applyTF(){
   if(!bars.length){ CH.candle.setData([]); CH.line.setData([]); chMsg('bu periyot için veri yok'); redrawOverlay(); return; }
   CH.candle.setData(toCandles(bars));
   CH.line.setData(toLine(bars));
+  applyIndicators(bars);
   CH.chart.timeScale().fitContent();
   chMsg(CH.note||'');
   if(!CH.note) chMsg('');
@@ -2862,11 +2897,231 @@ segWire('chType','ct',function(v){
   if(CH.line) CH.line.applyOptions({visible:v==='line'});
   redrawOverlay();
 });
-segWire('chTool','tool',function(v){ CH.tool=v; CH.pending=null; CH.hover=null; redrawOverlay(); });
+segWire('chTool','tool',function(v){
+  CH.tool=v; CH.pending=null; CH.hover=null; redrawOverlay();
+  if(v==='fib') fibDrawDialog();
+});
+/* göstergeler: çoklu aç/kapa (segWire tekli seçim yapıyor, burada ayrı) */
+(function(){
+  var box=$('chInd'); if(!box) return;
+  function paint(){ var c=indCfg(); box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', !!c[b.dataset.ind]); }); }
+  box.querySelectorAll('button').forEach(function(b){
+    b.onclick=function(){ var c=indCfg(); c[b.dataset.ind]=!c[b.dataset.ind]; save(); paint(); applyTF(); };
+  });
+  paint();
+  var pb=$('chPane');
+  if(pb){
+    if(!S.chartPane) S.chartPane='none';
+    pb.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.pane===S.chartPane); });
+    pb.querySelectorAll('button').forEach(function(b){
+      b.onclick=function(){
+        pb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on'); S.chartPane=b.dataset.pane; save(); applyTF();
+      };
+    });
+  }
+})();
+/* Fib aracı: gün sayısı sor → otomatik çiz ya da elle çiz */
+function fibDrawDialog(){
+  var sym=CH.sym;
+  dlg('φ Fibonacci çizimi',
+    '<p>Salınımı (tepe–dip) senin yerine bulup seviyeleri çizebilirim; ya da kendin çizebilirsin.</p>'+
+    '<div class="tpfield"><label>Kaç günlük geçmişte tepe/dip aransın?</label>'+
+    '<input class="fld" id="dlgFibDays" type="number" value="'+(parseInt($('fibLook')&&$('fibLook').value,10)||120)+'" min="30" step="10" style="width:100%">'+
+    '<div class="tphelp">Günlük veri ~1 yıl; daha uzun istersen otomatik olarak haftalık seriye geçilir.</div></div>',
+    [
+      {label:'Otomatik çiz', primary:true, fn:function(){
+        var d=Math.max(30, parseInt($('dlgFibDays').value,10)||120);
+        fibAutoCompute(sym, d);
+        CH.tool='cursor'; setToolBtn('cursor');
+      }},
+      {label:'Manuel çizeceğim', fn:function(){
+        CH.tool='fib';
+        dlg('Manuel Fibonacci','<p>Grafikte <b>önce tepeye</b>, sonra <b>dibe</b> tıkla (ya da tersi). <b>Esc</b> ile iptal edebilirsin.</p>',[{label:'Tamam', primary:true}]);
+        return false;
+      }},
+      {label:'Vazgeç', fn:function(){ CH.tool='cursor'; setToolBtn('cursor'); }}
+    ]);
+}
+function setToolBtn(v){
+  var box=$('chTool'); if(!box) return;
+  box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.tool===v); });
+}
+/* verilen gün sayısıyla salınımı hesapla ve geçici olarak çiz */
+function fibAutoCompute(sym, look){
+  var s=find(sym); var h=HIST?HIST[sym]:null;
+  if(!s||!h){ dlg('Veri yok','<p>Bu hisse için geçmiş veri bulunamadı.</p>',[{label:'Tamam',primary:true}]); return; }
+  var d=h.d||[], w=h.w||[], bars, mult;
+  if(look<=d.length || !w.length){ bars=d; mult=1; } else { bars=w; mult=5; }
+  var leg=fibLeg(bars, mult===1?look:Math.ceil(look/5));
+  if(!leg){ dlg('Hesaplanamadı','<p>Bu pencerede geçerli bir salınım bulunamadı.</p>',[{label:'Tamam',primary:true}]); return; }
+  leg.ageDays=leg.ageBars*mult; leg.hiT=bars[leg.hiI][0]; leg.loT=bars[leg.loI][0]; leg.unit=(mult===1?'günlük':'haftalık');
+  var near=fibNearest(leg, s.price);
+  var r=fibScore(leg.dir==='up'?'buy':'sell', near, leg, s, 5);
+  FIBMAP[sym]={leg:leg, near:near, sc:(r&&r.score!=null?r.score:'—')};
+  fibAutoApply(sym);
+  redrawOverlay();
+}
 (function(){
   var u=$('chUndo'); if(u) u.onclick=function(){ var a=chDrawings(); if(a.length){ a.pop(); save(); redrawOverlay(); } };
-  var c=$('chClear'); if(c) c.onclick=function(){ if(chDrawings().length && confirm('Bu hissedeki tüm çizimler silinsin mi?')){ S.chartDrawings[CH.sym]=[]; save(); redrawOverlay(); } };
+  var c=$('chClear'); if(c) c.onclick=function(){
+    var n=chDrawings().length;
+    if(!n){ dlg('Çizim yok','<p>Bu hissede silinecek çizim bulunmuyor.</p>',[{label:'Tamam',primary:true}]); return; }
+    dlg('Çizimleri temizle',
+      '<p><b>'+clean(CH.sym||'')+'</b> hissesindeki <b>'+n+'</b> çizim silinsin mi? Bu işlem geri alınamaz ve bulut hesabına da yansır.</p>',
+      [{label:'Evet, sil', primary:true, fn:function(){ S.chartDrawings[CH.sym]=[]; save(); redrawOverlay(); }},
+       {label:'Vazgeç'}]);
+  };
 })();
+/* ---------- uygulama içi diyalog (tarayıcı confirm/prompt yerine) ---------- */
+function dlgClose(){ var o=$('dlgOv'); if(o) o.classList.remove('open'); }
+function dlg(title, bodyHtml, buttons){
+  var ov=$('dlgOv'), b=$('dlgBody'); if(!ov||!b) return;
+  b.innerHTML='<h1 style="margin-bottom:10px">'+title+'</h1>'+bodyHtml+
+    '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px" id="dlgBtns"></div>';
+  var bar=$('dlgBtns');
+  (buttons||[]).forEach(function(bt,i){
+    var el=document.createElement('button');
+    el.className=bt.primary?'go buy':'ghost';
+    el.style.cssText=bt.primary?'flex:1; padding:12px':'padding:12px 14px';
+    el.textContent=bt.label;
+    el.onclick=function(){ if(bt.fn && bt.fn()===false) return; dlgClose(); };
+    bar.appendChild(el);
+  });
+  ov.classList.add('open');
+  ov.onclick=function(e){ if(e.target===ov) dlgClose(); };
+}
+/* ---------- gösterge hesapları (yalnız fiyattan; hacim verisi yok) ---------- */
+function indSMA(v,n){ var out=[],s=0; for(var i=0;i<v.length;i++){ s+=v[i]; if(i>=n) s-=v[i-n]; out.push(i>=n-1? s/n : null); } return out; }
+function indEMA(v,n){ var out=[],k=2/(n+1),e=null; for(var i=0;i<v.length;i++){ e=(e==null)?v[i]:(v[i]-e)*k+e; out.push(i>=n-1?e:null); } return out; }
+function indBB(v,n,mult){
+  var ma=indSMA(v,n), up=[], lo=[];
+  for(var i=0;i<v.length;i++){
+    if(ma[i]==null){ up.push(null); lo.push(null); continue; }
+    var s=0; for(var j=i-n+1;j<=i;j++){ var d=v[j]-ma[i]; s+=d*d; }
+    var sd=Math.sqrt(s/n); up.push(ma[i]+mult*sd); lo.push(ma[i]-mult*sd);
+  }
+  return {ma:ma, up:up, lo:lo};
+}
+function indRSI(v,n){
+  var out=[], g=0, l=0;
+  for(var i=0;i<v.length;i++){
+    if(i===0){ out.push(null); continue; }
+    var ch=v[i]-v[i-1]; g+=Math.max(ch,0); l+=Math.max(-ch,0);
+    if(i>n){ var o=v[i-n]-v[i-n-1]; g-=Math.max(o,0); l-=Math.max(-o,0); }
+    out.push(i>=n ? (l<=0?100:100-100/(1+(g/n)/(l/n))) : null);
+  }
+  return out;
+}
+function indMACD(v){
+  var e12=indEMA(v,12), e26=indEMA(v,26), macd=[], i;
+  for(i=0;i<v.length;i++) macd.push((e12[i]==null||e26[i]==null)?null:e12[i]-e26[i]);
+  var firstIdx=macd.findIndex(function(x){return x!=null;});
+  var sig=[], k=2/(9+1), e=null;
+  for(i=0;i<macd.length;i++){
+    if(macd[i]==null||firstIdx<0||i<firstIdx){ sig.push(null); continue; }
+    e=(e==null)?macd[i]:(macd[i]-e)*k+e;
+    sig.push(i>=firstIdx+8?e:null);
+  }
+  var hist=macd.map(function(m,j){ return (m==null||sig[j]==null)?null:m-sig[j]; });
+  return {macd:macd, sig:sig, hist:hist};
+}
+/* ---------- göstergelerin grafiğe uygulanması ---------- */
+var IND={}, PANE={chart:null, s1:null, s2:null, hist:null, kind:null}, paneSync=false;
+function indCfg(){ if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false}; return S.chartInd; }
+function lineSer(key, color, width, dashed){
+  if(!IND[key]){
+    IND[key]=CH.chart.addLineSeries({color:color, lineWidth:width||1.5, priceLineVisible:false,
+      lastValueVisible:false, crosshairMarkerVisible:false,
+      lineStyle:dashed?2:0});
+  }
+  return IND[key];
+}
+function applyIndicators(bars){
+  if(!CH.chart||!bars||!bars.length) return;
+  var t=bars.map(function(b){return b[0];}), c=bars.map(function(b){return b[4];});
+  var cfg=indCfg(), n=bars.length-1, read=[];
+  function put(key,color,arr,w,dash,label,dec){
+    var s=lineSer(key,color,w,dash);
+    if(!arr){ s.setData([]); return; }
+    var d=[]; for(var i=0;i<arr.length;i++) if(arr[i]!=null) d.push({time:t[i], value:arr[i]});
+    s.setData(d);
+    if(label && arr[n]!=null) read.push('<b style="color:'+color+'">'+label+'</b> '+fmt(arr[n],dec==null?2:dec));
+  }
+  put('ema20','#f59e0b', cfg.ema20?indEMA(c,20):null, 1.5, false, cfg.ema20?'EMA20':null);
+  put('ma50','#3b82f6',  cfg.ma50?indSMA(c,50):null,  1.5, false, cfg.ma50?'MA50':null);
+  put('ma200','#8b5cf6', cfg.ma200?indSMA(c,200):null,1.5, false, cfg.ma200?'MA200':null);
+  if(cfg.bb){
+    var bb=indBB(c,20,2);
+    put('bbU','#94a0ad', bb.up, 1, true, 'BB üst');
+    put('bbM','#94a0ad', bb.ma, 1, true, null);
+    put('bbL','#94a0ad', bb.lo, 1, true, 'BB alt');
+  } else { put('bbU','#94a0ad',null); put('bbM','#94a0ad',null); put('bbL','#94a0ad',null); }
+  // alt panel
+  var kind=S.chartPane||'none', box=$('chPane2');
+  if(box){
+    if(kind==='none'){
+      box.style.display='none';
+      if(PANE.chart){ PANE.chart.remove(); PANE={chart:null,s1:null,s2:null,hist:null,kind:null}; }
+    } else {
+      box.style.display='block';
+      if(PANE.chart && PANE.kind!==kind){ PANE.chart.remove(); PANE={chart:null,s1:null,s2:null,hist:null,kind:null}; }
+      if(!PANE.chart){
+        PANE.chart=LightweightCharts.createChart(box,{
+          width:box.clientWidth, height:box.clientHeight,
+          layout:{background:{color:'transparent'}, textColor:'#9aa6b2', fontFamily:'"Plus Jakarta Sans",system-ui,sans-serif', fontSize:10},
+          grid:{vertLines:{color:'#f1f4f8'}, horzLines:{color:'#f1f4f8'}},
+          rightPriceScale:{borderColor:'#e9edf2'},
+          timeScale:{borderColor:'#e9edf2', timeVisible:true, secondsVisible:false},
+          crosshair:{mode:0}, handleScale:true, handleScroll:true
+        });
+        PANE.kind=kind;
+        if(kind==='rsi'){
+          PANE.s1=PANE.chart.addLineSeries({color:'#0bbfa6', lineWidth:1.6, priceLineVisible:false});
+          PANE.s1.createPriceLine({price:70, color:'#f0556b', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'70'});
+          PANE.s1.createPriceLine({price:30, color:'#10b981', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'30'});
+        } else {
+          PANE.hist=PANE.chart.addHistogramSeries({priceLineVisible:false});
+          PANE.s1=PANE.chart.addLineSeries({color:'#3b82f6', lineWidth:1.6, priceLineVisible:false});
+          PANE.s2=PANE.chart.addLineSeries({color:'#f59e0b', lineWidth:1.4, priceLineVisible:false});
+        }
+        // iki grafiğin zaman ekseni birbirini takip etsin
+        CH.chart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
+          if(paneSync||!PANE.chart||!r) return; paneSync=true;
+          try{ PANE.chart.timeScale().setVisibleLogicalRange(r); }catch(e){}
+          paneSync=false;
+        });
+        PANE.chart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
+          if(paneSync||!CH.chart||!r) return; paneSync=true;
+          try{ CH.chart.timeScale().setVisibleLogicalRange(r); }catch(e){}
+          paneSync=false;
+        });
+      }
+      if(kind==='rsi'){
+        var rs=indRSI(c,14), d=[];
+        for(var i=0;i<rs.length;i++) if(rs[i]!=null) d.push({time:t[i], value:rs[i]});
+        PANE.s1.setData(d);
+        if(rs[n]!=null) read.push('<b style="color:#0bbfa6">RSI</b> '+fmt(rs[n],0)+rsiTag(rs[n]));
+      } else {
+        var m=indMACD(c), dm=[], ds=[], dh=[];
+        for(var j=0;j<m.macd.length;j++){
+          if(m.macd[j]!=null) dm.push({time:t[j], value:m.macd[j]});
+          if(m.sig[j]!=null)  ds.push({time:t[j], value:m.sig[j]});
+          if(m.hist[j]!=null) dh.push({time:t[j], value:m.hist[j], color:m.hist[j]>=0?'rgba(16,185,129,.5)':'rgba(240,85,107,.5)'});
+        }
+        PANE.hist.setData(dh); PANE.s1.setData(dm); PANE.s2.setData(ds);
+        if(m.macd[n]!=null&&m.sig[n]!=null){
+          read.push('<b style="color:#3b82f6">MACD</b> '+fmt(m.macd[n],3)+' · <b style="color:#f59e0b">sinyal</b> '+fmt(m.sig[n],3)+
+            ' · <b class="'+(m.hist[n]>=0?'up':'down')+'">'+(m.hist[n]>=0?'pozitif':'negatif')+'</b>');
+        }
+      }
+      PANE.chart.timeScale().fitContent();
+    }
+  }
+  var rd=$('chRead');
+  if(rd) rd.innerHTML = read.length? ('Son değerler — '+read.join(' &nbsp;·&nbsp; ')) :
+    '<span class="cov">Gösterge seçilmedi. Not: <code>history.js</code> hacim tutmadığı için VWAP/OBV gibi hacim tabanlı göstergeler hesaplanamıyor.</span>';
+}
 function setTfBtn(v){
   CH.tf=v;
   var box=$('chTf'); if(!box) return;
