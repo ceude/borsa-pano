@@ -214,6 +214,8 @@
   .ghost{background:var(--surface); border:1px solid var(--line); color:var(--dim);
     padding:8px 13px; border-radius:9px; cursor:pointer; font-size:12px; font-weight:600}
   .ghost:hover{border-color:var(--brand); color:var(--brand)}
+  .ghost.accent{border:1.5px solid var(--brand); color:var(--brand); background:var(--brand-bg); font-weight:700}
+  .ghost.accent:hover{filter:brightness(.97)}
   .hint{color:var(--faint); font-size:11.5px; line-height:1.55}
   .empty{color:var(--faint); text-align:center; padding:32px; font-size:13px}
   .log .e{font-family:"Plus Jakarta Sans"; font-size:12px; padding:9px 0; border-bottom:1px solid var(--line2);
@@ -407,7 +409,7 @@
       <div class="controls">
         <label class="hint" style="display:flex; align-items:center; gap:6px">Salınım penceresi (gün) <input class="fld" id="fibLook" type="number" value="120" min="30" step="10" style="width:80px" title="Tepe ve dibin aranacağı geçmiş gün sayısı. Günlük veri ~1 yıl olduğu için, bundan uzun pencerelerde otomatik olarak 5 yıllık haftalık seriye geçilir."></label>
         <label class="hint" style="display:flex; align-items:center; gap:6px">Yakınlık eşiği (%) <input class="fld" id="fibNear" type="number" value="5" min="0.5" step="0.5" style="width:70px" title="Fiyat, seviyeye bu yüzdeden yakınsa listeye girer."></label>
-        <button class="ghost" id="fibRun">Yeniden tara</button>
+        <button class="ghost accent" id="fibRun">⟳ Yeniden tara</button>
       </div>
       <div id="fibInfo" class="hint" style="margin-bottom:12px"></div>
       <h3 style="font-size:16px; margin:0 0 8px" class="up">▲ Alım bölgesi <span class="cov">(yukarı bacakta destek seviyesinde ya da yakınında)</span></h3>
@@ -1071,6 +1073,7 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <tr><td>Seviye</td><td>Fiyatın en yakın olduğu Fibonacci oranı.</td></tr>
         <tr><td>Seviye fiyatı</td><td>O oranın fiyat karşılığı.</td></tr>
         <tr><td>Uzaklık</td><td>Güncel fiyatın seviyeye uzaklığı (%). %1 altı yeşil.</td></tr>
+        <tr><td><b>Konum</b></td><td>Fiyat seviyenin üstünde mi altında mı. <b>Alım bölgesinde</b> fiyat desteğin <b>üstündeyse</b> seviye hâlâ tutuyor (yeşil); altındaysa destek <b>kırılmış</b> (kırmızı) — kurulum bozulmuş olabilir. <b>Satım bölgesinde</b> tam tersi: fiyat direncin altındaysa tutuyor, üstündeyse aşılmış.</td></tr>
         <tr><td>Bacak</td><td>Salınımın dipten tepeye büyüklüğü (%).</td></tr>
         <tr><td>Trend / RSI / Fiyat</td><td>Diğer sekmelerdekiyle aynı.</td></tr>
       </table>
@@ -2013,11 +2016,22 @@ function renderReal(){
       '<td>'+ccySym(MK)+fmt(pos.cost)+eurCost+'</td>'+
       '<td>'+(val==null?'—':ccySym(MK)+fmt(val)+eurVal)+'</td>'+
       '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+fmt(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+
-        (eurPnl!=null?'<span class="sub">'+(eurPnl>0?'+':'')+'€'+fmt(eurPnl)+'</span>':'')+'</td></tr>';
+        (eurPnl!=null?'<span class="sub">'+(eurPnl>0?'+':'')+'€'+fmt(eurPnl)+'</span>':'')+'</td>'+
+      '<td><button class="miniact" data-rtrade="'+sym+'">İşlem yap</button></td></tr>';
   });
-  $('realHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Güncel Fiyat</th><th>Maliyet</th><th>Güncel Değer</th><th>K/Z</th></tr></thead><tbody>'+rows+'</tbody></table>')
+  $('realHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Güncel Fiyat</th><th>Maliyet</th><th>Güncel Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>')
     :'<div class="empty">henüz gerçek pozisyon yok — yukarıdan AL ile ekle</div>';
   $('realHold').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+  $('realHold').querySelectorAll('[data-rtrade]').forEach(function(b){b.onclick=function(){
+    var sym=b.dataset.rtrade, pos=computeRealHoldings(realFor(MK))[sym]; if(!pos) return;
+    var s=find(sym);
+    $('rSym').value=clean(sym);
+    $('rQty').value=pos.qty;
+    if(s&&s.price!=null) $('rPrice').value=s.price;
+    updateRealCost();
+    $('rSym').scrollIntoView({behavior:'smooth', block:'center'});
+    $('rPrice').focus();
+  };});
   var cash=realCash(real); var totalv=cash+totVal; var dep=real.deposited||0; var pnl=totalv-dep;
   $('rDepV').innerHTML=amt(MK,dep);
   $('rCashV').innerHTML=amt(MK,cash);
@@ -2551,7 +2565,7 @@ function fibRender(buys, sells, scanned, look, thresh, meta){
     (meta.maxSpan?(', fiilen en çok <b>'+meta.maxSpan+' gün</b>'):'')+note+
     ' · seviyeye ≤%'+fmt(thresh,1)+' yakınlık · <b>'+buys.length+'</b> alım bölgesi, <b>'+sells.length+'</b> satım bölgesi adayı. Sıralama: güvenilirlik puanı (yüksekten düşüğe).';
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
-  function table(list){
+  function table(list, kind){
     if(!list.length) return '<div class="empty">Şu an bu koşullara uyan hisse yok.</div>';
     var head='<thead><tr>'+
       '<th class="l" title="Hisse kodu ve şirket.">Hisse</th>'+
@@ -2559,17 +2573,24 @@ function fibRender(buys, sells, scanned, look, thresh, meta){
       '<th title="Fiyatın en yakın olduğu Fibonacci oranı. 0.618 ve 0.5 en çok izlenen seviyelerdir.">Seviye</th>'+
       '<th title="O Fibonacci oranının fiyat karşılığı.">Seviye fiyatı</th>'+
       '<th title="Güncel fiyatın seviyeye uzaklığı. 0 = tam üstünde.">Uzaklık</th>'+
+      '<th title="'+(kind==='buy'
+        ? 'Fiyat desteğin ÜSTÜNDEyse seviye henüz tutuyor (yaklaşıyor). ALTINDAysa destek kırılmış — kurulum bozulmuş olabilir.'
+        : 'Fiyat direncin ALTINDAysa seviye henüz tutuyor (yaklaşıyor). ÜSTÜNDEyse direnç aşılmış — kurulum bozulmuş olabilir.')+'">Konum</th>'+
       '<th title="Salınım bacağının dipten tepeye büyüklüğü. Büyük bacak daha anlamlıdır.">Bacak</th>'+
       '<th title="Fiyatın 50/200 günlük ortalamalara göre yönü.">Trend</th>'+
       '<th title="Göreli Güç Endeksi (0–100).">RSI</th>'+
       '<th title="Güncel fiyat (~15 dk gecikmeli).">Fiyat</th><th></th></tr></thead>';
     var rows=list.map(function(x){
       var s=x.s;
+      var above=s.price>=x.near.level;
+      var intact=(kind==='buy')? above : !above;      // destek: üstünde tutuyor · direnç: altında tutuyor
+      var posTxt=(above?'▲ üstünde':'▼ altında')+(intact?'':' <span class="cov">kırıldı</span>');
       return '<tr><td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,24)+'</div></td>'+
         '<td><div class="scorebar"><div class="bar"><i style="width:'+x.sc+'%"></i></div><b>'+x.sc+'</b></div></td>'+
         '<td><b>'+(x.near.r*100).toFixed(1).replace('.0','')+'%</b></td>'+
         '<td>'+fmt(x.near.level)+'</td>'+
         '<td class="'+(x.near.dist<=1?'up':'')+'">'+fmt(x.near.dist,2)+'%</td>'+
+        '<td class="'+(intact?'up':'down')+'">'+posTxt+'</td>'+
         '<td>'+fmt(x.leg.legPct,0)+'%</td>'+
         '<td>'+trendIcon(s)+'</td>'+
         '<td>'+(s.rsi14==null?'<span class="na">—</span>':fmt(s.rsi14,0))+'</td>'+
@@ -2578,8 +2599,8 @@ function fibRender(buys, sells, scanned, look, thresh, meta){
     }).join('');
     return '<table>'+head+'<tbody>'+rows+'</tbody></table>';
   }
-  $('fibBuy').innerHTML=table(buys);
-  $('fibSell').innerHTML=table(sells);
+  $('fibBuy').innerHTML=table(buys,'buy');
+  $('fibSell').innerHTML=table(sells,'sell');
   FIBMAP={};
   buys.concat(sells).forEach(function(x){ FIBMAP[x.s.symbol]={leg:x.leg, near:x.near, sc:x.sc}; });
   ['fibBuy','fibSell'].forEach(function(id){
