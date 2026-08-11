@@ -2802,7 +2802,7 @@ function ensureChart(){
     layout:{background:{color:'transparent'}, textColor:'#9aa6b2',
       fontFamily:'"Plus Jakarta Sans",system-ui,sans-serif', fontSize:11},
     grid:{vertLines:{color:'#f1f4f8'}, horzLines:{color:'#f1f4f8'}},
-    rightPriceScale:{borderColor:'#e9edf2'},
+    rightPriceScale:{borderColor:'#e9edf2', minimumWidth:66},
     timeScale:{borderColor:'#e9edf2', timeVisible:true, secondsVisible:false},
     crosshair:{mode:0}
   });
@@ -3039,7 +3039,7 @@ function indMACD(v){
   return {macd:macd, sig:sig, hist:hist};
 }
 /* ---------- göstergelerin grafiğe uygulanması ---------- */
-var IND={}, PANE={chart:null, s1:null, s2:null, hist:null, kind:null}, paneSync=false;
+var IND={}, PANE={chart:null, s1:null, s2:null, hist:null, kind:null}, paneSync=false, mainSyncHooked=false;
 function indCfg(){ if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false}; return S.chartInd; }
 function lineSer(key, color, width, dashed){
   if(!IND[key]){
@@ -3132,7 +3132,7 @@ function applyIndicators(bars){
           width:box.clientWidth, height:box.clientHeight,
           layout:{background:{color:'transparent'}, textColor:'#9aa6b2', fontFamily:'"Plus Jakarta Sans",system-ui,sans-serif', fontSize:10},
           grid:{vertLines:{color:'#f1f4f8'}, horzLines:{color:'#f1f4f8'}},
-          rightPriceScale:{borderColor:'#e9edf2'},
+          rightPriceScale:{borderColor:'#e9edf2', minimumWidth:66},
           timeScale:{borderColor:'#e9edf2', timeVisible:true, secondsVisible:false},
           crosshair:{mode:0}, handleScale:true, handleScroll:true
         });
@@ -3153,12 +3153,15 @@ function applyIndicators(bars){
           PANE.s1=PANE.chart.addLineSeries({color:'#3b82f6', lineWidth:1.6, priceLineVisible:false});
           PANE.s2=PANE.chart.addLineSeries({color:'#f59e0b', lineWidth:1.4, priceLineVisible:false});
         }
-        // iki grafiğin zaman ekseni birbirini takip etsin
-        CH.chart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
-          if(paneSync||!PANE.chart||!r) return; paneSync=true;
-          try{ PANE.chart.timeScale().setVisibleLogicalRange(r); }catch(e){}
-          paneSync=false;
-        });
+        // iki grafiğin zaman ekseni birbirini takip etsin (ana grafiğe yalnız BİR kez bağlan)
+        if(!mainSyncHooked){
+          mainSyncHooked=true;
+          CH.chart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
+            if(paneSync||!PANE.chart||!r) return; paneSync=true;
+            try{ PANE.chart.timeScale().setVisibleLogicalRange(r); }catch(e){}
+            paneSync=false;
+          });
+        }
         PANE.chart.timeScale().subscribeVisibleLogicalRangeChange(function(r){
           if(paneSync||!CH.chart||!r) return; paneSync=true;
           try{ CH.chart.timeScale().setVisibleLogicalRange(r); }catch(e){}
@@ -3167,29 +3170,29 @@ function applyIndicators(bars){
       }
       if(kind==='rsi'){
         var rs=indRSI(c,14), d=[];
-        for(var i=0;i<rs.length;i++) if(rs[i]!=null) d.push({time:t[i], value:rs[i]});
+        for(var i=0;i<rs.length;i++) d.push(rs[i]!=null?{time:t[i], value:rs[i]}:{time:t[i]});
         PANE.s1.setData(d);
         if(rs[n]!=null) read.push('<b style="color:#0bbfa6">RSI</b> '+fmt(rs[n],0)+rsiTag(rs[n]));
       } else if(kind==='stoch'){
         var sk=indStoch(bars,14,3), dk=[], dd=[];
         for(var i=0;i<sk.k.length;i++){
-          if(sk.k[i]!=null) dk.push({time:t[i], value:sk.k[i]});
-          if(sk.d[i]!=null) dd.push({time:t[i], value:sk.d[i]});
+          dk.push(sk.k[i]!=null?{time:t[i], value:sk.k[i]}:{time:t[i]});
+          dd.push(sk.d[i]!=null?{time:t[i], value:sk.d[i]}:{time:t[i]});
         }
         PANE.s1.setData(dk); PANE.s2.setData(dd);
         if(sk.k[n]!=null) read.push('<b style="color:#2563eb">Stoch %K</b> '+fmt(sk.k[n],0)+' · <b style="color:#f59e0b">%D</b> '+(sk.d[n]!=null?fmt(sk.d[n],0):'—')+
           ' <span class="'+(sk.k[n]>80?'down':(sk.k[n]<20?'up':''))+'">'+(sk.k[n]>80?'(aşırı alım)':(sk.k[n]<20?'(aşırı satım)':''))+'</span>');
       } else if(kind==='atr'){
         var at=indATR(bars,14), da=[];
-        for(var i=0;i<at.length;i++) if(at[i]!=null && c[i]>0) da.push({time:t[i], value:at[i]/c[i]*100});
+        for(var i=0;i<at.length;i++) da.push((at[i]!=null&&c[i]>0)?{time:t[i], value:at[i]/c[i]*100}:{time:t[i]});
         PANE.s1.setData(da);
         if(at[n]!=null&&c[n]>0) read.push('<b style="color:#8b5cf6">ATR%</b> '+fmt(at[n]/c[n]*100,2)+'% · 1.5×ATR stop ≈ '+fmt(c[n]-1.5*at[n]));
       } else {
         var m=indMACD(c), dm=[], ds=[], dh=[];
         for(var j=0;j<m.macd.length;j++){
-          if(m.macd[j]!=null) dm.push({time:t[j], value:m.macd[j]});
-          if(m.sig[j]!=null)  ds.push({time:t[j], value:m.sig[j]});
-          if(m.hist[j]!=null) dh.push({time:t[j], value:m.hist[j], color:m.hist[j]>=0?'rgba(16,185,129,.5)':'rgba(240,85,107,.5)'});
+          dm.push(m.macd[j]!=null?{time:t[j], value:m.macd[j]}:{time:t[j]});
+          ds.push(m.sig[j]!=null ?{time:t[j], value:m.sig[j]} :{time:t[j]});
+          dh.push(m.hist[j]!=null?{time:t[j], value:m.hist[j], color:m.hist[j]>=0?'rgba(16,185,129,.5)':'rgba(240,85,107,.5)'}:{time:t[j]});
         }
         PANE.hist.setData(dh); PANE.s1.setData(dm); PANE.s2.setData(ds);
         if(m.macd[n]!=null&&m.sig[n]!=null){
@@ -3197,7 +3200,12 @@ function applyIndicators(bars){
             ' · <b class="'+(m.hist[n]>=0?'up':'down')+'">'+(m.hist[n]>=0?'pozitif':'negatif')+'</b>');
         }
       }
-      PANE.chart.timeScale().fitContent();
+      // ana grafikle bire bir hizala (fitContent kaymaya yol açıyordu)
+      try{
+        var mr=CH.chart.timeScale().getVisibleLogicalRange();
+        if(mr){ paneSync=true; PANE.chart.timeScale().setVisibleLogicalRange(mr); paneSync=false; }
+        else PANE.chart.timeScale().fitContent();
+      }catch(e){ PANE.chart.timeScale().fitContent(); }
     }
   }
   var rd=$('chRead');
