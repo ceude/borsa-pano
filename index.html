@@ -425,7 +425,7 @@
         <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
-        <b>Önce oku.</b> Buradaki "al sinyali", göstergenin <b>tanımı gereği</b> oluşan durumdur — fiyatın yükseleceği anlamına <b>gelmez</b>. Çok sayıda gösterge seçmek güveni artırmaz: bunların çoğu aynı fiyat hareketini farklı biçimde ölçer (örn. MA50, EMA20 ve SuperTrend büyük ölçüde aynı şeyi söyler), dolayısıyla "7/8 sinyal" bağımsız yedi kanıt değildir. Sinyaller ~15 dk gecikmeli <b>günlük kapanışlardan</b> hesaplanır. Yatırım tavsiyesi değildir.
+        <b>Önce oku.</b> Buradaki "al sinyali", göstergenin <b>tanımı gereği</b> oluşan durumdur — fiyatın yükseleceği anlamına <b>gelmez</b>. Çok sayıda gösterge seçmek güveni artırmaz: çoğu aynı fiyat hareketini farklı biçimde ölçer. Bu yüzden sayım <b>gösterge değil, bağımsız aile</b> üzerinden yapılır — altı trend göstergesi seçsen bile bu <b>tek</b> bağımsız sinyaldir. Sinyaller ~15 dk gecikmeli <b>günlük kapanışlardan</b> hesaplanır. Yatırım tavsiyesi değildir.
       </div>
       <div class="botbar" style="margin-top:0">
         <div class="hint" style="margin-bottom:8px"><b>Göstergeleri seç</b> — hepsi birlikte değerlendirilir. İstediğin kadar seçebilirsin.</div>
@@ -434,7 +434,7 @@
           <button class="ghost accent" id="sigRun">⟳ Tara</button>
           <button class="ghost" id="sigAll">Hepsini seç</button>
           <button class="ghost" id="sigNone">Temizle</button>
-          <label class="hint" style="display:flex; align-items:center; gap:6px">en az <input class="fld" id="sigMin" type="number" value="1" min="1" style="width:62px"> sinyal</label>
+          <label class="hint" style="display:flex; align-items:center; gap:6px">en az <input class="fld" id="sigMin" type="number" value="2" min="1" style="width:62px"> <b>bağımsız</b> sinyal</label>
         </div>
       </div>
       <div id="sigInfo" class="hint" style="margin-bottom:12px"></div>
@@ -1073,7 +1073,7 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
         <tr><td>Maks. düşüş</td><td>Zirveden en derin geri çekilme. <b>Dayanabileceğin</b> sayı bu — getiriden daha önemlidir.</td></tr>
       </table>
 
-      <h2>3. Sınırlar (dürüst liste)</h2>
+      <h2>4. Sınırlar (dürüst liste)</h2>
       <ul>
         <li><b>Hayatta kalma yanlılığı:</b> test yalnız <b>bugünkü</b> endeks üyeleriyle çalışır. Batmış/endeksten düşmüş hisseler yok → sonuç sistematik olarak <b>olduğundan iyi</b> çıkar.</li>
         <li><b>Kapanış fiyatından doluluk:</b> gerçekte sinyali kapanışta görüp o fiyattan alamazsın; gün içi kayma bunu kötüleştirir.</li>
@@ -1167,14 +1167,26 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
       </table>
       <p>Bir gösterge için yeterli geçmiş yoksa (örn. 200 günlük veri olmadan MA200) o gösterge <b>sayılmaz</b> — bu yüzden bölüm "5/7" gibi görünür: payda, o hisse için <b>değerlendirilebilen</b> gösterge sayısıdır.</p>
 
-      <h2>2. Sıralama</h2>
+      <h2>2. Aileler — neden "8/8" değil "2/3"?</h2>
+      <p>Göstergelerin çoğu <b>aynı fiyat hareketini</b> farklı formülle ölçer. MA50, EMA20, SuperTrend, SAR ve Ichimoku'nun hepsi "trend yukarı mı?" sorusuna cevap verir. Altısını birden seçip "6/6 sinyal" demek, <b>tek bir gerçeği altı kez saymak</b>tır ve sahte bir güven yaratır.</p>
+      <p>Bu yüzden göstergeler <b>bağımsız ailelere</b> ayrılmıştır ve <b>asıl sayı aile sayısıdır</b>:</p>
+      <table><tr><th>Aile</th><th>İçindekiler</th><th>Ne ölçer</th></tr>
+        <tr><td>Trend / yön</td><td>EMA20, MA50, MA200, SuperTrend, SAR, Ichimoku</td><td>Fiyatın yönü</td></tr>
+        <tr><td>Momentum</td><td>RSI, MACD, Stokastik</td><td>Hareketin hızı/ivmesi</td></tr>
+        <tr><td>Bant / konum</td><td>Bollinger, Keltner, Pivot</td><td>Fiyatın aralık içindeki yeri</td></tr>
+        <tr><td>Oynaklık filtresi</td><td>ATR%</td><td>İşlem yapılabilir oynaklık (yön sinyali değil)</td></tr>
+      </table>
+      <p>Bir aile, içindeki <b>seçili</b> göstergelerden <b>en az biri</b> sinyal verirse "veriyor" sayılır. Tabloda büyük sayı <b>aile</b> sayısıdır (örn. <b>2/3</b>); altındaki küçük satır ham gösterge sayısını gösterir (örn. 5/8) — ikincisi bilgi amaçlıdır, karar için birinciye bak.</p>
+      <p><b>Pratik öneri:</b> her aileden birer tane seç (örn. MA200 + MACD + Bollinger). Aynı aileden altı gösterge seçmek listeyi güçlendirmez, sadece aynı şeyi tekrarlar.</p>
+
+      <h2>3. Sıralama</h2>
       <ul>
-        <li>Önce <b>karşılanan sinyal sayısı</b> (çoktan aza).</li>
-        <li>Eşitlikte <b>ortalama sinyal gücü</b>.</li>
-        <li>"En az N sinyal" eşiğini kendin belirlersin. Hiçbir hisse eşiği geçemezse en yakın 10 aday soluk renkte listelenir.</li>
+        <li>Önce <b>karşılanan bağımsız aile sayısı</b> (çoktan aza).</li>
+        <li>Eşitlikte <b>ortalama sinyal gücü</b>, sonra ham gösterge sayısı.</li>
+        <li>"En az N bağımsız sinyal" eşiğini kendin belirlersin; seçtiğin aile sayısıyla sınırlanır. Hiçbir hisse eşiği geçemezse en yakın 10 aday soluk renkte listelenir.</li>
       </ul>
 
-      <h2>3. Sınırlar (dürüst liste)</h2>
+      <h2>4. Sınırlar (dürüst liste)</h2>
       <ul>
         <li><b>Göstergeler bağımsız değildir.</b> EMA20, MA50, SuperTrend, SAR ve Keltner büyük ölçüde aynı fiyat hareketini ölçer. "8/8 sinyal", sekiz ayrı kanıt değil, çoğunlukla <b>tek bir gerçeğin sekiz kez tekrarı</b>dır. Bu, yanlış bir güven duygusu yaratır.</li>
         <li><b>Çok gösterge seçmek daha iyi değildir.</b> Seçim arttıkça hem liste boşalır hem de kalanlar aşırı-uydurulmuş bir kombinasyona dönüşür.</li>
@@ -1420,7 +1432,7 @@ if(!S.cost.comm) S.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
 S.chartDrawings = S.chartDrawings || {};
 if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
 if(!S.chartPane) S.chartPane='none';
-if(!S.sigPick) S.sigPick={ma50:true, macd:true, rsi:true};
+if(!S.sigPick) S.sigPick={ma200:true, macd:true, bb:true};
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
 function ensureShape(st){
@@ -1438,7 +1450,7 @@ function ensureShape(st){
   st.chartDrawings = st.chartDrawings || {};
   if(!st.chartInd) st.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
   if(!st.chartPane) st.chartPane='none';
-  if(!st.sigPick) st.sigPick={ma50:true, macd:true, rsi:true};
+  if(!st.sigPick) st.sigPick={ma200:true, macd:true, bb:true};
   return st;
 }
 function save(){ if(typeof scheduleSync==='function') scheduleSync(); }
@@ -2750,62 +2762,76 @@ function fibGo(){
 }
 /* Her sinyal: {met:boolean, str:0-100}. Kurallar şeffaf ve tek tek belgelenmiştir. */
 var SIGDEFS=[
-  {k:'ema20', t:'EMA20', d:'Kapanış 20 günlük üstel ortalamanın üstünde.', f:function(x){
+  {k:'ema20', fam:'trend', t:'EMA20', d:'Kapanış 20 günlük üstel ortalamanın üstünde.', f:function(x){
     var v=x.ema20[x.n]; if(v==null) return null;
     return {met:x.c[x.n]>v, str:clamp01((x.c[x.n]/v-1)*100/3)};}},
-  {k:'ma50', t:'MA50', d:'Kapanış 50 günlük ortalamanın üstünde.', f:function(x){
+  {k:'ma50', fam:'trend', t:'MA50', d:'Kapanış 50 günlük ortalamanın üstünde.', f:function(x){
     var v=x.ma50[x.n]; if(v==null) return null;
     return {met:x.c[x.n]>v, str:clamp01((x.c[x.n]/v-1)*100/5)};}},
-  {k:'ma200', t:'MA200', d:'Kapanış 200 günlük ortalamanın üstünde (uzun vade boğa bölgesi).', f:function(x){
+  {k:'ma200', fam:'trend', t:'MA200', d:'Kapanış 200 günlük ortalamanın üstünde (uzun vade boğa bölgesi).', f:function(x){
     var v=x.ma200[x.n]; if(v==null) return null;
     return {met:x.c[x.n]>v, str:clamp01((x.c[x.n]/v-1)*100/10)};}},
-  {k:'bb', t:'Bollinger', d:'Fiyat alt banttan yukarı döndü (dün altında/üzerinde, bugün üstünde).', f:function(x){
+  {k:'bb', fam:'band', t:'Bollinger', d:'Fiyat alt banttan yukarı döndü (dün altında/üzerinde, bugün üstünde).', f:function(x){
     var lo=x.bb.lo, ma=x.bb.ma, n=x.n; if(lo[n]==null||lo[n-1]==null) return null;
     var met=(x.c[n-1]<=lo[n-1] && x.c[n]>lo[n]);
     return {met:met, str:clamp01((x.c[n]-lo[n])/((ma[n]-lo[n])||1)*100)};}},
-  {k:'st', t:'SuperTrend', d:'SuperTrend yönü yukarı. Dönüş ne kadar yeniyse sinyal o kadar güçlü.', f:function(x){
+  {k:'st', fam:'trend', t:'SuperTrend', d:'SuperTrend yönü yukarı. Dönüş ne kadar yeniyse sinyal o kadar güçlü.', f:function(x){
     var dir=x.st.dir, n=x.n; if(dir[n]==null) return null;
     var since=0; for(var i=n;i>0&&dir[i]===dir[i-1];i--) since++;
     return {met:dir[n]===1, str:since<=5?100:Math.max(35, clamp01(100-(since-5)*2))};}},
-  {k:'ichi', t:'Ichimoku', d:'Fiyat bulutun üstünde VE Tenkan, Kijun\'un üstünde.', f:function(x){
+  {k:'ichi', fam:'trend', t:'Ichimoku', d:'Fiyat bulutun üstünde VE Tenkan, Kijun\'un üstünde.', f:function(x){
     var n=x.n, i=n-26; if(i<0||x.ichi.spanA[i]==null||x.ichi.spanB[i]==null||x.ichi.tenkan[n]==null||x.ichi.kijun[n]==null) return null;
     var top=Math.max(x.ichi.spanA[i], x.ichi.spanB[i]);
     return {met:(x.c[n]>top && x.ichi.tenkan[n]>x.ichi.kijun[n]), str:clamp01((x.c[n]/top-1)*100/5)};}},
-  {k:'kc', t:'Keltner', d:'Kapanış üst Keltner bandını yukarı kırdı (momentum kırılımı).', f:function(x){
+  {k:'kc', fam:'band', t:'Keltner', d:'Kapanış üst Keltner bandını yukarı kırdı (momentum kırılımı).', f:function(x){
     var n=x.n, up=x.kc.up; if(up[n]==null||up[n-1]==null) return null;
     return {met:(x.c[n]>up[n]), str:clamp01(50+(x.c[n]/up[n]-1)*100*25)};}},
-  {k:'sar', t:'SAR', d:'Parabolic SAR noktaları fiyatın altında (yükseliş).', f:function(x){
+  {k:'sar', fam:'trend', t:'SAR', d:'Parabolic SAR noktaları fiyatın altında (yükseliş).', f:function(x){
     var n=x.n, s=x.sar; if(s[n]==null) return null;
     var since=0; for(var i=n;i>0&&s[i]!=null&&s[i-1]!=null&&(s[i]<x.c[i])===(s[i-1]<x.c[i-1]);i--) since++;
     return {met:s[n]<x.c[n], str:since<=4?100:Math.max(35, clamp01(100-(since-4)*2))};}},
-  {k:'piv', t:'Pivot', d:'Fiyat klasik pivot noktasının (P) üstünde.', f:function(x){
+  {k:'piv', fam:'band', t:'Pivot', d:'Fiyat klasik pivot noktasının (P) üstünde.', f:function(x){
     if(!x.piv) return null;
     return {met:x.c[x.n]>x.piv.P, str:clamp01((x.c[x.n]-x.piv.P)/((x.piv.R1-x.piv.P)||1)*100)};}},
-  {k:'rsi', t:'RSI', d:'RSI 50 üstünde ve yükseliyor.', f:function(x){
+  {k:'rsi', fam:'mom', t:'RSI', d:'RSI 50 üstünde ve yükseliyor.', f:function(x){
     var r=x.rsi, n=x.n; if(r[n]==null||r[n-1]==null) return null;
     return {met:(r[n]>=50 && r[n]>r[n-1]), str:clamp01((r[n]-50)/25*100)};}},
-  {k:'macd', t:'MACD', d:'MACD sinyal çizgisinin üstünde (histogram pozitif).', f:function(x){
+  {k:'macd', fam:'mom', t:'MACD', d:'MACD sinyal çizgisinin üstünde (histogram pozitif).', f:function(x){
     var m=x.macd, n=x.n; if(m.macd[n]==null||m.sig[n]==null) return null;
     return {met:m.macd[n]>m.sig[n], str:clamp01(50+(m.hist[n]/(0.01*x.c[n]))*50)};}},
-  {k:'stoch', t:'Stokastik', d:'%K, %D\'nin üstünde ve %K aşırı alımda değil (<80).', f:function(x){
+  {k:'stoch', fam:'mom', t:'Stokastik', d:'%K, %D\'nin üstünde ve %K aşırı alımda değil (<80).', f:function(x){
     var s=x.stoch, n=x.n; if(s.k[n]==null||s.d[n]==null) return null;
     var bonus=(s.k[n]<30)?20:0;
     return {met:(s.k[n]>s.d[n] && s.k[n]<80), str:clamp01(50+(s.k[n]-s.d[n])*5+bonus)};}},
-  {k:'atr', t:'ATR% (filtre)', d:'Oynaklık işlem yapılabilir bantta (%1–6); yön sinyali değil, filtredir.', f:function(x){
+  {k:'atr', fam:'filt', t:'ATR% (filtre)', d:'Oynaklık işlem yapılabilir bantta (%1–6); yön sinyali değil, filtredir.', f:function(x){
     var a=x.atr[x.n]; if(a==null||!x.c[x.n]) return null;
     var p=a/x.c[x.n]*100;
     return {met:(p>=1&&p<=6), str:(p>=1.5&&p<=4)?100:60};}}
 ];
 function clamp01(v){ return Math.max(0, Math.min(100, v)); }
+/* Göstergeler birbirinden bağımsız değildir; aynı şeyi ölçenler tek AİLE sayılır.
+   Bir aile, içindeki seçili göstergelerden en az biri sinyal verirse "veriyor" kabul edilir. */
+var SIGFAMS=[
+  {k:'trend', t:'Trend / yön',       d:'Fiyatın yönünü ölçer. EMA20, MA50, MA200, SuperTrend, SAR, Ichimoku büyük ölçüde aynı bilgiyi verir.'},
+  {k:'mom',   t:'Momentum',          d:'Hareketin hızını/ivmesini ölçer: RSI, MACD, Stokastik.'},
+  {k:'band',  t:'Bant / konum',      d:'Fiyatın bir aralık ya da referans seviyeye göre yerini ölçer: Bollinger, Keltner, Pivot.'},
+  {k:'filt',  t:'Oynaklık filtresi', d:'Yön sinyali değildir; işlem yapılabilir oynaklık şartıdır: ATR%.'}
+];
 
 /* ---------- Sinyal taraması ---------- */
 var sigLastMk=null;
-function sigCfg(){ if(!S.sigPick) S.sigPick={ma50:true, macd:true, rsi:true}; return S.sigPick; }
+function sigCfg(){ if(!S.sigPick) S.sigPick={ma200:true, macd:true, bb:true}; return S.sigPick; }
 function sigPaint(){
   var box=$('sigPick'); if(!box) return;
   var c=sigCfg();
-  box.innerHTML=SIGDEFS.map(function(d){
-    return '<button data-sig="'+d.k+'" class="'+(c[d.k]?'on':'')+'" title="'+d.d.replace(/"/g,'&quot;')+'">'+d.t+'</button>';
+  box.innerHTML=SIGFAMS.map(function(F){
+    var btns=SIGDEFS.filter(function(d){return d.fam===F.k;}).map(function(d){
+      return '<button data-sig="'+d.k+'" class="'+(c[d.k]?'on':'')+'" title="'+d.d.replace(/"/g,'&quot;')+'">'+d.t+'</button>';
+    }).join('');
+    var sel=SIGDEFS.filter(function(d){return d.fam===F.k && c[d.k];}).length;
+    return '<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px">'+
+      '<span class="hint" style="min-width:132px" title="'+F.d.replace(/"/g,'&quot;')+'"><b>'+F.t+'</b>'+(sel?' <span class="cov">('+sel+' seçili)</span>':'')+'</span>'+
+      '<div class="seg" style="flex-wrap:wrap; width:auto">'+btns+'</div></div>';
   }).join('');
   box.querySelectorAll('button').forEach(function(b){
     b.onclick=function(){ var cc=sigCfg(); cc[b.dataset.sig]=!cc[b.dataset.sig]; save(); sigPaint(); };
@@ -2828,57 +2854,72 @@ function sigScan(){
     dlg('Gösterge seçilmedi','<p>En az bir gösterge seçmelisin. Yukarıdaki listeden istediklerine tıkla.</p>',[{label:'Tamam',primary:true}]);
     return;
   }
-  var need=Math.max(1, Math.min(picked.length, parseInt($('sigMin').value,10)||1));
+  var famsPicked={}; picked.forEach(function(d){ famsPicked[d.fam]=1; });
+  var famCount=Object.keys(famsPicked).length;
+  var need=Math.max(1, Math.min(famCount, parseInt($('sigMin').value,10)||1));
+  if($('sigMin')) $('sigMin').value=need;
   var rows=[], scanned=0, skipped=0;
   marketStocks().forEach(function(s){
     if(s.price==null) return;
     var h=HIST[s.symbol]; if(!h||!h.d||h.d.length<60){ skipped++; return; }
     scanned++;
-    var x=sigCtx(h.d), met=[], miss=[], strSum=0, usable=0;
+    var x=sigCtx(h.d), met=[], strSum=0, usable=0, fam={};
     picked.forEach(function(d){
       var r=d.f(x);
-      if(r==null){ miss.push({t:d.t, na:true}); return; }
+      if(r==null) return;                       // veri yetersiz → hiç sayılmaz
       usable++;
-      if(r.met){ met.push({t:d.t, s:Math.round(r.str)}); strSum+=r.str; }
-      else miss.push({t:d.t});
+      fam[d.fam]=fam[d.fam]||{usable:0, met:0, names:[]};
+      fam[d.fam].usable++;
+      if(r.met){ fam[d.fam].met++; fam[d.fam].names.push(d.t); met.push({t:d.t, s:Math.round(r.str), fam:d.fam}); strSum+=r.str; }
     });
     if(!usable) return;
-    if(met.length<need) { rows.push({s:s, met:met, miss:miss, usable:usable, str:met.length?strSum/met.length:0, below:true}); return; }
-    rows.push({s:s, met:met, miss:miss, usable:usable, str:met.length?strSum/met.length:0, below:false});
+    var famUsable=0, famMet=0;
+    SIGFAMS.forEach(function(F){ if(fam[F.k]&&fam[F.k].usable){ famUsable++; if(fam[F.k].met>0) famMet++; } });
+    var row={s:s, met:met, usable:usable, fam:fam, famUsable:famUsable, famMet:famMet,
+             str:met.length?strSum/met.length:0, below:(famMet<need)};
+    rows.push(row);
   });
-  var full=rows.filter(function(r){ return !r.below && r.met.length===r.usable; });
+  var full=rows.filter(function(r){ return !r.below && r.famMet===r.famUsable; });
   var pass=rows.filter(function(r){ return !r.below; });
-  pass.sort(function(a,b){ return (b.met.length-a.met.length) || (b.str-a.str); });
-  var near=rows.filter(function(r){ return r.below && r.met.length>0; })
-               .sort(function(a,b){ return (b.met.length-a.met.length) || (b.str-a.str); }).slice(0,10);
+  pass.sort(function(a,b){ return (b.famMet-a.famMet) || (b.str-a.str) || (b.met.length-a.met.length); });
+  var near=rows.filter(function(r){ return r.below && r.famMet>0; })
+               .sort(function(a,b){ return (b.famMet-a.famMet) || (b.str-a.str); }).slice(0,10);
   sigRender(picked, pass, near, full.length, scanned, need, skipped);
   sigLastMk=MK;
 }
 function sigRender(picked, pass, near, fullCount, scanned, need, skipped){
   var total=picked.length;
-  var head='<b>'+scanned+'</b> hisse tarandı · seçili gösterge: <b>'+total+'</b> · en az <b>'+need+'</b> sinyal şartı'+
+  var fp={}; picked.forEach(function(d){ fp[d.fam]=(fp[d.fam]||0)+1; });
+  var famNames=SIGFAMS.filter(function(F){return fp[F.k];}).map(function(F){ return F.t.split(' /')[0]+' ('+fp[F.k]+')'; });
+  var head='<b>'+scanned+'</b> hisse tarandı · seçili gösterge: <b>'+total+'</b>, <b>'+famNames.length+' bağımsız aile</b> — '+famNames.join(' · ')+
+    ' · en az <b>'+need+'</b> bağımsız sinyal şartı'+
     (skipped?(' · '+skipped+' hisse yeterli geçmiş veri olmadığı için atlandı'):'');
   var msg;
-  if(fullCount>0) msg='<b class="up">'+fullCount+' hisse seçtiğin göstergelerin HEPSİNDEN al sinyali veriyor.</b>';
-  else if(pass.length) msg='<b class="down">Hepsini birden sağlayan hisse şu an yok.</b> Aşağıdakiler en az '+need+' sinyali karşılıyor.';
-  else msg='<b class="down">Bu kombinasyonda hiçbir hisse '+need+' sinyali karşılamıyor.</b>'+(near.length?' En yakınlar aşağıda.':' Daha az gösterge seçmeyi ya da eşiği düşürmeyi dene.');
-  $('sigInfo').innerHTML=head+'<br>'+msg+' Sıralama: önce sinyal sayısı, sonra ortalama sinyal gücü.';
+  if(fullCount>0) msg='<b class="up">'+fullCount+' hisse seçtiğin ailelerin HEPSİNDEN al sinyali veriyor.</b>';
+  else if(pass.length) msg='<b class="down">Tüm aileleri birden sağlayan hisse şu an yok.</b> Aşağıdakiler en az '+need+' bağımsız sinyali karşılıyor.';
+  else msg='<b class="down">Bu kombinasyonda hiçbir hisse '+need+' bağımsız sinyali karşılamıyor.</b>'+(near.length?' En yakınlar aşağıda.':' Daha az aile seçmeyi ya da eşiği düşürmeyi dene.');
+  $('sigInfo').innerHTML=head+'<br>'+msg+
+    ' Sıralama: önce bağımsız sinyal sayısı, sonra ortalama güç.'+
+    (famNames.length===1?' <b>Uyarı:</b> tek aile seçtin — bu, tek bir bakış açısıdır, teyit değil.':'');
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   function tbl(list, dim){
     if(!list.length) return '';
     return '<table><thead><tr>'+
       '<th class="l">Hisse</th>'+
-      '<th title="Karşılanan sinyal / değerlendirilebilen gösterge sayısı. Veri yetersizse gösterge sayılmaz.">Sinyal</th>'+
+      '<th title="Kaç BAĞIMSIZ gösterge ailesi al sinyali veriyor / seçtiğin ailelerden kaçı bu hissede değerlendirilebildi. Aynı şeyi ölçen göstergeler tek aile sayılır — asıl bakman gereken sayı budur.">Bağımsız sinyal</th>'+
       '<th title="Karşılanan sinyallerin ortalama gücü (0–100). Kazanma olasılığı değildir.">Güç</th>'+
-      '<th class="l" title="Hangi göstergeler al sinyali veriyor.">Veren göstergeler</th>'+
+      '<th class="l" title="Hangi ailede hangi göstergeler sinyal veriyor.">Veren aileler</th>'+
       '<th title="Fiyatın 50/200 günlük ortalamalara göre yönü.">Trend</th>'+
       '<th>Fiyat</th><th>Gün %</th><th></th></tr></thead><tbody>'+
       list.map(function(r){
-        var s=r.s, pct=Math.round(r.met.length/r.usable*100);
-        var chips=r.met.map(function(m){ return '<span class="bottag" title="güç '+m.s+'">'+m.t+'</span>'; }).join(' ');
+        var s=r.s, pct=Math.round(r.famMet/r.famUsable*100);
+        var chips=SIGFAMS.filter(function(F){ return r.fam[F.k] && r.fam[F.k].met>0; }).map(function(F){
+          return '<span class="bottag" title="'+F.d.replace(/"/g,'&quot;')+'"><b>'+F.t.split(' /')[0]+':</b> '+r.fam[F.k].names.join(', ')+'</span>';
+        }).join(' ');
         return '<tr'+(dim?' style="opacity:.72"':'')+'><td>'+pmark(s.symbol,simH,realH)+
           '<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span><div class="nm">'+(s.name||'').slice(0,24)+'</div></td>'+
-          '<td><b class="'+(pct===100?'up':(pct>=50?'':'down'))+'">'+r.met.length+'/'+r.usable+'</b></td>'+
+          '<td><b class="'+(pct===100?'up':(pct>=50?'':'down'))+'" style="font-size:15px">'+r.famMet+'/'+r.famUsable+'</b>'+
+            '<div class="nm">'+r.met.length+'/'+r.usable+' gösterge</div></td>'+
           '<td><div class="scorebar"><div class="bar"><i style="width:'+Math.round(r.str)+'%"></i></div><b>'+fmt(r.str,0)+'</b></div></td>'+
           '<td class="l" style="white-space:normal; max-width:340px">'+(chips||'<span class="na">—</span>')+'</td>'+
           '<td>'+trendIcon(s)+'</td>'+
