@@ -652,6 +652,18 @@
             <button class="on" data-pane="none">Yok</button>
             <button data-pane="rsi" title="Göreli Güç Endeksi (14) — 70 üstü aşırı alım, 30 altı aşırı satım.">RSI</button>
             <button data-pane="macd" title="MACD (12,26,9) — hızlı/yavaş ortalama farkı ve sinyal çizgisi; kesişimler momentum değişimi sayılır.">MACD</button>
+            <button data-pane="stoch" title="Stokastik (14,3) — fiyatın son 14 günün aralığındaki yeri. 80 üstü aşırı alım, 20 altı aşırı satım.">Stokastik</button>
+            <button data-pane="atr" title="ATR% (14) — ortalama günlük dalgalanmanın fiyata oranı. Stop mesafesi için.">ATR%</button>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px">
+          <span class="hint">Gelişmiş:</span>
+          <div class="seg" id="chInd2">
+            <button data-ind="st" title="SuperTrend (ATR 10, çarpan 3) — trend takip çizgisi; yeşilse yükseliş, kırmızıysa düşüş kabul edilir. Çizgi aynı zamanda iz süren stop olarak kullanılır.">SuperTrend</button>
+            <button data-ind="ichi" title="Ichimoku (9/26/52) — Tenkan, Kijun ve bulut (Senkou A/B). Bulutun üstü boğa, altı ayı bölgesi sayılır.">Ichimoku</button>
+            <button data-ind="kc" title="Keltner Kanalı (EMA20 ± 2×ATR20) — Bollinger'a benzer ama oynaklığı ATR ile ölçer.">Keltner</button>
+            <button data-ind="sar" title="Parabolic SAR (0.02–0.2) — noktalar fiyatın altındaysa yükseliş, üstündeyse düşüş; iz süren stop olarak kullanılır.">SAR</button>
+            <button data-ind="piv" title="Klasik pivot noktaları — önceki barın yüksek/düşük/kapanışından hesaplanan P, R1/R2, S1/S2 destek-direnç çizgileri.">Pivot</button>
           </div>
         </div>
         <div id="fibAutoBar" class="hint" style="display:none; background:var(--brand-bg); border:1px solid var(--brand); color:var(--brand-ink); border-radius:10px; padding:9px 12px; margin-bottom:10px"></div>
@@ -1339,7 +1351,7 @@ if(S.botTP===undefined) S.botTP=2.5;
 if(!S.cost) S.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
 if(!S.cost.comm) S.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
 S.chartDrawings = S.chartDrawings || {};
-if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false};
+if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
 if(!S.chartPane) S.chartPane='none';
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
 if(S.botScoreMin!==undefined){ S.botThr.BIST=S.botScoreMin; S.botThr.DAX=S.botScoreMin; delete S.botScoreMin; }
@@ -1356,7 +1368,7 @@ function ensureShape(st){
   if(!st.cost) st.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
   if(!st.cost.comm) st.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
   st.chartDrawings = st.chartDrawings || {};
-  if(!st.chartInd) st.chartInd={ema20:false, ma50:true, ma200:true, bb:false};
+  if(!st.chartInd) st.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
   if(!st.chartPane) st.chartPane='none';
   return st;
 }
@@ -2903,11 +2915,11 @@ segWire('chTool','tool',function(v){
 });
 /* göstergeler: çoklu aç/kapa (segWire tekli seçim yapıyor, burada ayrı) */
 (function(){
-  var box=$('chInd'); if(!box) return;
-  function paint(){ var c=indCfg(); box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', !!c[b.dataset.ind]); }); }
-  box.querySelectorAll('button').forEach(function(b){
+  var boxes=[$('chInd'), $('chInd2')].filter(Boolean); if(!boxes.length) return;
+  function paint(){ var c=indCfg(); boxes.forEach(function(box){ box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', !!c[b.dataset.ind]); }); }); }
+  boxes.forEach(function(box){ box.querySelectorAll('button').forEach(function(b){
     b.onclick=function(){ var c=indCfg(); c[b.dataset.ind]=!c[b.dataset.ind]; save(); paint(); applyTF(); };
-  });
+  }); });
   paint();
   var pb=$('chPane');
   if(pb){
@@ -3028,7 +3040,7 @@ function indMACD(v){
 }
 /* ---------- göstergelerin grafiğe uygulanması ---------- */
 var IND={}, PANE={chart:null, s1:null, s2:null, hist:null, kind:null}, paneSync=false;
-function indCfg(){ if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false}; return S.chartInd; }
+function indCfg(){ if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false}; return S.chartInd; }
 function lineSer(key, color, width, dashed){
   if(!IND[key]){
     IND[key]=CH.chart.addLineSeries({color:color, lineWidth:width||1.5, priceLineVisible:false,
@@ -3057,6 +3069,55 @@ function applyIndicators(bars){
     put('bbM','#94a0ad', bb.ma, 1, true, null);
     put('bbL','#94a0ad', bb.lo, 1, true, 'BB alt');
   } else { put('bbU','#94a0ad',null); put('bbM','#94a0ad',null); put('bbL','#94a0ad',null); }
+  /* --- gelişmiş göstergeler --- */
+  // SuperTrend: yön değişince çizgi kopsun diye boş nokta (whitespace) kullanılır
+  if(cfg.st){
+    var stt=indSuperTrend(bars,10,3);
+    function stSer(key,color,arr){
+      var s=lineSer(key,color,2,false), d=[];
+      for(var i=0;i<arr.length;i++) d.push(arr[i]!=null?{time:t[i],value:arr[i]}:{time:t[i]});
+      s.setData(d);
+    }
+    stSer('stUp','#10b981', stt.up); stSer('stDn','#f0556b', stt.dn);
+    if(stt.dir[n]!=null) read.push('<b>SuperTrend</b> <span class="'+(stt.dir[n]===1?'up':'down')+'">'+(stt.dir[n]===1?'yükseliş':'düşüş')+'</span> · çizgi '+fmt(stt.dir[n]===1?stt.up[n]:stt.dn[n]));
+  } else { put('stUp','#10b981',null); put('stDn','#f0556b',null); }
+  if(cfg.ichi){
+    var ic=indIchimoku(bars);
+    put('ichT','#2563eb', ic.tenkan, 1.3, false, 'Tenkan');
+    put('ichK','#dc2626', ic.kijun, 1.3, false, 'Kijun');
+    // Senkou A/B 26 bar İLERİ kaydırılır; veri sonundaki 26 barlık projeksiyon çizilemez
+    function shiftFwd(arr,k){ var d=[]; for(var i=0;i<arr.length;i++){ var j=i+k; if(j<arr.length && arr[i]!=null) d.push({time:t[j], value:arr[i]}); } return d; }
+    lineSer('ichA','#16a34a',1,true).setData(shiftFwd(ic.spanA,26));
+    lineSer('ichB','#b91c1c',1,true).setData(shiftFwd(ic.spanB,26));
+    // Chikou: kapanış 26 bar GERİ
+    var ch=[]; for(var i=26;i<bars.length;i++) ch.push({time:t[i-26], value:ic.chikou[i]});
+    lineSer('ichC','#9333ea',1,true).setData(ch);
+  } else { ['ichT','ichK','ichA','ichB','ichC'].forEach(function(k){ put(k,'#999',null); }); }
+  if(cfg.kc){
+    var kc=indKeltner(bars,20,2);
+    put('kcU','#0891b2', kc.up, 1, true, 'KC üst');
+    put('kcL','#0891b2', kc.lo, 1, true, 'KC alt');
+  } else { put('kcU','#0891b2',null); put('kcL','#0891b2',null); }
+  if(cfg.sar){
+    if(!IND.sar) IND.sar=CH.chart.addLineSeries({color:'#7c5cff', lineWidth:1, lineVisible:false,
+      pointMarkersVisible:true, pointMarkersRadius:1.6, priceLineVisible:false, lastValueVisible:false, crosshairMarkerVisible:false});
+    var sr=indSAR(bars,0.02,0.2), ds=[];
+    for(var i=0;i<sr.length;i++) if(sr[i]!=null) ds.push({time:t[i], value:sr[i]});
+    IND.sar.setData(ds);
+    if(sr[n]!=null) read.push('<b style="color:#7c5cff">SAR</b> '+fmt(sr[n])+' <span class="'+(sr[n]<c[n]?'up':'down')+'">('+(sr[n]<c[n]?'fiyatın altında — yükseliş':'fiyatın üstünde — düşüş')+')</span>');
+  } else if(IND.sar) IND.sar.setData([]);
+  // Pivot: yatay fiyat çizgileri
+  if(IND.pivLines){ IND.pivLines.forEach(function(pl){ try{CH.candle.removePriceLine(pl);}catch(e){} }); IND.pivLines=null; }
+  if(cfg.piv){
+    var pv=indPivot(bars);
+    if(pv){
+      IND.pivLines=[];
+      [['R2',pv.R2,'#f0556b'],['R1',pv.R1,'#f0556b'],['P',pv.P,'#5d6b7a'],['S1',pv.S1,'#10b981'],['S2',pv.S2,'#10b981']].forEach(function(x){
+        IND.pivLines.push(CH.candle.createPriceLine({price:x[1], color:x[2], lineWidth:1, lineStyle:2, axisLabelVisible:true, title:x[0]}));
+      });
+      read.push('<b>Pivot</b> P '+fmt(pv.P)+' · R1 '+fmt(pv.R1)+' · S1 '+fmt(pv.S1));
+    }
+  }
   // alt panel
   var kind=S.chartPane||'none', box=$('chPane2');
   if(box){
@@ -3080,6 +3141,13 @@ function applyIndicators(bars){
           PANE.s1=PANE.chart.addLineSeries({color:'#0bbfa6', lineWidth:1.6, priceLineVisible:false});
           PANE.s1.createPriceLine({price:70, color:'#f0556b', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'70'});
           PANE.s1.createPriceLine({price:30, color:'#10b981', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'30'});
+        } else if(kind==='stoch'){
+          PANE.s1=PANE.chart.addLineSeries({color:'#2563eb', lineWidth:1.6, priceLineVisible:false});
+          PANE.s2=PANE.chart.addLineSeries({color:'#f59e0b', lineWidth:1.3, priceLineVisible:false});
+          PANE.s1.createPriceLine({price:80, color:'#f0556b', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'80'});
+          PANE.s1.createPriceLine({price:20, color:'#10b981', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:'20'});
+        } else if(kind==='atr'){
+          PANE.s1=PANE.chart.addLineSeries({color:'#8b5cf6', lineWidth:1.6, priceLineVisible:false});
         } else {
           PANE.hist=PANE.chart.addHistogramSeries({priceLineVisible:false});
           PANE.s1=PANE.chart.addLineSeries({color:'#3b82f6', lineWidth:1.6, priceLineVisible:false});
@@ -3102,6 +3170,20 @@ function applyIndicators(bars){
         for(var i=0;i<rs.length;i++) if(rs[i]!=null) d.push({time:t[i], value:rs[i]});
         PANE.s1.setData(d);
         if(rs[n]!=null) read.push('<b style="color:#0bbfa6">RSI</b> '+fmt(rs[n],0)+rsiTag(rs[n]));
+      } else if(kind==='stoch'){
+        var sk=indStoch(bars,14,3), dk=[], dd=[];
+        for(var i=0;i<sk.k.length;i++){
+          if(sk.k[i]!=null) dk.push({time:t[i], value:sk.k[i]});
+          if(sk.d[i]!=null) dd.push({time:t[i], value:sk.d[i]});
+        }
+        PANE.s1.setData(dk); PANE.s2.setData(dd);
+        if(sk.k[n]!=null) read.push('<b style="color:#2563eb">Stoch %K</b> '+fmt(sk.k[n],0)+' · <b style="color:#f59e0b">%D</b> '+(sk.d[n]!=null?fmt(sk.d[n],0):'—')+
+          ' <span class="'+(sk.k[n]>80?'down':(sk.k[n]<20?'up':''))+'">'+(sk.k[n]>80?'(aşırı alım)':(sk.k[n]<20?'(aşırı satım)':''))+'</span>');
+      } else if(kind==='atr'){
+        var at=indATR(bars,14), da=[];
+        for(var i=0;i<at.length;i++) if(at[i]!=null && c[i]>0) da.push({time:t[i], value:at[i]/c[i]*100});
+        PANE.s1.setData(da);
+        if(at[n]!=null&&c[n]>0) read.push('<b style="color:#8b5cf6">ATR%</b> '+fmt(at[n]/c[n]*100,2)+'% · 1.5×ATR stop ≈ '+fmt(c[n]-1.5*at[n]));
       } else {
         var m=indMACD(c), dm=[], ds=[], dh=[];
         for(var j=0;j<m.macd.length;j++){
@@ -3121,6 +3203,102 @@ function applyIndicators(bars){
   var rd=$('chRead');
   if(rd) rd.innerHTML = read.length? ('Son değerler — '+read.join(' &nbsp;·&nbsp; ')) :
     '<span class="cov">Gösterge seçilmedi. Not: <code>history.js</code> hacim tutmadığı için VWAP/OBV gibi hacim tabanlı göstergeler hesaplanamıyor.</span>';
+}
+/* ---------- gelişmiş göstergeler (formülleri kamuya açık; "premium" olan erişim, matematik değil) ----------*/
+/* ATR (Wilder yumuşatması) */
+function indATR(bars,n){
+  var out=[], tr=[], prev=null, i;
+  for(i=0;i<bars.length;i++){
+    var h=bars[i][2], l=bars[i][3], pc=i?bars[i-1][4]:bars[i][4];
+    tr.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc)));
+    if(i<n-1){ out.push(null); continue; }
+    if(i===n-1){ var s=0; for(var j=0;j<n;j++) s+=tr[j]; prev=s/n; }
+    else prev=(prev*(n-1)+tr[i])/n;
+    out.push(prev);
+  }
+  return out;
+}
+/* SuperTrend (ATR tabanlı trend takip) */
+function indSuperTrend(bars,n,mult){
+  var atr=indATR(bars,n), up=[], dn=[], dir=[], fu=null, fl=null, trend=1;
+  for(var i=0;i<bars.length;i++){
+    if(atr[i]==null){ up.push(null); dn.push(null); dir.push(null); continue; }
+    var mid=(bars[i][2]+bars[i][3])/2, bu=mid+mult*atr[i], bl=mid-mult*atr[i], c=bars[i][4], pc=bars[i-1][4];
+    fu=(fu==null||bu<fu||pc>fu)? bu : fu;
+    fl=(fl==null||bl>fl||pc<fl)? bl : fl;
+    if(trend===1 && c<fl) trend=-1; else if(trend===-1 && c>fu) trend=1;
+    dir.push(trend);
+    up.push(trend===1? fl : null);
+    dn.push(trend===-1? fu : null);
+  }
+  return {up:up, dn:dn, dir:dir};
+}
+/* Ichimoku */
+function indIchimoku(bars){
+  function hh(i,n){ var m=-Infinity; for(var j=Math.max(0,i-n+1);j<=i;j++) if(bars[j][2]>m)m=bars[j][2]; return m; }
+  function ll(i,n){ var m=Infinity; for(var j=Math.max(0,i-n+1);j<=i;j++) if(bars[j][3]<m)m=bars[j][3]; return m; }
+  var t=[],k=[],a=[],b=[],c=[];
+  for(var i=0;i<bars.length;i++){
+    t.push(i>=8?(hh(i,9)+ll(i,9))/2:null);
+    k.push(i>=25?(hh(i,26)+ll(i,26))/2:null);
+    a.push((t[i]!=null&&k[i]!=null)?(t[i]+k[i])/2:null);
+    b.push(i>=51?(hh(i,52)+ll(i,52))/2:null);
+    c.push(bars[i][4]);
+  }
+  return {tenkan:t, kijun:k, spanA:a, spanB:b, chikou:c};
+}
+/* Keltner Kanalı: EMA20 ± mult × ATR20 */
+function indKeltner(bars,n,mult){
+  var c=bars.map(function(b){return b[4];}), e=indEMA(c,n), atr=indATR(bars,n), up=[], lo=[];
+  for(var i=0;i<bars.length;i++){
+    if(e[i]==null||atr[i]==null){ up.push(null); lo.push(null); continue; }
+    up.push(e[i]+mult*atr[i]); lo.push(e[i]-mult*atr[i]);
+  }
+  return {ma:e, up:up, lo:lo};
+}
+/* Parabolic SAR */
+function indSAR(bars,step,max){
+  var out=[], n=bars.length, i;
+  if(n<2) return bars.map(function(){return null;});
+  var up=bars[1][4]>=bars[0][4], af=step, ep=up?bars[0][2]:bars[0][3], sar=up?bars[0][3]:bars[0][2];
+  out.push(null);
+  for(i=1;i<n;i++){
+    sar=sar+af*(ep-sar);
+    if(up){
+      sar=Math.min(sar, bars[i-1][3], (i>1?bars[i-2][3]:bars[i-1][3]));
+      if(bars[i][2]>ep){ ep=bars[i][2]; af=Math.min(af+step,max); }
+      if(bars[i][3]<sar){ up=false; sar=ep; ep=bars[i][3]; af=step; }
+    } else {
+      sar=Math.max(sar, bars[i-1][2], (i>1?bars[i-2][2]:bars[i-1][2]));
+      if(bars[i][3]<ep){ ep=bars[i][3]; af=Math.min(af+step,max); }
+      if(bars[i][2]>sar){ up=true; sar=ep; ep=bars[i][2]; af=step; }
+    }
+    out.push(sar);
+  }
+  return out;
+}
+/* Stokastik %K / %D */
+function indStoch(bars,kn,dn){
+  var k=[];
+  for(var i=0;i<bars.length;i++){
+    if(i<kn-1){ k.push(null); continue; }
+    var hh=-Infinity, ll=Infinity;
+    for(var j=i-kn+1;j<=i;j++){ if(bars[j][2]>hh)hh=bars[j][2]; if(bars[j][3]<ll)ll=bars[j][3]; }
+    k.push(hh>ll? (bars[i][4]-ll)/(hh-ll)*100 : 50);
+  }
+  var d=[];
+  for(var i2=0;i2<k.length;i2++){
+    var s=0, ok=true;
+    for(var j2=i2-dn+1;j2<=i2;j2++){ if(j2<0||k[j2]==null){ ok=false; break; } s+=k[j2]; }
+    d.push(ok? s/dn : null);
+  }
+  return {k:k, d:d};
+}
+/* Klasik pivot noktaları (önceki bardan) */
+function indPivot(bars){
+  var i=bars.length-2; if(i<0) return null;
+  var h=bars[i][2], l=bars[i][3], c=bars[i][4], p=(h+l+c)/3;
+  return {P:p, R1:2*p-l, S1:2*p-h, R2:p+(h-l), S2:p-(h-l)};
 }
 function setTfBtn(v){
   CH.tf=v;
