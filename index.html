@@ -337,7 +337,7 @@
     <button class="tab" data-v="all" title="Tüm Liste — alfabetik">Tüm Liste</button>
     <button class="tab" data-v="movers" title="En Çok Artan/Azalan/Hacim">Artan/Azalan</button>
     <button class="tab" data-v="fib" title="Fibonacci seviyelerine yakın hisseler">Fibonacci</button>
-    <button class="tab" data-v="sig" title="Seçtiğin göstergelere göre al sinyali veren hisseler">Sinyaller</button>
+    <button class="tab" data-v="sig" title="Seçtiğin indikatörlere göre al sinyali veren hisseler">İndikatörler</button>
     <button class="tab" data-v="sim" title="Simülatör — sanal para + oto-trader">Simülatör</button>
     <button class="tab" data-v="backtest" title="Geçmişte Test — stratejinin geriye dönük testi">Geçmiş Test</button>
     <button class="tab" data-v="real" title="Gerçek Portföy">Gerçek Portföy</button>
@@ -437,6 +437,7 @@
           <label class="hint" style="display:flex; align-items:center; gap:6px">en az <input class="fld" id="sigMin" type="number" value="2" min="1" style="width:62px"> <b>bağımsız</b> sinyal</label>
         </div>
       </div>
+      <div class="hint" style="margin-bottom:10px">Fibonacci sinyali, <b>Fibonacci sekmesindeki</b> pencere ve yakınlık ayarlarını kullanır.</div>
       <div id="sigInfo" class="hint" style="margin-bottom:12px"></div>
       <div class="scroll" id="sigBody"></div>
     </section>
@@ -1145,8 +1146,8 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
   <div class="doccard">
     <button class="docclose">✕ Kapat</button>
     <div class="doc">
-      <h1>Sinyaller — nasıl çalışır?</h1>
-      <p>Seçtiğin göstergeleri seçili piyasadaki tüm hisselere uygular ve her hisse için <b>kaç tanesinin al sinyali verdiğini</b> sayar. Veri: <code>history.js</code> günlük OHLC + <code>data.js</code> güncel fiyat.</p>
+      <h1>İndikatörler — nasıl çalışır?</h1>
+      <p>Seçtiğin indikatörleri seçili piyasadaki tüm hisselere uygular ve her hisse için <b>kaç tanesinin al sinyali verdiğini</b> sayar. Veri: <code>history.js</code> günlük OHLC + <code>data.js</code> güncel fiyat.</p>
       <div class="warn"><b>Önce oku:</b> "Al sinyali" burada <b>göstergenin tanımı gereği oluşan durum</b> demektir; fiyatın yükseleceğini <b>söylemez</b>. Bu göstergelerin öngörü gücü kanıtlanmış değildir.</div>
 
       <h2>1. Sinyal kuralları (tam liste)</h2>
@@ -1159,6 +1160,7 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <tr><td>Ichimoku</td><td>Fiyat bulutun üstünde <b>ve</b> Tenkan &gt; Kijun</td><td>Bulutun %5 üstünde tavan</td></tr>
         <tr><td>Keltner</td><td>Kapanış üst bandı yukarı kırdı</td><td>Kırılım büyüklüğü</td></tr>
         <tr><td>SAR</td><td>SAR noktaları fiyatın altında</td><td>Dönüş ≤4 bar önceyse 100; sonra azalır</td></tr>
+        <tr><td>Fibonacci</td><td>Yukarı bacakta, fiyat bir Fibonacci destek seviyesine yakın <b>ve</b> seviyenin üstünde (destek tutuyor)</td><td>Yakınlık %60 + seviye ağırlığı %40 (0.618 en yüksek)</td></tr>
         <tr><td>Pivot</td><td>Fiyat pivot noktasının (P) üstünde</td><td>P → R1 arasındaki yer</td></tr>
         <tr><td>RSI</td><td>RSI ≥ 50 <b>ve</b> dünden yüksek</td><td>50→75 arası ölçeklenir</td></tr>
         <tr><td>MACD</td><td>MACD &gt; sinyal çizgisi</td><td>Histogramın fiyata oranı</td></tr>
@@ -1173,7 +1175,7 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
       <table><tr><th>Aile</th><th>İçindekiler</th><th>Ne ölçer</th></tr>
         <tr><td>Trend / yön</td><td>EMA20, MA50, MA200, SuperTrend, SAR, Ichimoku</td><td>Fiyatın yönü</td></tr>
         <tr><td>Momentum</td><td>RSI, MACD, Stokastik</td><td>Hareketin hızı/ivmesi</td></tr>
-        <tr><td>Bant / konum</td><td>Bollinger, Keltner, Pivot</td><td>Fiyatın aralık içindeki yeri</td></tr>
+        <tr><td>Bant / konum</td><td>Bollinger, Keltner, <b>Fibonacci</b>, Pivot</td><td>Fiyatın bir aralık ya da referans seviyeye göre yeri</td></tr>
         <tr><td>Oynaklık filtresi</td><td>ATR%</td><td>İşlem yapılabilir oynaklık (yön sinyali değil)</td></tr>
       </table>
       <p>Bir aile, içindeki <b>seçili</b> göstergelerden <b>en az biri</b> sinyal verirse "veriyor" sayılır. Tabloda büyük sayı <b>aile</b> sayısıdır (örn. <b>2/3</b>); altındaki küçük satır ham gösterge sayısını gösterir (örn. 5/8) — ikincisi bilgi amaçlıdır, karar için birinciye bak.</p>
@@ -2790,6 +2792,14 @@ var SIGDEFS=[
     var n=x.n, s=x.sar; if(s[n]==null) return null;
     var since=0; for(var i=n;i>0&&s[i]!=null&&s[i-1]!=null&&(s[i]<x.c[i])===(s[i-1]<x.c[i-1]);i--) since++;
     return {met:s[n]<x.c[n], str:since<=4?100:Math.max(35, clamp01(100-(since-4)*2))};}},
+  {k:'fib', fam:'band', t:'Fibonacci', d:'Yukarı bacakta fiyat bir Fibonacci destek seviyesine yakın VE seviyenin üstünde (destek tutuyor).', f:function(x){
+    var L=x.fib; if(!L||!L.leg) return null;
+    if(L.leg.dir!=='up') return {met:false, str:0};
+    var c=x.c[x.n];
+    if(c<L.leg.lo) return {met:false, str:0};
+    var met=(L.near.dist<=L.thresh && c>=L.near.level);
+    var prox=clamp01((1-L.near.dist/L.thresh)*100);
+    return {met:met, str:clamp01(prox*0.6 + L.near.q*0.4)};}},
   {k:'piv', fam:'band', t:'Pivot', d:'Fiyat klasik pivot noktasının (P) üstünde.', f:function(x){
     if(!x.piv) return null;
     return {met:x.c[x.n]>x.piv.P, str:clamp01((x.c[x.n]-x.piv.P)/((x.piv.R1-x.piv.P)||1)*100)};}},
@@ -2814,7 +2824,7 @@ function clamp01(v){ return Math.max(0, Math.min(100, v)); }
 var SIGFAMS=[
   {k:'trend', t:'Trend / yön',       d:'Fiyatın yönünü ölçer. EMA20, MA50, MA200, SuperTrend, SAR, Ichimoku büyük ölçüde aynı bilgiyi verir.'},
   {k:'mom',   t:'Momentum',          d:'Hareketin hızını/ivmesini ölçer: RSI, MACD, Stokastik.'},
-  {k:'band',  t:'Bant / konum',      d:'Fiyatın bir aralık ya da referans seviyeye göre yerini ölçer: Bollinger, Keltner, Pivot.'},
+  {k:'band',  t:'Bant / konum',      d:'Fiyatın bir aralık ya da referans seviyeye göre yerini ölçer: Bollinger, Keltner, Fibonacci, Pivot.'},
   {k:'filt',  t:'Oynaklık filtresi', d:'Yön sinyali değildir; işlem yapılabilir oynaklık şartıdır: ATR%.'}
 ];
 
@@ -2845,8 +2855,15 @@ function sigCtx(bars){
     ema20:indEMA(c,20), ma50:indSMA(c,50), ma200:indSMA(c,200),
     bb:bbv, st:indSuperTrend(bars,10,3), ichi:indIchimoku(bars),
     kc:indKeltner(bars,20,2), sar:indSAR(bars,0.02,0.2), piv:indPivot(bars),
-    rsi:indRSI(c,14), macd:indMACD(c), stoch:indStoch(bars,14,3), atr:indATR(bars,14) };
+    rsi:indRSI(c,14), macd:indMACD(c), stoch:indStoch(bars,14,3), atr:indATR(bars,14),
+    fib:(function(){
+      var look=SIGFIB.look, thresh=SIGFIB.near;
+      var lg=fibLeg(bars, look); if(!lg) return null;
+      var nr=fibNearest(lg, c[n]);
+      return {leg:lg, near:nr, thresh:thresh, q:nr.q};
+    })() };
 }
+var SIGFIB={look:120, near:5};
 function sigScan(){
   var cfg=sigCfg();
   var picked=SIGDEFS.filter(function(d){ return cfg[d.k]; });
@@ -2858,6 +2875,8 @@ function sigScan(){
   var famCount=Object.keys(famsPicked).length;
   var need=Math.max(1, Math.min(famCount, parseInt($('sigMin').value,10)||1));
   if($('sigMin')) $('sigMin').value=need;
+  SIGFIB.look = Math.max(30, parseInt($('fibLook')&&$('fibLook').value,10)||120);
+  SIGFIB.near = Math.max(0.5, parseFloat($('fibNear')&&$('fibNear').value)||5);
   var rows=[], scanned=0, skipped=0;
   marketStocks().forEach(function(s){
     if(s.price==null) return;
