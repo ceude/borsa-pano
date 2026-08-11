@@ -216,6 +216,15 @@
   .ghost:hover{border-color:var(--brand); color:var(--brand)}
   .ghost.accent{border:1.5px solid var(--brand); color:var(--brand); background:var(--brand-bg); font-weight:700}
   .ghost.accent:hover{filter:brightness(.97)}
+  .prow{display:flex; justify-content:space-between; align-items:center; gap:12px;
+    font-size:13px; padding:9px 0; border-bottom:1px solid var(--line2)}
+  .prow:last-child{border-bottom:none}
+  .prow span{color:var(--dim)}
+  .prow b{font-weight:600}
+  .pchip{font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px;
+    background:var(--brand-bg); color:var(--brand-ink)}
+  .pchip.std{background:var(--line2); color:var(--dim)}
+  .psec{font-size:12px; color:var(--faint); text-transform:uppercase; letter-spacing:.05em; margin:18px 0 4px}
   .hint{color:var(--faint); font-size:11.5px; line-height:1.55}
   .empty{color:var(--faint); text-align:center; padding:32px; font-size:13px}
   .log .e{font-family:"Plus Jakarta Sans"; font-size:12px; padding:9px 0; border-bottom:1px solid var(--line2);
@@ -1221,23 +1230,24 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <div class="hint" style="margin-top:14px">Şifreni Supabase güvenli saklar; bu dosyada tutulmaz. Aynı e-posta/şifreyle her cihazdan gir.</div>
       </div>
       <div id="authSignedIn" style="display:none">
-        <h1>Profil</h1>
-        <div id="roleBox" style="background:var(--brand-bg); border:1px solid var(--brand); color:var(--brand-ink); border-radius:10px; padding:9px 12px; margin-bottom:10px">Üyelik: <b>Standart Üye</b></div>
-        <div id="upsell" class="hint" style="display:none; margin-bottom:12px">Standart üyelikte <b>Günlük</b>, <b>Kısa Vade</b> ve <b>Orta/Uzun</b> sekmeleri kapalıdır. Üyelik seviyeleri hesap üzerinden tanımlanır.</div>
-        <div id="adminBox" style="display:none; margin-bottom:14px">
-          <div class="hint" style="margin-bottom:6px"><b>Yönetici araçları</b></div>
+        <h1 style="font-size:19px; margin:0 0 14px">Profil</h1>
+        <div class="prow"><span>Hesap</span><b id="authWho">—</b></div>
+        <div class="prow"><span>Üyelik</span><span class="pchip" id="roleBox">Standart Üye</span></div>
+        <div class="prow"><span>Bulut</span><b id="authSync">—</b></div>
+        <div id="upsell" class="hint" style="display:none; margin-top:10px">Standart üyelikte <b>Günlük</b>, <b>Kısa Vade</b> ve <b>Orta/Uzun</b> sekmeleri kapalıdır.</div>
+        <div id="adminBox" style="display:none">
+          <div class="psec">Yönetici</div>
           <button class="ghost accent" id="goBacktest">📊 Geçmiş Test'i aç</button>
         </div>
-        <p id="authWho"></p>
-        <div class="hint" id="authSync" style="margin:6px 0 16px"></div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <div class="psec">Bulut işlemleri</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
           <button class="ghost" id="authPull">Buluttan çek</button>
           <button class="ghost" id="authPush">Buluta gönder</button>
           <button class="ghost" id="authRestore">Yerel yedeği geri yükle</button>
           <button class="ghost" id="authLogout">Çıkış</button>
         </div>
-        <div class="hint" style="margin-top:14px"><b>Nasıl çalışır:</b> Veriler yalnız bulutta tutulur, tarayıcıda hiçbir şey saklanmaz; her değişiklik ~2.5 sn içinde buluta yazılır, başka bir cihaz açıksa oraya anında yansır. <b>Çakışma güvenliği:</b> buluttan veri alınmadan önce mevcut durumun oturum içi yedeği alınır (son 5) ve <b>gerçek işlem geçmişi asla silinmez</b> — iki cihazdaki gerçek işlemler birleştirilir. Botu tek cihazda çalıştır.</div>
-        <h2 style="margin-top:22px">Notlarım</h2>
+        <div class="hint" style="margin-top:10px">Veriler yalnız bulutta tutulur; her değişiklik ~2.5 sn içinde yazılır ve açık olan diğer cihaza anında yansır. Buluttan veri alınmadan önce mevcut durumun oturum içi yedeği alınır (son 5) ve <b>gerçek işlem geçmişi asla silinmez</b>. Botu tek cihazda çalıştır.</div>
+        <div class="psec">Notlarım</div>
         <div class="hint" style="margin-bottom:8px">Genel notlar / günlük haberler / banka önerileri. Bulutla eşitlenir. Hisseye özel not için bir hisseye tıkla.</div>
         <textarea id="notesArea" style="min-height:220px" placeholder="03.06 — X Bankası THYAO için 'AL', hedef …"></textarea>
       </div>
@@ -2689,6 +2699,9 @@ function fibScore(kind, near, leg, s, thresh){
   var p={};
   p.prox = clampN((1-near.dist/thresh)*100, 0, 100);
   p.level = near.q;
+  // Seviye hâlâ geçerli mi? Destekte fiyat üstünde, dirençte altında olmalı.
+  var above=(s.price!=null && near.level!=null) ? (s.price>=near.level) : null;
+  p.hold = (above==null) ? null : (((kind==='buy')?above:!above) ? 100 : 10);
   p.swing = leg.legPct>=20?100 : leg.legPct>=10? 60+(leg.legPct-10)/10*40 : clampN(leg.legPct/10*60,15,60);
   var ageD=(leg.ageDays!=null?leg.ageDays:leg.ageBars);
   p.fresh = ageD<=40?100 : clampN(100-(ageD-40)*1.5, 20, 100);
@@ -2703,7 +2716,7 @@ function fibScore(kind, near, leg, s, thresh){
     if(s.rsi14!=null){ var w=s.rsi14;
       p.rsi=(w>=55&&w<=70)?100:(w>70)?85:(w>=45)?70:40; } else p.rsi=null;
   }
-  var W={prox:1.5, level:1.2, trend:1.5, swing:1.0, fresh:0.8, rsi:0.8};
+  var W={prox:1.5, hold:1.4, level:1.2, trend:1.5, swing:1.0, fresh:0.8, rsi:0.8};
   var ws=0, vs=0;
   for(var k in W){ if(p[k]!=null){ ws+=W[k]; vs+=W[k]*p[k]; } }
   return { score: ws>0?Math.round(vs/ws):null, parts:p };
@@ -2855,8 +2868,9 @@ var SIGDEFS=[
     var c=x.c[x.n];
     if(c<L.leg.lo) return {met:false, str:0};
     var met=(L.near.dist<=L.thresh && c>=L.near.level);
-    var prox=clamp01((1-L.near.dist/L.thresh)*100);
-    return {met:met, str:clamp01(prox*0.6 + L.near.q*0.4)};}},
+    // Güç: Fibonacci sekmesindeki güvenilirlik puanının BİREBİR aynısı → iki sekme aynı sırayı verir
+    var r=fibScore('buy', L.near, L.leg, x.stock||{price:c}, L.thresh);
+    return {met:met, str:(r&&r.score!=null)?r.score:0};}},
   {k:'piv', fam:'band', t:'Pivot', d:'Fiyat klasik pivot noktasının (P) üstünde.', f:function(x){
     if(!x.piv) return null;
     return {met:x.c[x.n]>x.piv.P, str:clamp01((x.c[x.n]-x.piv.P)/((x.piv.R1-x.piv.P)||1)*100)};}},
@@ -2905,10 +2919,10 @@ function sigPaint(){
   });
 }
 /* bir hisse için tüm gösterge serilerini bir kez hesapla */
-function sigCtx(bars){
+function sigCtx(bars, stock){
   var c=bars.map(function(b){return b[4];}), n=bars.length-1;
   var bbv=indBB(c,20,2);
-  return { bars:bars, c:c, n:n,
+  return { bars:bars, c:c, n:n, stock:stock||null,
     ema20:indEMA(c,20), ma50:indSMA(c,50), ma200:indSMA(c,200),
     bb:bbv, st:indSuperTrend(bars,10,3), ichi:indIchimoku(bars),
     kc:indKeltner(bars,20,2), sar:indSAR(bars,0.02,0.2), piv:indPivot(bars),
@@ -2939,7 +2953,7 @@ function sigScan(){
     if(s.price==null) return;
     var h=HIST[s.symbol]; if(!h||!h.d||h.d.length<60){ skipped++; return; }
     scanned++;
-    var x=sigCtx(h.d), met=[], strSum=0, usable=0, fam={};
+    var x=sigCtx(h.d, s), met=[], strSum=0, usable=0, fam={};
     picked.forEach(function(d){
       var r=d.f(x);
       if(r==null) return;                       // veri yetersiz → hiç sayılmaz
@@ -3720,7 +3734,7 @@ function applyRole(){
   var visV=vis?vis.id.replace('v-',''):null;
   if(visV && visV!=='detail' && !canView(visV)) goView(defView());
   else if(curV && !canNav(curV)) goView(defView());
-  var rb=$('roleBox'); if(rb) rb.innerHTML='Üyelik: <b>'+roleLabel()+'</b>';
+  var rb=$('roleBox'); if(rb){ rb.textContent=roleLabel(); rb.className='pchip'+(ROLE==='standart'?' std':''); }
   var ab=$('adminBox'); if(ab) ab.style.display=isAdmin()?'block':'none';
   var ub=$('upsell'); if(ub) ub.style.display=isPremium()?'none':'block';
 }
@@ -3853,7 +3867,7 @@ function updateAuthBar(){
   if(sbReady()){
     if(b){ b.textContent='☁ '+(SB_USER.email? SB_USER.email.split('@')[0] : 'bağlı')+(ROLE!=='standart'?(' · '+(ROLE==='admin'?'Admin':'Premium')):''); b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
     if(so) so.style.display='none';
-    if(si){ si.style.display='block'; var w=$('authWho'); if(w) w.textContent=SB_USER.email+' olarak bağlısın. Değişikliklerin otomatik buluta kaydediliyor.'; }
+    if(si){ si.style.display='block'; var w=$('authWho'); if(w) w.textContent=SB_USER.email||'—'; }
     if(typeof applyRole==='function') applyRole();
   } else {
     if(b){ b.textContent='☁ Bulut'; b.style.color=''; b.style.borderColor=''; }
