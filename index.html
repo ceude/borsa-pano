@@ -337,7 +337,7 @@
     <button class="tab" data-v="all" title="Tüm Liste — alfabetik">Tüm Liste</button>
     <button class="tab" data-v="movers" title="En Çok Artan/Azalan/Hacim">Artan/Azalan</button>
     <button class="tab" data-v="fib" title="Fibonacci seviyelerine yakın hisseler">Fibonacci</button>
-    <button class="tab" data-v="sig" title="Seçtiğin indikatörlere göre al sinyali veren hisseler">İndikatörler</button>
+    <button class="tab" data-v="sig" title="Seçtiğin indikatörlere göre pozitif sinyal veren hisseler">İndikatörler</button>
     <button class="tab" data-v="sim" title="Simülatör — sanal para + oto-trader">Simülatör</button>
     <button class="tab" data-v="backtest" title="Geçmişte Test — stratejinin geriye dönük testi">Geçmiş Test</button>
     <button class="tab" data-v="real" title="Gerçek Portföy">Gerçek Portföy</button>
@@ -405,7 +405,7 @@
         <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
-        <b>Önce oku.</b> Fibonacci seviyelerinin fiyatı öngördüğüne dair <b>sağlam bir kanıt yoktur</b>; çok sayıda kişi aynı seviyelere baktığı için kısmen kendini doğrulayan bir etkidir ve sık sık çalışmaz. Buradaki liste "fiyat şu an sık izlenen bir seviyenin yakınında" demektir — <b>"al" ya da "sat" sinyali değildir</b>. Güvenilirlik puanı bu <b>kurulumun</b> derli topluluğunu ölçer, kazanma olasılığını değil. Yatırım tavsiyesi değildir.
+        <b>Önce oku.</b> Fibonacci seviyelerinin fiyatı öngördüğüne dair <b>sağlam bir kanıt yoktur</b>; çok sayıda kişi aynı seviyelere baktığı için kısmen kendini doğrulayan bir etkidir ve sık sık çalışmaz. Buradaki liste "fiyat şu an sık izlenen bir seviyenin yakınında" demektir — <b>alım ya da satım önerisi değildir</b>. Güvenilirlik puanı bu <b>kurulumun</b> derli topluluğunu ölçer, kazanma olasılığını değil. Yatırım tavsiyesi değildir.
       </div>
       <div class="controls">
         <label class="hint" style="display:flex; align-items:center; gap:6px">Salınım penceresi (gün) <input class="fld" id="fibLook" type="number" value="120" min="30" step="10" style="width:80px" title="Tepe ve dibin aranacağı geçmiş gün sayısı. Günlük veri ~1 yıl olduğu için, bundan uzun pencerelerde otomatik olarak 5 yıllık haftalık seriye geçilir."></label>
@@ -413,9 +413,9 @@
         <button class="ghost accent" id="fibRun">⟳ Yeniden tara</button>
       </div>
       <div id="fibInfo" class="hint" style="margin-bottom:12px"></div>
-      <h3 style="font-size:16px; margin:0 0 8px" class="up">▲ Alım bölgesi <span class="cov">(yukarı bacakta destek seviyesinde ya da yakınında)</span></h3>
+      <h3 style="font-size:16px; margin:0 0 8px" class="up">▲ Pozitif bölge <span class="cov">(yukarı bacakta destek seviyesinde ya da yakınında)</span></h3>
       <div class="scroll" id="fibBuy"></div>
-      <h3 style="font-size:16px; margin:22px 0 8px" class="down">▼ Satım bölgesi <span class="cov">(aşağı bacakta direnç seviyesinde ya da yakınında)</span></h3>
+      <h3 style="font-size:16px; margin:22px 0 8px" class="down">▼ Negatif bölge <span class="cov">(aşağı bacakta direnç seviyesinde ya da yakınında)</span></h3>
       <div class="scroll" id="fibSell"></div>
     </section>
 
@@ -425,7 +425,7 @@
         <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
-        <b>Önce oku.</b> Buradaki "al sinyali", göstergenin <b>tanımı gereği</b> oluşan durumdur — fiyatın yükseleceği anlamına <b>gelmez</b>. Çok sayıda gösterge seçmek güveni artırmaz: çoğu aynı fiyat hareketini farklı biçimde ölçer. Bu yüzden sayım <b>gösterge değil, bağımsız aile</b> üzerinden yapılır — altı trend göstergesi seçsen bile bu <b>tek</b> bağımsız sinyaldir. Sinyaller ~15 dk gecikmeli <b>günlük kapanışlardan</b> hesaplanır. Yatırım tavsiyesi değildir.
+        <b>Önce oku.</b> Buradaki "pozitif sinyal", indikatörün <b>tanımı gereği</b> oluşan durumdur — fiyatın yükseleceği anlamına <b>gelmez</b>. Çok sayıda gösterge seçmek güveni artırmaz: çoğu aynı fiyat hareketini farklı biçimde ölçer. Bu yüzden sayım <b>gösterge değil, bağımsız aile</b> üzerinden yapılır — altı trend göstergesi seçsen bile bu <b>tek</b> bağımsız sinyaldir. Sinyaller ~15 dk gecikmeli <b>günlük kapanışlardan</b> hesaplanır. Yatırım tavsiyesi değildir.
       </div>
       <div class="botbar" style="margin-top:0">
         <div class="hint" style="margin-bottom:8px"><b>Göstergeleri seç</b> — hepsi birlikte değerlendirilir. İstediğin kadar seçebilirsin.</div>
@@ -450,7 +450,7 @@
 
     <section class="view card" id="v-all">
       <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
-      <div class="scroll"><table id="allTable"><thead><tr><th class="l">Hisse</th><th>Fiyat</th><th>Günlük %</th><th>Hacim</th><th></th></tr></thead><tbody id="allBody"></tbody></table></div>
+      <div class="scroll"><table id="allTable"><thead><tr id="allHead"></tr></thead><tbody id="allBody"></tbody></table></div>
     </section>
 
     <section class="view card" id="v-movers">
@@ -1097,8 +1097,8 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
       <h2>1. Salınım bacağı nasıl bulunuyor</h2>
       <ul>
         <li>Son <b>N gün</b> (varsayılan 120) içindeki <b>en yüksek tepe</b> ve <b>en düşük dip</b> bulunur.</li>
-        <li><b>Dip önce, tepe sonra</b> ise bacak <b>yukarı</b>dır → geri çekilme seviyeleri <b>destek</b> sayılır → <b>alım bölgesi</b> listesine girer.</li>
-        <li><b>Tepe önce, dip sonra</b> ise bacak <b>aşağı</b>dır → tepki seviyeleri <b>direnç</b> sayılır → <b>satım bölgesi</b> listesine girer.</li>
+        <li><b>Dip önce, tepe sonra</b> ise bacak <b>yukarı</b>dır → geri çekilme seviyeleri <b>destek</b> sayılır → <b>pozitif bölge</b> listesine girer.</li>
+        <li><b>Tepe önce, dip sonra</b> ise bacak <b>aşağı</b>dır → tepki seviyeleri <b>direnç</b> sayılır → <b>negatif bölge</b> listesine girer.</li>
         <li>Yukarı bacakta fiyat dibin altına inmişse ya da aşağı bacakta tepenin üstüne çıkmışsa bacak <b>geçersiz</b> sayılır ve hisse listelenmez.</li>
       </ul>
 
@@ -1126,7 +1126,7 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <tr><td>Seviye</td><td>Fiyatın en yakın olduğu Fibonacci oranı.</td></tr>
         <tr><td>Seviye fiyatı</td><td>O oranın fiyat karşılığı.</td></tr>
         <tr><td>Uzaklık</td><td>Güncel fiyatın seviyeye uzaklığı (%). %1 altı yeşil.</td></tr>
-        <tr><td><b>Konum</b></td><td>Fiyat seviyenin üstünde mi altında mı. <b>Alım bölgesinde</b> fiyat desteğin <b>üstündeyse</b> seviye hâlâ tutuyor (yeşil); altındaysa destek <b>kırılmış</b> (kırmızı) — kurulum bozulmuş olabilir. <b>Satım bölgesinde</b> tam tersi: fiyat direncin altındaysa tutuyor, üstündeyse aşılmış.</td></tr>
+        <tr><td><b>Konum</b></td><td>Fiyat seviyenin üstünde mi altında mı. <b>Pozitif bölgede</b> fiyat desteğin <b>üstündeyse</b> seviye hâlâ tutuyor (yeşil); altındaysa destek <b>kırılmış</b> (kırmızı) — kurulum bozulmuş olabilir. <b>Negatif bölgede</b> tam tersi: fiyat direncin altındaysa tutuyor, üstündeyse aşılmış.</td></tr>
         <tr><td>Bacak</td><td>Salınımın dipten tepeye büyüklüğü (%).</td></tr>
         <tr><td>Trend / RSI / Fiyat</td><td>Diğer sekmelerdekiyle aynı.</td></tr>
       </table>
@@ -1147,11 +1147,11 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
     <button class="docclose">✕ Kapat</button>
     <div class="doc">
       <h1>İndikatörler — nasıl çalışır?</h1>
-      <p>Seçtiğin indikatörleri seçili piyasadaki tüm hisselere uygular ve her hisse için <b>kaç tanesinin al sinyali verdiğini</b> sayar. Veri: <code>history.js</code> günlük OHLC + <code>data.js</code> güncel fiyat.</p>
-      <div class="warn"><b>Önce oku:</b> "Al sinyali" burada <b>göstergenin tanımı gereği oluşan durum</b> demektir; fiyatın yükseleceğini <b>söylemez</b>. Bu göstergelerin öngörü gücü kanıtlanmış değildir.</div>
+      <p>Seçtiğin indikatörleri seçili piyasadaki tüm hisselere uygular ve her hisse için <b>kaç tanesinin pozitif sinyal verdiğini</b> sayar. Veri: <code>history.js</code> günlük OHLC + <code>data.js</code> güncel fiyat.</p>
+      <div class="warn"><b>Önce oku:</b> "Pozitif sinyal" burada <b>indikatörün tanımı gereği oluşan durum</b> demektir; fiyatın yükseleceğini <b>söylemez</b>. Bu göstergelerin öngörü gücü kanıtlanmış değildir.</div>
 
-      <h2>1. Sinyal kuralları (tam liste)</h2>
-      <table><tr><th>Gösterge</th><th>Al sinyali koşulu</th><th>Güç (0–100)</th></tr>
+      <h2>1. Pozitif sinyal kuralları (tam liste)</h2>
+      <table><tr><th>İndikatör</th><th>Pozitif sinyal koşulu</th><th>Güç (0–100)</th></tr>
         <tr><td>EMA20</td><td>Kapanış &gt; EMA20</td><td>Ortalamanın %3 üstünde tavan</td></tr>
         <tr><td>MA50</td><td>Kapanış &gt; MA50</td><td>%5 üstünde tavan</td></tr>
         <tr><td>MA200</td><td>Kapanış &gt; MA200</td><td>%10 üstünde tavan</td></tr>
@@ -1178,7 +1178,7 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <tr><td>Bant / konum</td><td>Bollinger, Keltner, <b>Fibonacci</b>, Pivot</td><td>Fiyatın bir aralık ya da referans seviyeye göre yeri</td></tr>
         <tr><td>Oynaklık filtresi</td><td>ATR%</td><td>İşlem yapılabilir oynaklık (yön sinyali değil)</td></tr>
       </table>
-      <p>Bir aile, içindeki <b>seçili</b> göstergelerden <b>en az biri</b> sinyal verirse "veriyor" sayılır. Tabloda büyük sayı <b>aile</b> sayısıdır (örn. <b>2/3</b>); altındaki küçük satır ham gösterge sayısını gösterir (örn. 5/8) — ikincisi bilgi amaçlıdır, karar için birinciye bak.</p>
+      <p>Bir aile, içindeki <b>seçili</b> indikatörlerden <b>en az biri</b> pozitif sinyal verirse "veriyor" sayılır. Tabloda büyük sayı <b>aile</b> sayısıdır (örn. <b>2/3</b>); altındaki küçük satır ham gösterge sayısını gösterir (örn. 5/8) — ikincisi bilgi amaçlıdır, karar için birinciye bak.</p>
       <p><b>Pratik öneri:</b> her aileden birer tane seç (örn. MA200 + MACD + Bollinger). Aynı aileden altı gösterge seçmek listeyi güçlendirmez, sadece aynı şeyi tekrarlar.</p>
 
       <h2>3. Sıralama</h2>
@@ -1221,7 +1221,13 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <div class="hint" style="margin-top:14px">Şifreni Supabase güvenli saklar; bu dosyada tutulmaz. Aynı e-posta/şifreyle her cihazdan gir.</div>
       </div>
       <div id="authSignedIn" style="display:none">
-        <h1>Bulut açık</h1>
+        <h1>Profil</h1>
+        <div id="roleBox" style="background:var(--brand-bg); border:1px solid var(--brand); color:var(--brand-ink); border-radius:10px; padding:9px 12px; margin-bottom:10px">Üyelik: <b>Standart Üye</b></div>
+        <div id="upsell" class="hint" style="display:none; margin-bottom:12px">Standart üyelikte <b>Günlük</b>, <b>Kısa Vade</b> ve <b>Orta/Uzun</b> sekmeleri kapalıdır. Üyelik seviyeleri hesap üzerinden tanımlanır.</div>
+        <div id="adminBox" style="display:none; margin-bottom:14px">
+          <div class="hint" style="margin-bottom:6px"><b>Yönetici araçları</b></div>
+          <button class="ghost accent" id="goBacktest">📊 Geçmiş Test'i aç</button>
+        </div>
         <p id="authWho"></p>
         <div class="hint" id="authSync" style="margin:6px 0 16px"></div>
         <div style="display:flex; gap:10px; flex-wrap:wrap">
@@ -1509,7 +1515,7 @@ function marketStocks(){ return STOCKS.filter(function(s){return s.market===MK;}
 
 /* gate */
 function showGate(){ $('gate').style.display='flex'; $('app').style.display='none'; }
-function showApp(){ $('gate').style.display='none'; $('app').style.display='block'; renderAll(); goView('trade'); }
+function showApp(){ $('gate').style.display='none'; $('app').style.display='block'; renderAll(); applyRole(); goView(defView()); }
 document.querySelectorAll('.gate-opt').forEach(function(o){
   o.onclick=function(){ MK=o.dataset.m; S.lastMarket=MK; save(); syncSwitch(); showApp(); };
 });
@@ -1523,7 +1529,7 @@ $('mktSwitch').querySelectorAll('button').forEach(function(b){
     if(typeof btReset==='function') btReset();
     fibLastMk=null; if($('fibBuy')){ $('fibBuy').innerHTML=''; $('fibSell').innerHTML=''; $('fibInfo').textContent=''; }
     sigLastMk=null; if($('sigBody')){ $('sigBody').innerHTML=''; $('sigInfo').textContent=''; }
-    renderAll(); goView('trade'); };
+    renderAll(); applyRole(); goView(defView()); };
 });
 
 /* header meta */
@@ -1560,6 +1566,7 @@ function renderTicker(){
 
 /* ---------- tabs ---------- */
 function goView(v){
+  if(typeof canView==='function' && v!=='detail' && !canView(v)) v=(typeof defView==='function'?defView():'all');
   document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('active', x.dataset.v===v);});
   document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
   $('v-'+v).classList.add('active');
@@ -1866,19 +1873,69 @@ buildFilterRow();
 $('clearFilters').onclick=function(){ colFilters={}; $('screenFilterRow').querySelectorAll('.colf').forEach(function(i){i.value='';}); qScreen=''; $('searchScreen').value=''; renderScreen(); };
 
 /* ---------- all list ---------- */
-var qAll='';
+var qAll='', sortKA='symbol', sortDirA=1;
+/* Tüm Liste: Orta/Uzun sekmesindeki sütunların tamamı (Skor hariç) + hacim */
+var ACOLS=[
+  {k:'symbol',t:'Hisse',l:true,tip:'Hisse kodu ve şirket adı.'},
+  {k:'price',t:'Fiyat',tip:'Hissenin güncel fiyatı (yaklaşık 15 dk gecikmeli).'},
+  {k:'changePct',t:'Gün %',tip:'Bugünkü yüzde değişim (önceki güne göre).'},
+  {k:'volume',t:'Hacim',tip:'Son veri çekimindeki işlem hacmi.'},
+  {k:'_tr',t:'Trend',tip:'Fiyatın 50/200 günlük ortalamalara göre yönü. ↑↑ fiyat>MA50>MA200 · ↑ fiyat>MA50 · ↓ fiyat≤MA50.'},
+  {k:'_rs',t:'Göreli Güç',tip:'Hissenin son 1 aydaki getirisi eksi endeksin aynı dönemdeki getirisi. Pozitifse piyasayı yeniyor.'},
+  {k:'ret1m',t:'1A %',tip:'Son ~1 aylık (21 işlem günü) fiyat değişimi.'},
+  {k:'rsi14',t:'RSI',tip:'Göreli Güç Endeksi (0–100). 55–70 sağlıklı; >70 aşırı alım; <30 aşırı satım.'},
+  {k:'atrPct',t:'ATR%',tip:'Ortalama günlük dalgalanma (fiyatın %si). Stop mesafesi için kullanılır.'},
+  {k:'pe',t:'F/K',tip:'Fiyat/Kazanç: fiyat, yıllık kârın kaç katı. Düşük = ucuz. Kabaca <10 ucuz, 10–20 makul, >20 pahalı.'},
+  {k:'pb',t:'P/D',tip:'Piyasa/Defter: fiyat, özsermayenin kaç katı. <1,5 ucuz, 1,5–3 normal, >3 pahalı.'},
+  {k:'roe',t:'Özsr.K %',tip:'Özsermaye Kârlılığı (ROE). Yüksek iyi.'},
+  {k:'debtToEquity',t:'Borç/Özsr',tip:'Borcun özsermayeye oranı. Düşük = daha sağlam. Finans hisselerinde anlamı farklıdır.'},
+  {k:'netMargin',t:'Marj %',tip:'Net kâr marjı: satışın yüzde kaçı net kâra dönüşüyor.'},
+  {k:'scoreCoverage',t:'Veri',tip:'Temel oranlardan kaçının mevcut olduğu. Düşükse verilere temkinli yaklaş.'},
+  {k:'act',t:''}
+];
+function buildHeadAll(){
+  var h=$('allHead'); if(!h) return;
+  h.innerHTML = ACOLS.map(function(c){
+    var arr=c.k===sortKA?'<span class="arr">'+(sortDirA<0?'▼':'▲')+'</span>':'';
+    return '<th class="'+(c.l?'l':'')+'" data-k="'+c.k+'"'+(c.tip?' title="'+c.tip+'"':'')+'>'+c.t+' '+arr+'</th>';
+  }).join('');
+  h.querySelectorAll('th').forEach(function(th){
+    var k=th.dataset.k; if(k==='act') return;
+    th.onclick=function(){ if(sortKA===k){sortDirA*=-1;}else{sortKA=k; sortDirA=(k==='symbol')?1:-1;} renderAllList(); };
+  });
+}
 function renderAllList(){
+  buildHeadAll();
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
-  var rows=marketStocks().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);});
+  var rows=marketStocks().slice();
   if(qAll){var q=qAll.toLowerCase(); rows=rows.filter(function(s){return s.symbol.toLowerCase().indexOf(q)>=0||(s.name||'').toLowerCase().indexOf(q)>=0;});}
+  var benchA=(DATA && DATA.benchmarks) ? DATA.benchmarks[MK] : null;
+  rows.forEach(function(s){ s._rs=(s.ret1m!=null? s.ret1m-(benchA||0) : null); });
+  function valA(s,k){ if(k==='_tr') return trendRank(s); if(k==='_rs') return s._rs; return s[k]; }
+  rows.sort(function(a,b){
+    if(sortKA==='symbol') return sortDirA*a.symbol.localeCompare(b.symbol);
+    var va=valA(a,sortKA), vb=valA(b,sortKA);
+    if(va==null&&vb==null)return 0; if(va==null)return 1; if(vb==null)return -1; return sortDirA*(va-vb);
+  });
   $('allBody').innerHTML = rows.map(function(s){
     var c=chCls(s.changePct), badge=s.market==='BIST'?'b-bist':s.market==='NASDAQ'?'b-nasdaq':'b-dax';
     return '<tr><td>'+pmark(s.symbol,simH,realH)+'<span class="sym" data-sym="'+s.symbol+'">'+clean(s.symbol)+'</span> <span class="badge '+badge+'">'+s.market+'</span><div class="nm">'+(s.name||'').slice(0,40)+'</div></td>'+
       '<td>'+(s.price==null?'<span class="na">—</span>':fmt(s.price))+'</td>'+
       '<td class="'+c+'">'+(s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%')+'</td>'+
       '<td>'+fmtInt(s.volume)+'</td>'+
+      '<td>'+trendIcon(s)+'</td>'+
+      '<td class="'+chCls(s._rs)+'">'+(s._rs==null?'<span class="na">—</span>':(s._rs>0?'+':'')+fmt(s._rs,1)+'%')+'</td>'+
+      '<td class="'+chCls(s.ret1m)+'">'+(s.ret1m==null?'<span class="na">—</span>':(s.ret1m>0?'+':'')+fmt(s.ret1m,1)+'%')+'</td>'+
+      '<td>'+(s.rsi14==null?'<span class="na">—</span>':fmt(s.rsi14,0))+'</td>'+
+      '<td>'+(s.atrPct==null?'<span class="na">—</span>':fmt(s.atrPct,1)+'%')+'</td>'+
+      '<td>'+(s.pe==null?'<span class="na">—</span>':qDot('pe',s.pe)+fmt(s.pe))+'</td>'+
+      '<td>'+(s.pb==null?'<span class="na">—</span>':qDot('pb',s.pb)+fmt(s.pb))+'</td>'+
+      '<td>'+(s.roe==null?'<span class="na">—</span>':qDot('roe',s.roe)+fmt(s.roe)+'%')+'</td>'+
+      '<td>'+(s.debtToEquity==null?'<span class="na">—</span>':qDot('de',s.debtToEquity)+fmt(s.debtToEquity))+'</td>'+
+      '<td>'+(s.netMargin==null?'<span class="na">—</span>':qDot('margin',s.netMargin)+fmt(s.netMargin)+'%')+'</td>'+
+      '<td><span class="cov">'+(s.scoreCoverage||0)+'</span></td>'+
       '<td><button class="miniact" data-sym="'+s.symbol+'">Sim</button></td></tr>';
-  }).join('') || '<tr><td colspan="5" class="empty">eşleşen hisse yok</td></tr>';
+  }).join('') || '<tr><td colspan="16" class="empty">eşleşen hisse yok</td></tr>';
   $('allBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
   $('allBody').querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
 }
@@ -2427,7 +2484,7 @@ function btFibOk(bars, i, look, thresh){
     if(bars[j][3]<lo){ lo=bars[j][3]; loI=j; }
   }
   if(hiI<0||loI<0||hi<=lo) return false;
-  if(loI>hiI) return false;                       // aşağı bacak → alım bölgesi değil
+  if(loI>hiI) return false;                       // aşağı bacak → pozitif bölge değil
   var c=bars[i][4]; if(c<lo) return false;        // dip kırılmış
   var rs=[0.382,0.5,0.618,0.786];
   for(var k=0;k<rs.length;k++){
@@ -2604,8 +2661,8 @@ function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
 
 /* ================= FIBONACCI TARAMASI =================
    Salınım bacağı: son N gün içindeki en yüksek tepe ve en düşük dip.
-   Dip önce / tepe sonra → bacak YUKARI → geri çekilme seviyeleri DESTEK (alım bölgesi).
-   Tepe önce / dip sonra → bacak AŞAĞI → tepki seviyeleri DİRENÇ (satım bölgesi). */
+   Dip önce / tepe sonra → bacak YUKARI → geri çekilme seviyeleri DESTEK (pozitif bölge).
+   Tepe önce / dip sonra → bacak AŞAĞI → tepki seviyeleri DİRENÇ (negatif bölge). */
 var FIBLV=[{r:0.236,q:45},{r:0.382,q:70},{r:0.5,q:85},{r:0.618,q:100},{r:0.786,q:60}];
 var fibLastMk=null, FIBMAP={}, fibPending=null;
 function fibLeg(bars, look){
@@ -2694,7 +2751,7 @@ function fibRender(buys, sells, scanned, look, thresh, meta){
   else if(meta.maxDay && look>meta.maxDay) note=' · <b class="down">istenen '+look+' gün ama en fazla '+meta.maxDay+' gün veri var</b> — fiilen '+meta.maxDay+' gün tarandı';
   $('fibInfo').innerHTML = scanned+' hissede salınım tarandı · istenen pencere <b>'+look+' gün</b>'+
     (meta.maxSpan?(', fiilen en çok <b>'+meta.maxSpan+' gün</b>'):'')+note+
-    ' · seviyeye ≤%'+fmt(thresh,1)+' yakınlık · <b>'+buys.length+'</b> alım bölgesi, <b>'+sells.length+'</b> satım bölgesi adayı. Sıralama: güvenilirlik puanı (yüksekten düşüğe).';
+    ' · seviyeye ≤%'+fmt(thresh,1)+' yakınlık · <b>'+buys.length+'</b> pozitif bölge, <b>'+sells.length+'</b> negatif bölge adayı. Sıralama: güvenilirlik puanı (yüksekten düşüğe).';
   var simH=simFor(MK).holdings, realH=computeRealHoldings(realFor(MK));
   function table(list, kind){
     if(!list.length) return '<div class="empty">Şu an bu koşullara uyan hisse yok.</div>';
@@ -2914,7 +2971,7 @@ function sigRender(picked, pass, near, fullCount, scanned, need, skipped){
     ' · en az <b>'+need+'</b> bağımsız sinyal şartı'+
     (skipped?(' · '+skipped+' hisse yeterli geçmiş veri olmadığı için atlandı'):'');
   var msg;
-  if(fullCount>0) msg='<b class="up">'+fullCount+' hisse seçtiğin ailelerin HEPSİNDEN al sinyali veriyor.</b>';
+  if(fullCount>0) msg='<b class="up">'+fullCount+' hisse seçtiğin ailelerin HEPSİNDE pozitif sinyal veriyor.</b>';
   else if(pass.length) msg='<b class="down">Tüm aileleri birden sağlayan hisse şu an yok.</b> Aşağıdakiler en az '+need+' bağımsız sinyali karşılıyor.';
   else msg='<b class="down">Bu kombinasyonda hiçbir hisse '+need+' bağımsız sinyali karşılamıyor.</b>'+(near.length?' En yakınlar aşağıda.':' Daha az aile seçmeyi ya da eşiği düşürmeyi dene.');
   $('sigInfo').innerHTML=head+'<br>'+msg+
@@ -2925,9 +2982,9 @@ function sigRender(picked, pass, near, fullCount, scanned, need, skipped){
     if(!list.length) return '';
     return '<table><thead><tr>'+
       '<th class="l">Hisse</th>'+
-      '<th title="Kaç BAĞIMSIZ gösterge ailesi al sinyali veriyor / seçtiğin ailelerden kaçı bu hissede değerlendirilebildi. Aynı şeyi ölçen göstergeler tek aile sayılır — asıl bakman gereken sayı budur.">Bağımsız sinyal</th>'+
+      '<th title="Kaç BAĞIMSIZ indikatör ailesi pozitif sinyal veriyor / seçtiğin ailelerden kaçı bu hissede değerlendirilebildi. Aynı şeyi ölçen göstergeler tek aile sayılır — asıl bakman gereken sayı budur.">Bağımsız sinyal</th>'+
       '<th title="Karşılanan sinyallerin ortalama gücü (0–100). Kazanma olasılığı değildir.">Güç</th>'+
-      '<th class="l" title="Hangi ailede hangi göstergeler sinyal veriyor.">Veren aileler</th>'+
+      '<th class="l" title="Hangi ailede hangi indikatörler pozitif sinyal veriyor.">Veren aileler</th>'+
       '<th title="Fiyatın 50/200 günlük ortalamalara göre yönü.">Trend</th>'+
       '<th>Fiyat</th><th>Gün %</th><th></th></tr></thead><tbody>'+
       list.map(function(r){
@@ -3643,6 +3700,30 @@ function initDetailChart(sym){
 }
 
 /* ================= SUPABASE BULUT SENKRON ================= */
+var ROLE='standart';
+function isAdmin(){ return ROLE==='admin'; }
+function isPremium(){ return ROLE==='premium' || ROLE==='admin'; }
+function roleLabel(){ return ROLE==='admin'?'Admin':(ROLE==='premium'?'Premium Üye':'Standart Üye'); }
+/* Hangi sekmeyi kim görebilir */
+function canView(v){
+  if(v==='backtest') return isAdmin();                       // yalnız admin, profilden açılır
+  if(v==='trade'||v==='gunun'||v==='screen') return isPremium();
+  return true;
+}
+function canNav(v){ return v!=='backtest' && canView(v); }   // Geçmiş Test sekme çubuğunda hiç görünmez
+function defView(){ return canView('trade')?'trade':'all'; }
+function applyRole(){
+  document.querySelectorAll('.tab').forEach(function(b){ b.style.display = canNav(b.dataset.v)?'':'none'; });
+  var cur=document.querySelector('.tab.active');
+  var curV=cur?cur.dataset.v:null;
+  var vis=document.querySelector('.view.active');
+  var visV=vis?vis.id.replace('v-',''):null;
+  if(visV && visV!=='detail' && !canView(visV)) goView(defView());
+  else if(curV && !canNav(curV)) goView(defView());
+  var rb=$('roleBox'); if(rb) rb.innerHTML='Üyelik: <b>'+roleLabel()+'</b>';
+  var ab=$('adminBox'); if(ab) ab.style.display=isAdmin()?'block':'none';
+  var ub=$('upsell'); if(ub) ub.style.display=isPremium()?'none':'block';
+}
 var SB=null, SB_USER=null, SB_REV=0, syncTimer=null, realtimeCh=null, suppressSync=false, sbInitTries=0;
 function cloudCfgOk(){ return typeof window.SUPA_URL==='string' && typeof window.SUPA_ANON==='string' && window.SUPA_URL.indexOf('supabase.co')>0 && window.SUPA_URL.indexOf('BURAYA')<0; }
 function sbReady(){ return !!(SB && SB_USER); }
@@ -3731,10 +3812,24 @@ function afterLogin(){
   });
 }
 function checkAccess(cb){
-  SB.from('pano_access').select('allowed').eq('user_id',SB_USER.id).maybeSingle().then(function(res){
-    if(res.error){ var m=$('lgMsg'); if(m) m.innerHTML='<span class="down">Erişim kontrolü hatası: '+res.error.message+' (pano_access tablosu kurulu mu?)</span>'; cb(false); return; }
-    if(res.data){ cb(!!res.data.allowed); return; }
-    SB.from('pano_access').insert({user_id:SB_USER.id, email:SB_USER.email||null}).then(function(){ cb(false); }, function(){ cb(false); });
+  function handle(row){
+    ROLE = (row && row.role ? String(row.role).toLowerCase().trim() : 'standart');
+    if(ROLE!=='admin' && ROLE!=='premium') ROLE='standart';
+    applyRole();
+    cb(!!(row && row.allowed));
+  }
+  // önce role sütunuyla dene; sütun yoksa yalnız allowed ile devam et (herkes Standart)
+  SB.from('pano_access').select('allowed,role').eq('user_id',SB_USER.id).maybeSingle().then(function(res){
+    if(res.error){
+      SB.from('pano_access').select('allowed').eq('user_id',SB_USER.id).maybeSingle().then(function(r2){
+        if(r2.error){ var m=$('lgMsg'); if(m) m.innerHTML='<span class="down">Erişim kontrolü hatası: '+r2.error.message+' (pano_access tablosu kurulu mu?)</span>'; cb(false); return; }
+        if(r2.data){ handle(r2.data); return; }
+        SB.from('pano_access').insert({user_id:SB_USER.id, email:SB_USER.email||null}).then(function(){ handle(null); }, function(){ handle(null); });
+      });
+      return;
+    }
+    if(res.data){ handle(res.data); return; }
+    SB.from('pano_access').insert({user_id:SB_USER.id, email:SB_USER.email||null}).then(function(){ handle(null); }, function(){ handle(null); });
   });
 }
 function loadCloud(){
@@ -3756,9 +3851,10 @@ function updateAuthBar(){
     return;
   }
   if(sbReady()){
-    if(b){ b.textContent='☁ '+(SB_USER.email? SB_USER.email.split('@')[0] : 'bağlı'); b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
+    if(b){ b.textContent='☁ '+(SB_USER.email? SB_USER.email.split('@')[0] : 'bağlı')+(ROLE!=='standart'?(' · '+(ROLE==='admin'?'Admin':'Premium')):''); b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
     if(so) so.style.display='none';
     if(si){ si.style.display='block'; var w=$('authWho'); if(w) w.textContent=SB_USER.email+' olarak bağlısın. Değişikliklerin otomatik buluta kaydediliyor.'; }
+    if(typeof applyRole==='function') applyRole();
   } else {
     if(b){ b.textContent='☁ Bulut'; b.style.color=''; b.style.borderColor=''; }
     if(so) so.style.display='block'; if(si) si.style.display='none';
@@ -3781,6 +3877,7 @@ function wireCloud(){
     SB.auth.signInWithPassword({email:c.email, password:c.pass}).then(function(res){
       if(res.error){ msg('Hata: '+res.error.message); return; } msg('Giriş başarılı.');
     }); };
+  var gb=$('goBacktest'); if(gb) gb.onclick=function(){ close(); goView('backtest'); };
   var lo=$('authLogout'); if(lo) lo.onclick=function(){ if(SB) SB.auth.signOut(); stopRealtime(); };
   var pl=$('authPull'); if(pl) pl.onclick=function(){ pullThenAdopt(); };
   var ps=$('authPush'); if(ps) ps.onclick=function(){ if(sbReady()) pushRemote(false); };
@@ -3811,7 +3908,7 @@ function initSupabase(){
     else {
       stopRealtime(); SB_REV=0;
       if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
-      suppressSync=true; S=ensureShape({}); MK=null; MEM_BAK=[]; reinitUIFromState(); suppressSync=false;
+      suppressSync=true; S=ensureShape({}); MK=null; MEM_BAK=[]; ROLE='standart'; reinitUIFromState(); suppressSync=false;
       if(typeof showLogin==='function') showLogin();
     }
     updateAuthBar();
