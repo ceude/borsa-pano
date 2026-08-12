@@ -712,6 +712,7 @@
             <button data-ind="piv" title="Klasik pivot noktaları — önceki barın yüksek/düşük/kapanışından hesaplanan P, R1/R2, S1/S2 destek-direnç çizgileri.">Pivot</button>
           </div>
         </div>
+        <div id="sigChartNote" class="hint" style="display:none; background:var(--brand-bg); border:1px solid var(--brand); color:var(--brand-ink); border-radius:10px; padding:8px 12px; margin-bottom:10px"></div>
         <div id="fibAutoBar" class="hint" style="display:none; background:var(--brand-bg); border:1px solid var(--brand); color:var(--brand-ink); border-radius:10px; padding:9px 12px; margin-bottom:10px"></div>
         <div id="chBox" style="position:relative; height:360px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)">
           <canvas id="chOv" style="position:absolute; inset:0; pointer-events:none; z-index:5"></canvas>
@@ -2941,7 +2942,7 @@ var SIGFAMS=[
 ];
 
 /* ---------- Sinyal taraması ---------- */
-var sigLastMk=null, sigUserRan=false;
+var sigLastMk=null, sigUserRan=false, sigPending=null;
 function sigCfg(){ if(!S.sigPick) S.sigPick={ma200:true, macd:true, bb:true}; return S.sigPick; }
 function sigPaint(){
   var box=$('sigPick'); if(!box) return;
@@ -3068,7 +3069,7 @@ function sigRender(picked, pass, near, fullCount, scanned, need, skipped){
   if(!pass.length && near.length) html='<div class="hint" style="margin:10px 0 6px">En yakın adaylar (eşiğin altında):</div>'+tbl(near,true);
   else if(pass.length && near.length && pass.length<5) html+='<div class="hint" style="margin:14px 0 6px">Eşiğin hemen altındakiler:</div>'+tbl(near,true);
   $('sigBody').innerHTML = html || '<div class="empty">Gösterilecek hisse yok.</div>';
-  $('sigBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
+  $('sigBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){ sigPending=e.dataset.sym; openStock(e.dataset.sym); };});
   $('sigBody').querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
 }
 function sigGo(){
@@ -3316,7 +3317,12 @@ segWire('chTool','tool',function(v){
 /* göstergeler: çoklu aç/kapa (segWire tekli seçim yapıyor, burada ayrı) */
 (function(){
   var boxes=[$('chInd'), $('chInd2')].filter(Boolean); if(!boxes.length) return;
-  function paint(){ var c=indCfg(); boxes.forEach(function(box){ box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', !!c[b.dataset.ind]); }); }); }
+  function paint(){
+    var c=indCfg();
+    boxes.forEach(function(box){ box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', !!c[b.dataset.ind]); }); });
+    var pbx=$('chPane');
+    if(pbx) pbx.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.pane===(S.chartPane||'none')); });
+  }
   boxes.forEach(function(box){ box.querySelectorAll('button').forEach(function(b){
     b.onclick=function(){ var c=indCfg(); c[b.dataset.ind]=!c[b.dataset.ind]; save(); paint(); applyTF(); };
   }); });
@@ -3738,6 +3744,25 @@ function setTfBtn(v){
   var box=$('chTf'); if(!box) return;
   box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.tf===v); });
 }
+/* İndikatörler sekmesinde seçili olanları hisse grafiğine taşı */
+function sigApplyToChart(sym){
+  var c=sigCfg();
+  var overlays=['ema20','ma50','ma200','bb','st','ichi','kc','sar','piv'];
+  var ind={}; overlays.forEach(function(k){ ind[k]=!!c[k]; });
+  S.chartInd=ind;
+  var panes=['rsi','macd','stoch','atr'];          // alt panel tek seçim: ilk seçili olan
+  var pane='none';
+  for(var i=0;i<panes.length;i++){ if(c[panes[i]]){ pane=panes[i]; break; } }
+  S.chartPane=pane;
+  save();
+  var b1=$('chInd'), b2=$('chInd2'), pb=$('chPane');
+  [b1,b2].forEach(function(box){ if(box) box.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', !!ind[b.dataset.ind]); }); });
+  if(pb) pb.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.pane===pane); });
+  var extra=[];
+  if(pane!=='none'){ var pn={rsi:'RSI',macd:'MACD',stoch:'Stokastik',atr:'ATR%'}[pane]; if(pn) extra.push(pn); }
+  var many=panes.filter(function(k){return c[k];});
+  return {panes:many, chosen:pane};
+}
 function fibAutoApply(sym){
   var bar=$('fibAutoBar');
   CH.auto=null;
@@ -3766,8 +3791,11 @@ function fibAutoApply(sym){
   };
   $('fibAutoHide').onclick=function(){ CH.auto=null; bar.style.display='none'; redrawOverlay(); };
 }
+var sigFromList=null;
 function initDetailChart(sym){
   CH.sym=sym; CH.pending=null; CH.hover=null;
+  sigFromList=(sigPending===sym)?sym:null; sigPending=null;
+  var _n=$('sigChartNote'); if(_n && !sigFromList) _n.style.display='none';
   if(fibPending===sym){ fibAutoApply(sym); fibPending=null; }
   else { CH.auto=null; var _b=$('fibAutoBar'); if(_b) _b.style.display='none'; }
   chMsg('grafik yükleniyor…');
@@ -3775,6 +3803,23 @@ function initDetailChart(sym){
   loadHistory(function(okHist){
     if(!okHist){ chMsg('history.js bulunamadı — fetch_data.py v3 ile Actions bir kez çalışmalı'); return; }
     if(!ensureChart()){ chMsg('grafik başlatılamadı'); return; }
+    if(sigFromList===sym){
+      var r=sigApplyToChart(sym);
+      if(sigCfg().fib) fibAutoCompute(sym, SIGFIB.look);   // Fibonacci seçiliyse seviyeleri de çiz
+      var note=$('sigChartNote');
+      if(note){
+        var names=[];
+        [['ema20','EMA20'],['ma50','MA50'],['ma200','MA200'],['bb','Bollinger'],['st','SuperTrend'],
+         ['ichi','Ichimoku'],['kc','Keltner'],['sar','SAR'],['piv','Pivot'],['fib','Fibonacci']]
+          .forEach(function(x){ if(sigCfg()[x[0]]) names.push(x[1]); });
+        var pn={rsi:'RSI',macd:'MACD',stoch:'Stokastik',atr:'ATR%'}[r.chosen];
+        if(pn) names.push(pn+' (alt panel)');
+        note.style.display=names.length?'block':'none';
+        note.innerHTML='İndikatörler sekmesindeki seçimin uygulandı: <b>'+names.join(', ')+'</b>'+
+          (r.panes.length>1?(' <span class="cov">— alt panelde aynı anda tek gösterge olabilir, '+pn+' seçildi.</span>'):'');
+      }
+      sigFromList=null;
+    }
     applyTF();
   });
 }
