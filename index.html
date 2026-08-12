@@ -2170,7 +2170,8 @@ function openStock(sym){
     ['Fiyat', s.price==null?'—':ccySym(s.market)+fmt(s.price)],
     ['Önceki Kapanış', s.prevClose==null?'—':ccySym(s.market)+fmt(s.prevClose)],
     ['Günlük %', s.changePct==null?'—':(s.changePct>0?'+':'')+fmt(s.changePct)+'%'],
-    ['RSI (14g)', s.rsi14==null?'—':fmt(s.rsi14,0)+rsiTag(s.rsi14)],
+    ['RSI (14g)', (function(){ var r=(s._rsiLive!=null?s._rsiLive:s.rsi14);
+        return r==null?'—':(fmt(r,0)+rsiTag(r)+(s._rsiLive!=null?' <span class="cov" title="Grafikteki RSI ile aynı hesap: günlük kapanışlardan Wilder yöntemiyle">·grafikle aynı</span>':'')); })()],
     ['1 Hafta', pchg(s.ret1w)],
     ['1 Ay', pchg(s.ret1m)],
     ['3 Ay', pchg(s.ret3m)],
@@ -2188,7 +2189,10 @@ function openStock(sym){
     ['Veri kapsamı', (s.scoreCoverage||0)+' metrik'],
     ['Para birimi', s.currency||ccyCode(s.market)]
   ];
-  $('detailMetrics').innerHTML = M.map(function(m){return '<div class="metric"><div class="k">'+m[0]+'</div><div class="v">'+m[1]+'</div></div>';}).join('');
+  $('detailMetrics').innerHTML = M.map(function(m){
+    var idAttr=(m[0].indexOf('RSI')===0)?' id="mRsi"':'';
+    return '<div class="metric"'+idAttr+'><div class="k">'+m[0]+'</div><div class="v">'+m[1]+'</div></div>';
+  }).join('');
   var ta=$('detailNotes'); ta.value=S.stockNotes[sym]||'';
   ta.oninput=function(){ S.stockNotes[sym]=ta.value; save(); };
   $('detailToSim').onclick=function(){ selectInSim(sym); };
@@ -3638,13 +3642,20 @@ function indBB(v,n,mult){
   }
   return {ma:ma, up:up, lo:lo};
 }
+/* RSI — Wilder yumuşatması (TradingView ve çoğu platformun kullandığı standart).
+   Önceden basit ortalama kullanılıyordu; sert hareketlerde ~5-7 puan sapma yapıyordu. */
 function indRSI(v,n){
-  var out=[], g=0, l=0;
-  for(var i=0;i<v.length;i++){
-    if(i===0){ out.push(null); continue; }
-    var ch=v[i]-v[i-1]; g+=Math.max(ch,0); l+=Math.max(-ch,0);
-    if(i>n){ var o=v[i-n]-v[i-n-1]; g-=Math.max(o,0); l-=Math.max(-o,0); }
-    out.push(i>=n ? (l<=0?100:100-100/(1+(g/n)/(l/n))) : null);
+  var out=[], i, ag=0, al=0;
+  for(i=0;i<v.length;i++) out.push(null);
+  if(v.length<=n) return out;
+  for(i=1;i<=n;i++){ var d0=v[i]-v[i-1]; ag+=Math.max(d0,0); al+=Math.max(-d0,0); }
+  ag/=n; al/=n;
+  out[n] = (al<=0) ? 100 : 100-100/(1+ag/al);
+  for(i=n+1;i<v.length;i++){
+    var d=v[i]-v[i-1];
+    ag=(ag*(n-1)+Math.max(d,0))/n;
+    al=(al*(n-1)+Math.max(-d,0))/n;
+    out[i] = (al<=0) ? 100 : 100-100/(1+ag/al);
   }
   return out;
 }
@@ -3685,16 +3696,25 @@ function applyIndicators(bars){
   var t=bars.map(function(b){return b[0];}), c=bars.map(function(b){return b[4];});
   var cfg=indCfg(), n=bars.length-1, read=[];
   var U=tfUnit();
-  function put(key,color,arr,w,dash,label,dec){
+  var shortCov=[];   // ekrandaki barın küçük kısmında hesaplanabilen göstergeler
+  function put(key,color,arr,w,dash,label,dec,need){
     var s=lineSer(key,color,w,dash);
     if(!arr){ s.setData([]); return; }
     var d=[]; for(var i=0;i<arr.length;i++) if(arr[i]!=null) d.push({time:t[i], value:arr[i]});
     s.setData(d);
-    if(label && arr[n]!=null) read.push('<b style="color:'+color+'">'+label+'</b> '+fmt(arr[n],dec==null?2:dec));
+    if(label){
+      if(arr[n]!=null){
+        read.push('<b style="color:'+color+'">'+label+'</b> '+fmt(arr[n],dec==null?2:dec));
+        if(need && d.length < bars.length*0.5) shortCov.push({l:label, have:d.length, need:need});
+      } else if(need){
+        read.push('<b style="color:'+color+'">'+label+'</b> <span class="down">hesaplanamıyor</span>');
+        shortCov.push({l:label, have:0, need:need});
+      }
+    }
   }
-  put('ema20','#f59e0b', cfg.ema20?indEMA(c,20):null, 1.5, false, cfg.ema20?('EMA20 ('+20+' '+U.u+')'):null);
-  put('ma50','#3b82f6',  cfg.ma50?indSMA(c,50):null,  1.5, false, cfg.ma50?('MA50 ('+50+' '+U.u+')'):null);
-  put('ma200','#8b5cf6', cfg.ma200?indSMA(c,200):null,1.5, false, cfg.ma200?('MA200 ('+200+' '+U.u+')'):null);
+  put('ema20','#f59e0b', cfg.ema20?indEMA(c,20):null, 1.5, false, cfg.ema20?('EMA20 ('+20+' '+U.u+')'):null, 2, 20);
+  put('ma50','#3b82f6',  cfg.ma50?indSMA(c,50):null,  1.5, false, cfg.ma50?('MA50 ('+50+' '+U.u+')'):null, 2, 50);
+  put('ma200','#8b5cf6', cfg.ma200?indSMA(c,200):null,1.5, false, cfg.ma200?('MA200 ('+200+' '+U.u+')'):null, 2, 200);
   if(cfg.bb){
     var bb=indBB(c,20,2);
     put('bbU','#94a0ad', bb.up, 1, true, 'BB üst');
@@ -3841,11 +3861,18 @@ function applyIndicators(bars){
     }
   }
   var rd=$('chRead');
+  var cov='';
+  if(shortCov.length){
+    cov='<div class="hint" style="margin-top:4px">ℹ '+shortCov.map(function(x){
+      return '<b>'+x.l.split(' (')[0]+'</b> '+x.need+' bar ister; ekranda '+bars.length+' bar var → '+
+             (x.have?('yalnız son '+x.have+' barda çizilebiliyor'):'çizilemiyor');
+    }).join(' · ')+'. Daha uzun geçmiş için <b>1Y</b> ya da <b>5Y</b> periyodunu dene.</div>';
+  }
   var warn = (!U.daily && (cfg.ema20||cfg.ma50||cfg.ma200||cfg.bb||cfg.st||cfg.ichi||cfg.kc||cfg.sar||S.chartPane!=='none'))
     ? '<div class="hint down" style="margin-top:4px">⚠ Bu periyot <b>'+(CH.tf==='5Y'?'haftalık':'15 dakikalık')+'</b> bar kullanır; göstergeler bu barlardan hesaplanır. Örnek: burada <b>MA50 = 50 '+U.u+'</b>, klasik 50 <b>günlük</b> ortalama değildir. Günlük karşılıkları için <b>1Y</b> periyoduna geç.</div>'
     : '';
   if(rd) rd.innerHTML = (read.length? ('Son değerler — '+read.join(' &nbsp;·&nbsp; ')) :
-    '<span class="cov">Gösterge seçilmedi. Not: <code>history.js</code> hacim tutmadığı için VWAP/OBV gibi hacim tabanlı göstergeler hesaplanamıyor.</span>') + warn;
+    '<span class="cov">Gösterge seçilmedi. Not: <code>history.js</code> hacim tutmadığı için VWAP/OBV gibi hacim tabanlı göstergeler hesaplanamıyor.</span>') + cov + warn;
 }
 /* ---------- gelişmiş göstergeler (formülleri kamuya açık; "premium" olan erişim, matematik değil) ----------*/
 /* ATR (Wilder yumuşatması) */
@@ -4163,6 +4190,16 @@ function renderOzet(sym){
         if(byFam[F.k] && byFam[F.k].usable){ fu++; if(byFam[F.k].met>0){ fm++; names.push(F.t.split(' /')[0]); } }
       });
       if(fu) fam={met:fm, usable:fu, names:names};
+      // Grafik, kart ve özet aynı RSI'yi göstersin: günlük kapanışlardan tek hesap
+      if(x.rsi && x.rsi[x.n]!=null){
+        s._rsiLive=x.rsi[x.n];
+        var card=$('mRsi');
+        if(card){
+          var vEl=card.querySelector('.v');
+          if(vEl) vEl.innerHTML=fmt(s._rsiLive,0)+rsiTag(s._rsiLive)+
+            ' <span class="cov" title="Grafikteki RSI ile aynı hesap: günlük kapanışlardan Wilder yöntemiyle">·grafikle aynı</span>';
+        }
+      }
       // fibonacci
       var fp=fibPick(h, SIGFIB.look);
       if(fp && fp.bars.length>20){
@@ -4175,7 +4212,12 @@ function renderOzet(sym){
       }
     }
   }catch(e){}
-  var o=buildOzet(s, null, fam, fib);
+  var sForText=s;
+  if(s._rsiLive!=null){
+    sForText={}; for(var k in s) sForText[k]=s[k];
+    sForText.rsi14=s._rsiLive;                 // özet, grafikteki RSI ile aynı sayıyı anlatsın
+  }
+  var o=buildOzet(sForText, null, fam, fib);
   var html='<p style="margin:0">'+o.sentences.join(' ')+'</p>';
   if(o.question){
     html+='<p style="margin:8px 0 0">'+o.question+
