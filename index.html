@@ -319,6 +319,11 @@
 
 <!-- APP -->
 <div id="app" style="display:none">
+  <div id="previewBanner" style="display:none; align-items:center; justify-content:center; gap:12px;
+       background:#fff4e5; border-bottom:1px solid #f0b862; color:#7a4a00; font-size:12.5px; padding:7px 14px">
+    <span>👁 <b>Standart üye</b> görünümündesin — üyeliğin değişmedi.</span>
+    <button class="ghost" id="previewExit" style="padding:4px 10px">Kendi görünümüme dön</button>
+  </div>
   <div id="mktSummary" class="summ-fixed"></div>
   <a class="adbanner" id="adBanner" target="_blank" rel="noopener">
     <img id="adLogo" alt="SprachSnack">
@@ -1243,6 +1248,11 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <div class="prow"><span>Üyelik</span><span class="pchip" id="roleBox">Standart Üye</span></div>
         <div class="prow"><span>Bulut</span><b id="authSync">—</b></div>
         <div id="upsell" class="hint" style="display:none; margin-top:10px">Standart üyelikte <b>Günlük</b>, <b>Kısa Vade</b> ve <b>Orta/Uzun</b> sekmeleri kapalıdır.</div>
+        <div id="previewBox" style="display:none">
+          <div class="psec">Görünüm</div>
+          <button class="ghost" id="previewBtn">👁 Standart üye gözünden gör</button>
+          <div class="hint" id="previewNote" style="display:none; margin-top:6px">Şu an <b>Standart üye</b> görünümündesin. Üyeliğin değişmedi; bu yalnız bu sekmedeki geçici bir önizlemedir.</div>
+        </div>
         <div id="adminBox" style="display:none">
           <div class="psec">Yönetici</div>
           <button class="ghost accent" id="goBacktest">📊 Geçmiş Test'i aç</button>
@@ -3770,10 +3780,24 @@ function initDetailChart(sym){
 }
 
 /* ================= SUPABASE BULUT SENKRON ================= */
-var ROLE='standart';
-function isAdmin(){ return ROLE==='admin'; }
-function isPremium(){ return ROLE==='premium' || ROLE==='admin'; }
-function roleLabel(){ return ROLE==='admin'?'Admin':(ROLE==='premium'?'Premium Üye':'Standart Üye'); }
+var ROLE='standart';        // Supabase'ten gelen GERÇEK rol
+var VIEW_ROLE=null;         // geçici önizleme rolü (yalnız bu oturum, buluta yazılmaz)
+function effRole(){ return VIEW_ROLE || ROLE; }
+function isAdmin(){ return effRole()==='admin'; }
+function isPremium(){ return effRole()==='premium' || effRole()==='admin'; }
+function labelOf(r){ return r==='admin'?'Admin':(r==='premium'?'Premium Üye':'Standart Üye'); }
+function roleLabel(){ return labelOf(effRole()); }
+function setViewRole(r){
+  // Yalnız DAHA KISITLI bir görünüme geçilebilir; önizleme ile yetki yükseltilemez.
+  if(r && !(ROLE==='admin' || ROLE==='premium')) r=null;
+  if(r==='admin') r=null;
+  if(r==='premium' && ROLE!=='admin') r=null;
+  VIEW_ROLE = (r && r!==ROLE) ? r : null;
+  applyRole();
+  var vis=document.querySelector('.view.active');
+  var v=vis?vis.id.replace('v-',''):null;
+  if(v && v!=='detail' && !canView(v)) goView(defView());
+}
 /* Hangi sekmeyi kim görebilir */
 function canView(v){
   if(v==='backtest') return isAdmin();                       // yalnız admin, profilden açılır
@@ -3790,9 +3814,18 @@ function applyRole(){
   var visV=vis?vis.id.replace('v-',''):null;
   if(visV && visV!=='detail' && !canView(visV)) goView(defView());
   else if(curV && !canNav(curV)) goView(defView());
-  var rb=$('roleBox'); if(rb){ rb.textContent=roleLabel(); rb.className='pchip'+(ROLE==='standart'?' std':''); }
-  var ab=$('adminBox'); if(ab) ab.style.display=isAdmin()?'block':'none';
+  var rb=$('roleBox'); if(rb){ rb.textContent=roleLabel(); rb.className='pchip'+(effRole()==='standart'?' std':''); }
+  var ab=$('adminBox'); if(ab) ab.style.display=(ROLE==='admin')?'block':'none';   // yönetici kutusu gerçek role bağlı
   var ub=$('upsell'); if(ub) ub.style.display=isPremium()?'none':'block';
+  // Önizleme kutusu: yalnız gerçek rolü premium/admin olanlara
+  var pv=$('previewBox');
+  if(pv) pv.style.display=(ROLE==='premium'||ROLE==='admin')?'block':'none';
+  var pb=$('previewBtn');
+  if(pb) pb.textContent = VIEW_ROLE ? ('↩ '+labelOf(ROLE)+' görünümüne dön') : '👁 Standart üye gözünden gör';
+  var pn=$('previewNote');
+  if(pn) pn.style.display = VIEW_ROLE ? 'block' : 'none';
+  var banner=$('previewBanner');
+  if(banner) banner.style.display = VIEW_ROLE ? 'flex' : 'none';
 }
 var SB=null, SB_USER=null, SB_REV=0, syncTimer=null, realtimeCh=null, suppressSync=false, sbInitTries=0;
 function cloudCfgOk(){ return typeof window.SUPA_URL==='string' && typeof window.SUPA_ANON==='string' && window.SUPA_URL.indexOf('supabase.co')>0 && window.SUPA_URL.indexOf('BURAYA')<0; }
@@ -3885,6 +3918,7 @@ function checkAccess(cb){
   function handle(row){
     ROLE = (row && row.role ? String(row.role).toLowerCase().trim() : 'standart');
     if(ROLE!=='admin' && ROLE!=='premium') ROLE='standart';
+    VIEW_ROLE=null;                       // yeni oturumda önizleme kapalı başlar
     applyRole();
     cb(!!(row && row.allowed));
   }
@@ -3947,6 +3981,8 @@ function wireCloud(){
     SB.auth.signInWithPassword({email:c.email, password:c.pass}).then(function(res){
       if(res.error){ msg('Hata: '+res.error.message); return; } msg('Giriş başarılı.');
     }); };
+  var pb2=$('previewBtn'); if(pb2) pb2.onclick=function(){ setViewRole(VIEW_ROLE?null:'standart'); };
+  var pe=$('previewExit'); if(pe) pe.onclick=function(){ setViewRole(null); };
   var gb=$('goBacktest'); if(gb) gb.onclick=function(){ close(); goView('backtest'); };
   var lo=$('authLogout'); if(lo) lo.onclick=function(){ if(SB) SB.auth.signOut(); stopRealtime(); };
   var pl=$('authPull'); if(pl) pl.onclick=function(){ pullThenAdopt(); };
@@ -3978,7 +4014,7 @@ function initSupabase(){
     else {
       stopRealtime(); SB_REV=0;
       if(syncTimer){ clearTimeout(syncTimer); syncTimer=null; }
-      suppressSync=true; S=ensureShape({}); MK=null; MEM_BAK=[]; ROLE='standart'; reinitUIFromState(); suppressSync=false;
+      suppressSync=true; S=ensureShape({}); MK=null; MEM_BAK=[]; ROLE='standart'; VIEW_ROLE=null; reinitUIFromState(); suppressSync=false;
       if(typeof showLogin==='function') showLogin();
     }
     updateAuthBar();
