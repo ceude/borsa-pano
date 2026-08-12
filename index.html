@@ -494,7 +494,7 @@
         <div><div class="k">Toplam K/Z</div><div class="v" id="pnlV">—</div></div>
         <div><div class="k">Kesinti (komisyon)</div><div class="v" id="feeV" title="Ödenen toplam komisyon. Spread/kayma ayrıca dolum fiyatlarının içinde.">—</div></div>
       </div>
-      <div class="botbar">
+      <div class="botbar" id="botBar" style="display:none">
         <div class="hint" style="margin-bottom:8px"><b>🤖 Oto-trader v2</b> — her piyasa ayrı açılır/kapanır, ayrı eşik:</div>
         <div style="display:flex; gap:20px; flex-wrap:wrap; align-items:center">
           <div style="display:flex; align-items:center; gap:8px">
@@ -524,7 +524,7 @@
         </div>
         <div class="hint" style="margin-top:6px">Alış <b>görünenden pahalı</b>, satış <b>görünenden ucuz</b> dolar (spread) + her emirde komisyon düşülür; komisyon pozisyon maliyetine eklenir, K/Z <b>net</b> gösterilir. Varsayılan: %0.05 spread · DAX/NASDAQ 0,90 komisyon (N26'nın 2 Eylül 2026'da başlayan işlem ücreti; Go/Metal aylık ücretsiz kotanı kullanıyorsan 0 yapabilirsin) · BIST 0 (kendi aracı kurumuna göre gir).</div>
       </div>
-      <div class="disclaimer">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı; spread+komisyon artık modellense de <b>gecikme kaynaklı ekstra kayma modellenmiyor</b> — momentum sistemlerinde gecikme sistematik olarak aleyhe çalışır, gerçek sonuç sim'den kötü olur. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
+      <div class="disclaimer" id="botNote" style="display:none">🤖 <b>Oto-trader yalnız SİMÜLASYON.</b> Sanal parayla, ~15 dk gecikmeli ve 15 dakikada bir tazelenen veriyle çalışır. <b>Sadece bu sekme/pencere açık ve cihaz uyanıkken</b> işlem yapar; kapatırsan durur. Stop ve satışlar gecikmeli fiyatla kontrol edildiği için gerçekte farklı fiyattan dolardı; spread+komisyon artık modellense de <b>gecikme kaynaklı ekstra kayma modellenmiyor</b> — momentum sistemlerinde gecikme sistematik olarak aleyhe çalışır, gerçek sonuç sim'den kötü olur. Sim'de kâr etmesi, stratejinin gerçekte para kazandıracağını <b>kanıtlamaz</b>. Yatırım tavsiyesi değildir.</div>
       <div class="simgrid">
         <div class="trade">
           <h3>İşlem</h3>
@@ -721,6 +721,10 @@
         <div id="chPane2" style="height:130px; margin-top:6px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface); display:none"></div>
         <div id="chRead" class="hint" style="margin-top:8px"></div>
         <div class="hint" style="margin-top:8px">Sürükle: kaydır · tekerlek / iki parmak: zoom · <b>φ Fib</b>: gün sayısı sorar, salınımı bulup otomatik çizer ya da elle çizersin · <b>Esc</b>: yarım çizimi iptal · çizimler hisseye kaydedilir ve bulutla eşitlenir.</div>
+      </div>
+      <h3 style="font-size:16px; margin:6px 0 10px">Pano Özeti</h3>
+      <div id="ozetBox" style="background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:14px">
+        <div id="ozetText" style="font-size:13.5px; line-height:1.75"></div>
       </div>
       <div class="metrics" id="detailMetrics"></div>
       <button class="miniact" id="detailToSim" style="padding:10px 16px; margin-bottom:18px">Simülatöre gönder</button>
@@ -1097,7 +1101,7 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
         <tr><td>Maks. düşüş</td><td>Zirveden en derin geri çekilme. <b>Dayanabileceğin</b> sayı bu — getiriden daha önemlidir.</td></tr>
       </table>
 
-      <h2>4. Sınırlar (dürüst liste)</h2>
+      <h2>3. Sınırlar (dürüst liste)</h2>
       <ul>
         <li><b>Hayatta kalma yanlılığı:</b> test yalnız <b>bugünkü</b> endeks üyeleriyle çalışır. Batmış/endeksten düşmüş hisseler yok → sonuç sistematik olarak <b>olduğundan iyi</b> çıkar.</li>
         <li><b>Kapanış fiyatından doluluk:</b> gerçekte sinyali kapanışta görüp o fiyattan alamazsın; gün içi kayma bunu kötüleştirir.</li>
@@ -1192,7 +1196,31 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
       </table>
       <p>Bir gösterge için yeterli geçmiş yoksa (örn. 200 günlük veri olmadan MA200) o gösterge <b>sayılmaz</b> — bu yüzden bölüm "5/7" gibi görünür: payda, o hisse için <b>değerlendirilebilen</b> gösterge sayısıdır.</p>
 
-      <h2>2. Aileler — neden "8/8" değil "2/3"?</h2>
+      <h2>2. Bir indikatör "pozitif sinyal"e nasıl çevriliyor?</h2>
+      <p>Her indikatör aslında bir <b>sayı</b> üretir (MACD −0,42 · RSI 63 · fiyat 154,20). Bu sayı tek başına "pozitif" ya da "negatif" değildir. Tarama, her indikatör için önceden tanımlı iki şeyi hesaplar:</p>
+      <table><tr><th>Ne</th><th>Nasıl</th></tr>
+        <tr><td><b>Sinyal var mı? (evet/hayır)</b></td><td>İndikatörün <b>kendi klasik eşiğine</b> göre bir <b>karşılaştırma</b>: fiyat ortalamanın üstünde mi, MACD sinyal çizgisini geçmiş mi, %K %D'nin üstünde mi… Yukarıdaki tabloda her satırın "koşul" sütunu tam olarak budur. Koşul sağlanıyorsa o indikatör <b>pozitif</b> sayılır.</td></tr>
+        <tr><td><b>Ne kadar güçlü? (0–100)</b></td><td>Koşulun <b>ne kadar farkla</b> sağlandığı ölçülür ve 0–100'e sıkıştırılır. Örnek: fiyat MA50'nin %0,1 üstündeyse zayıf, %5 üstündeyse tavan puan. Trend takip edenlerde (SuperTrend, SAR) ölçü farktır değil <b>tazeliktir</b>: dönüş ne kadar yeniyse puan o kadar yüksek.</td></tr>
+      </table>
+
+      <h3>Üç somut örnek</h3>
+      <table><tr><th>Durum</th><th>Koşul</th><th>Sonuç</th></tr>
+        <tr><td>Fiyat 154,20 · MA50 = 148,00</td><td>fiyat &gt; MA50 ✓</td><td>Pozitif · fark %4,2 → güç ≈ 84 (tavan %5'te)</td></tr>
+        <tr><td>RSI dün 48, bugün 53</td><td>RSI ≥ 50 <b>ve</b> yükseliyor ✓</td><td>Pozitif · 50→75 ölçeğinde 53 → güç ≈ 12 (zayıf)</td></tr>
+        <tr><td>MACD −0,42 · sinyal −0,55</td><td>MACD &gt; sinyal ✓</td><td>Pozitif — <b>ikisi de eksi olsa bile</b>, çünkü ölçülen ikisinin <b>farkı</b></td></tr>
+      </table>
+      <p>Son satır önemli: "pozitif sinyal" <b>fiyat artıyor</b> demek değildir. İndikatörün kendi tanımındaki koşulun sağlandığı anlamına gelir. Düşen bir hissede de MACD sinyal çizgisini yukarı kesebilir.</p>
+
+      <h3>Puanlar nasıl birleşiyor</h3>
+      <ul>
+        <li>Tabloda gördüğün <b>Güç</b> sütunu, o hissede <b>pozitif olan</b> indikatörlerin güçlerinin <b>düz ortalamasıdır</b>. Sinyal vermeyenler ortalamaya girmez.</li>
+        <li>Sıralamada <b>önce</b> bağımsız aile sayısı, sonra bu ortalama güç kullanılır. Yani "3/3 · güç 55", "2/3 · güç 95"in üstünde çıkar — <b>çeşitlilik güçten önce gelir</b>.</li>
+        <li>Bir indikatör için yeterli geçmiş yoksa (örn. 200 günlük veri olmadan MA200) o indikatör <b>ne pozitif ne negatif</b> sayılır; paydadan tamamen düşer.</li>
+      </ul>
+
+      <div class="warn"><b>Güç puanı bir olasılık değildir.</b> "Güç 95", %95 kazanma şansı ya da %95 yükselme ihtimali demek <b>değildir</b>; yalnızca koşulun geniş bir farkla sağlandığını söyler. Geniş fark bazen "hareket çoktan olmuş" anlamına da gelir — yani yüksek güç, geç kalmış giriş olabilir.</div>
+
+      <h2>3. Aileler — neden "8/8" değil "2/3"?</h2>
       <p>Göstergelerin çoğu <b>aynı fiyat hareketini</b> farklı formülle ölçer. MA50, EMA20, SuperTrend, SAR ve Ichimoku'nun hepsi "trend yukarı mı?" sorusuna cevap verir. Altısını birden seçip "6/6 sinyal" demek, <b>tek bir gerçeği altı kez saymak</b>tır ve sahte bir güven yaratır.</p>
       <p>Bu yüzden göstergeler <b>bağımsız ailelere</b> ayrılmıştır ve <b>asıl sayı aile sayısıdır</b>:</p>
       <table><tr><th>Aile</th><th>İçindekiler</th><th>Ne ölçer</th></tr>
@@ -1204,14 +1232,14 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
       <p>Bir aile, içindeki <b>seçili</b> indikatörlerden <b>en az biri</b> pozitif sinyal verirse "veriyor" sayılır. Tabloda büyük sayı <b>aile</b> sayısıdır (örn. <b>2/3</b>); altındaki küçük satır ham gösterge sayısını gösterir (örn. 5/8) — ikincisi bilgi amaçlıdır, karar için birinciye bak.</p>
       <p><b>Pratik öneri:</b> her aileden birer tane seç (örn. MA200 + MACD + Bollinger). Aynı aileden altı gösterge seçmek listeyi güçlendirmez, sadece aynı şeyi tekrarlar.</p>
 
-      <h2>3. Sıralama</h2>
+      <h2>4. Sıralama</h2>
       <ul>
         <li>Önce <b>karşılanan bağımsız aile sayısı</b> (çoktan aza).</li>
         <li>Eşitlikte <b>ortalama sinyal gücü</b>, sonra ham gösterge sayısı.</li>
         <li>"En az N bağımsız sinyal" eşiğini kendin belirlersin; seçtiğin aile sayısıyla sınırlanır. Hiçbir hisse eşiği geçemezse en yakın 10 aday soluk renkte listelenir.</li>
       </ul>
 
-      <h2>4. Sınırlar (dürüst liste)</h2>
+      <h2>5. Sınırlar (dürüst liste)</h2>
       <ul>
         <li><b>Göstergeler bağımsız değildir.</b> EMA20, MA50, SuperTrend, SAR ve Keltner büyük ölçüde aynı fiyat hareketini ölçer. "8/8 sinyal", sekiz ayrı kanıt değil, çoğunlukla <b>tek bir gerçeğin sekiz kez tekrarı</b>dır. Bu, yanlış bir güven duygusu yaratır.</li>
         <li><b>Çok gösterge seçmek daha iyi değildir.</b> Seçim arttıkça hem liste boşalır hem de kalanlar aşırı-uydurulmuş bir kombinasyona dönüşür.</li>
@@ -1467,7 +1495,7 @@ if(S.botTP===undefined) S.botTP=2.5;
 if(!S.cost) S.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
 if(!S.cost.comm) S.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
 S.chartDrawings = S.chartDrawings || {};
-if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
+if(!S.chartInd) S.chartInd={ema20:false, ma50:false, ma200:false, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
 if(!S.chartPane) S.chartPane='none';
 if(!S.sigPick) S.sigPick={ma200:true, macd:true, bb:true};
 if(S.botEnabled!==undefined){ if(S.botEnabled){ S.botOn.BIST=true; S.botOn.DAX=true; } delete S.botEnabled; }
@@ -1485,7 +1513,7 @@ function ensureShape(st){
   if(!st.cost) st.cost={spread:0.05, comm:{BIST:0, DAX:0.9, NASDAQ:0.9}};
   if(!st.cost.comm) st.cost.comm={BIST:0, DAX:0.9, NASDAQ:0.9};
   st.chartDrawings = st.chartDrawings || {};
-  if(!st.chartInd) st.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
+  if(!st.chartInd) st.chartInd={ema20:false, ma50:false, ma200:false, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
   if(!st.chartPane) st.chartPane='none';
   if(!st.sigPick) st.sigPick={ma200:true, macd:true, bb:true};
   return st;
@@ -2164,6 +2192,7 @@ function openStock(sym){
   var ta=$('detailNotes'); ta.value=S.stockNotes[sym]||'';
   ta.oninput=function(){ S.stockNotes[sym]=ta.value; save(); };
   $('detailToSim').onclick=function(){ selectInSim(sym); };
+  if(typeof renderOzet==='function') renderOzet(sym);
   goView('detail');
   setTimeout(function(){ initDetailChart(sym); }, 0);
 }
@@ -2528,6 +2557,7 @@ function botSellQty(m,sym,px,qty,reason,keepPos){
 }
 function botSell(m,sym,px,reason){ var bp=S.botPos[m][sym]; if(bp) botSellQty(m,sym,px,bp.qty,reason,false); }
 function botTick(){
+  if(typeof isPremium==='function' && !isPremium()) return;   // yetkisiz kullanıcıda çalışmaz
   if(!anyBot()) return; var acted=false, now=Date.now();
   MARKETS.forEach(function(m){
     if(!S.botOn[m]) return;
@@ -2593,6 +2623,10 @@ function updateBotBtn(){
     : 'Hepsi kapalı — açtığın piyasada, bu sekme açık kaldığı sürece kurallara göre al-sat yapar.';
 }
 function setBot(m,on){
+  if(on && typeof isPremium==='function' && !isPremium()){
+    dlg('Premium özellik','<p>Oto-trader <b>Premium</b> ve <b>Admin</b> üyeliklerde kullanılabilir.</p>',[{label:'Tamam',primary:true}]);
+    return;
+  }
   S.botOn[m]=on; save();
   if(botTimer){ clearInterval(botTimer); botTimer=null; }
   if(anyBot()){ botTick(); botTimer=setInterval(botTick, 60*1000); }
@@ -3265,7 +3299,7 @@ MARKETS.forEach(function(m){
   tp.value=(S.botTP!=null?S.botTP:2.5);
   tp.onchange=function(){ var v=parseFloat(this.value); if(isNaN(v)||v<=0) v=2.5; S.botTP=Math.min(20,Math.max(0.5,v)); this.value=S.botTP; save(); };
 })();
-function wireDoc(btnId, ovId){ var ov=$(ovId); if(!ov) return; var b=$(btnId); if(b) b.onclick=function(){ ov.classList.add('open'); }; var c=ov.querySelector('.docclose'); if(c) c.onclick=function(){ ov.classList.remove('open'); }; ov.onclick=function(e){ if(e.target===ov) ov.classList.remove('open'); }; }
+function wireDoc(btnId, ovId){ var ov=$(ovId); if(!ov) return; var b=$(btnId); if(b) b.onclick=function(){ ov.classList.add('open'); }; var c=ov.querySelector('.docclose'); if(c) c.onclick=function(){ ov.classList.remove('open'); }; wireBackdrop(ov, function(){ ov.classList.remove('open'); }); }
 wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnMid','docOvMid'); wireDoc('docBtnBT','docOvBT'); wireDoc('docBtnFib','docOvFib'); wireDoc('docBtnSig','docOvSig');
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid','docOvBT','docOvFib','docOvSig'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
 if($('fibRun')) $('fibRun').onclick=fibGo;
@@ -3290,7 +3324,7 @@ if($('realCsvBtn')) $('realCsvBtn').onclick=exportRealCSV;
   };
 })();
 updateBotBtn();
-if(anyBot()){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
+if(anyBot() && isPremium()){ if(botTimer) clearInterval(botTimer); botTimer=setInterval(botTick, 60*1000); botTick(); }
 
 /* ================= HİSSE DETAY GRAFİĞİ (lightweight-charts) ================= */
 var HIST=null, HIST_LOADING=false, HIST_ERR=false;
@@ -3457,7 +3491,8 @@ segWire('chTool','tool',function(v){
     if(pbx) pbx.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.pane===(S.chartPane||'none')); });
   }
   boxes.forEach(function(box){ box.querySelectorAll('button').forEach(function(b){
-    b.onclick=function(){ var c=indCfg(); c[b.dataset.ind]=!c[b.dataset.ind]; save(); paint(); applyTF(); };
+    b.onclick=function(){ var c=indCfg(); c[b.dataset.ind]=!c[b.dataset.ind]; save(); paint(); applyTF();
+      var nt=$('sigChartNote'); if(nt) nt.style.display='none'; };
   }); });
   paint();
   var pb=$('chPane');
@@ -3468,6 +3503,7 @@ segWire('chTool','tool',function(v){
       b.onclick=function(){
         pb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
         b.classList.add('on'); S.chartPane=b.dataset.pane; save(); applyTF();
+        var nt=$('sigChartNote'); if(nt) nt.style.display='none';
       };
     });
   }
@@ -3551,6 +3587,19 @@ function fibAutoCompute(sym, look){
 })();
 /* ---------- uygulama içi diyalog (tarayıcı confirm/prompt yerine) ---------- */
 function dlgClose(){ var o=$('dlgOv'); if(o) o.classList.remove('open'); }
+/* Dışarı tıklayınca kapatma — ama metin seçerken imleç dışarı taşarsa KAPATMA.
+   Kapanması için hem basma hem bırakma olayının zeminde olması gerekir. */
+function wireBackdrop(ov, closeFn){
+  if(!ov) return;
+  var downOnBackdrop=false;
+  ov.onmousedown=function(e){ downOnBackdrop=(e.target===ov); };
+  ov.onclick=function(e){
+    if(e.target!==ov || !downOnBackdrop) { downOnBackdrop=false; return; }
+    downOnBackdrop=false;
+    if(window.getSelection && String(window.getSelection())) return;  // metin seçiliyse kapatma
+    closeFn();
+  };
+}
 function dlg(title, bodyHtml, buttons){
   var ov=$('dlgOv'), b=$('dlgBody'); if(!ov||!b) return;
   b.innerHTML='<h1 style="margin-bottom:10px">'+title+'</h1>'+bodyHtml+
@@ -3565,7 +3614,7 @@ function dlg(title, bodyHtml, buttons){
     bar.appendChild(el);
   });
   ov.classList.add('open');
-  ov.onclick=function(e){ if(e.target===ov) dlgClose(); };
+  wireBackdrop(ov, dlgClose);
 }
 /* ---------- gösterge hesapları (yalnız fiyattan; hacim verisi yok) ---------- */
 function indSMA(v,n){ var out=[],s=0; for(var i=0;i<v.length;i++){ s+=v[i]; if(i>=n) s-=v[i-n]; out.push(i>=n-1? s/n : null); } return out; }
@@ -3604,7 +3653,7 @@ function indMACD(v){
 }
 /* ---------- göstergelerin grafiğe uygulanması ---------- */
 var IND={}, PANE={chart:null, s1:null, s2:null, hist:null, kind:null}, paneSync=false, mainSyncHooked=false;
-function indCfg(){ if(!S.chartInd) S.chartInd={ema20:false, ma50:true, ma200:true, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false}; return S.chartInd; }
+function indCfg(){ if(!S.chartInd) S.chartInd={ema20:false, ma50:false, ma200:false, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false}; return S.chartInd; }
 function lineSer(key, color, width, dashed){
   if(!IND[key]){
     IND[key]=CH.chart.addLineSeries({color:color, lineWidth:width||1.5, priceLineVisible:false,
@@ -3924,6 +3973,204 @@ function fibAutoApply(sym){
   };
   $('fibAutoHide').onclick=function(){ CH.auto=null; bar.style.display='none'; redrawOverlay(); };
 }
+/* ---------- PANO ÖZETİ: hisseye özgü, değişken metinli görünüm yorumu ----------
+   Kural: asla al/sat/tut demez. Yalnız "pozitif / negatif / nötr görünüm" der.
+   Metin, sembolden türeyen sabit bir sayı ile varyasyon seçer → her hisse farklı okunur. */
+function hashStr(t){
+  var h=2166136261>>>0; t=String(t||'');
+  for(var i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,16777619)>>>0; }
+  h^=h>>>15; h=Math.imul(h,2246822507)>>>0; h^=h>>>13;   // son karıştırma: ardışık semboller aynı varyantı seçmesin
+  return h>>>0;
+}
+function pick(arr,h,salt){ return arr[(h+salt)%arr.length]; }
+function fmtP(v,d){ return (v==null||isNaN(v))?'—':((v>0?'+':'')+Number(v).toFixed(d==null?1:d).replace('.',',')+'%'); }
+
+function buildOzet(s, ctx, famInfo, fibInfo){
+  var h=hashStr(s.symbol), out={html:'', action:null, actionLabel:''};
+  var P=[];   // pozitif bulgular · N: negatif · X: nötr/uyarı
+  var N=[], X=[];
+
+  /* --- teknik duruş --- */
+  var trendTxt=null;
+  if(s.ma50!=null && s.price!=null){
+    if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200){ trendTxt='güçlü'; P.push('trend'); }
+    else if(s.price>s.ma50){ trendTxt='ılımlı'; P.push('trend'); }
+    else if(s.ma200!=null && s.price>s.ma200){ trendTxt='karışık'; X.push('trend'); }
+    else { trendTxt='zayıf'; N.push('trend'); }
+  }
+  if(s.rsi14!=null){
+    if(s.rsi14>70) N.push('rsi-asiri');
+    else if(s.rsi14>=55) P.push('rsi');
+    else if(s.rsi14<30) X.push('rsi-dip');
+    else if(s.rsi14<45) N.push('rsi-zayif');
+  }
+  if(s.ret1m!=null){ if(s.ret1m>3) P.push('mom1'); else if(s.ret1m<-3) N.push('mom1'); }
+  if(s.ret3m!=null){ if(s.ret3m>8) P.push('mom3'); else if(s.ret3m<-8) N.push('mom3'); }
+
+  /* --- değerleme --- */
+  var val=[];
+  if(s.pe!=null && s.pe>0){ if(s.pe<10) val.push('düşük F/K'); else if(s.pe>25) val.push('yüksek F/K'); }
+  if(s.pb!=null && s.pb>0){ if(s.pb<1.5) val.push('defter değerine yakın fiyat'); else if(s.pb>3) val.push('defterin belirgin üstünde fiyat'); }
+  if(s.roe!=null){ if(s.roe>=20) val.push('güçlü özsermaye kârlılığı'); else if(s.roe<5) val.push('zayıf özsermaye kârlılığı'); }
+  if(s.netMargin!=null){ if(s.netMargin>=15) val.push('yüksek net marj'); else if(s.netMargin<3) val.push('ince net marj'); }
+  if(s.debtToEquity!=null && s.debtToEquity>150) val.push('yüksek borçluluk');
+
+  /* --- cümle 1: genel duruş --- */
+  var pos=P.length, neg=N.length;
+  var stance = (pos>neg+1)?'pozitif' : (neg>pos+1)?'negatif' : 'nötr';
+  var s1;
+  if(stance==='pozitif'){
+    s1 = pick([
+      'Teknik tabloda ağırlık <b class="up">pozitif görünüm</b> tarafında: ',
+      'Göstergelerin çoğu şu an <b class="up">pozitif görünüm</b> veriyor; ',
+      '<b class="up">Pozitif görünüm</b> baskın: '
+    ], h, 0);
+  } else if(stance==='negatif'){
+    s1 = pick([
+      'Teknik tablo şu an <b class="down">negatif görünüm</b> ağırlıklı: ',
+      'Göstergelerin çoğu <b class="down">negatif görünüm</b> işaret ediyor; ',
+      '<b class="down">Negatif görünüm</b> öne çıkıyor: '
+    ], h, 1);
+  } else {
+    s1 = pick([
+      'Tablo şu an <b>nötr görünüm</b> veriyor: ',
+      'Sinyaller birbirini dengeliyor, <b>nötr görünüm</b>: ',
+      '<b>Nötr görünüm</b> — iki yönlü işaretler bir arada: '
+    ], h, 2);
+  }
+  var det=[];
+  if(trendTxt) det.push('trend '+trendTxt+(s.ma50!=null?(' (fiyat 50 günlük ortalamanın '+(s.price>s.ma50?'üstünde':'altında')+')'):''));
+  if(s.rsi14!=null) det.push('RSI '+Math.round(s.rsi14)+(s.rsi14>70?' (aşırı alım bölgesi)':s.rsi14<30?' (aşırı satım bölgesi)':''));
+  if(s.ret1m!=null) det.push('1 aylık '+fmtP(s.ret1m));
+  if(!det.length){
+    // Teknik veri yoksa yorum uydurma; durumu açıkça söyle.
+    out.sentences=['Bu hisse için yeterli <b>geçmiş fiyat verisi</b> bulunmadığından teknik görünüm hesaplanamadı.'+
+      (s.score!=null?(' Yalnız temel tarafta Orta/Uzun Vade Skoru '+Math.round(s.score)+'/100.'):'')];
+    return out;
+  }
+  s1 += det.slice(0,3).join(', ')+'.';
+
+  /* --- cümle 2: indikatör ailesi + fibonacci --- */
+  var s2='';
+  if(famInfo && famInfo.usable>0){
+    var fw = pick(['Bağımsız indikatör ailelerinden','Farklı ölçüm ailelerinden','Birbirinden bağımsız aile içinden'], h, 3);
+    s2 += fw+' <b>'+famInfo.met+'/'+famInfo.usable+'</b> tanesi pozitif tarafta'+
+          (famInfo.names.length?(' ('+famInfo.names.join(', ')+')'):'')+'';
+  }
+  if(fibInfo){
+    var konum = fibInfo.above ? 'üstünde tutuyor' : 'altına sarkmış';
+    var fibPhrase = pick([
+      'Fibonacci tarafında fiyat %'+fibInfo.r+' seviyesinin '+konum,
+      '%'+fibInfo.r+' Fibonacci seviyesine %'+fibInfo.dist+' uzaklıkta ve seviyenin '+konum,
+      'Salınımın %'+fibInfo.r+' seviyesi yakın: fiyat bu seviyenin '+konum
+    ], h, 4);
+    s2 += (s2? '; ' : '') + fibPhrase;
+  }
+  if(s2) s2 += '.';
+
+  /* --- cümle 3: değerleme / risk --- */
+  var s3='';
+  if(val.length){
+    var vw = pick(['Temel tarafta','Bilanço tarafında','Değerleme tarafında'], h, 5);
+    s3 = vw+' '+val.slice(0,3).join(', ')+' dikkat çekiyor';
+    if(s.score!=null) s3 += ' (Orta/Uzun Vade Skoru '+Math.round(s.score)+'/100)';
+    s3 += '.';
+  } else if(s.score!=null){
+    s3 = 'Orta/Uzun Vade Skoru '+Math.round(s.score)+'/100.';
+  }
+  var risk=[];
+  if(s.atrPct!=null && s.atrPct>4) risk.push('günlük dalgalanma yüksek (ATR %'+s.atrPct.toFixed(1).replace('.',',')+')');
+  if(s.pctFromHigh!=null && s.pctFromHigh<-25) risk.push('52 hafta zirvesinin %'+Math.abs(Math.round(s.pctFromHigh))+' altında');
+  if(s.relVol!=null && s.relVol<0.6) risk.push('işlem hacmi ortalamanın altında');
+  if(risk.length) s3 += (s3?' ':'')+pick(['Ayrıca ','Not: ','Öte yandan '],h,6)+risk.slice(0,2).join(' ve ')+'.';
+
+  /* --- soru + eylem --- */
+  if(fibInfo && fibInfo.distN!=null && fibInfo.distN<=5){
+    out.action='fib';
+    out.question=pick([
+      'Bu Fibonacci seviyelerini grafiğe çizmemi ister misin?',
+      'Salınımı ve seviyeleri grafik üzerinde göstereyim mi?',
+      'Fibonacci seviyelerini grafikte işaretleyeyim mi?'
+    ],h,7);
+  } else if(s.ma50!=null && s.ma200!=null && s.price!=null && Math.abs(s.price/s.ma200-1)*100<4){
+    out.action='ma';
+    out.question=pick([
+      'Fiyat 200 günlük ortalamaya çok yakın — ortalamaları grafikte göstereyim mi?',
+      '200 günlük ortalama kritik mesafede; çizgileri grafiğe ekleyeyim mi?'
+    ],h,8);
+  } else if(s.rsi14!=null && (s.rsi14>70 || s.rsi14<30)){
+    out.action='rsi';
+    out.question=pick([
+      'RSI uç bölgede — alt panelde RSI grafiğini açayım mı?',
+      'RSI’ın geçmiş seyrini alt panelde göstereyim mi?'
+    ],h,9);
+  } else if(s.atrPct!=null && s.atrPct>3){
+    out.action='bb';
+    out.question=pick([
+      'Oynaklık yüksek — Bollinger bantlarını grafiğe ekleyeyim mi?',
+      'Dalgalanma bandını (Bollinger) grafikte göstereyim mi?'
+    ],h,10);
+  }
+  out.sentences=[s1,s2,s3].filter(Boolean);
+  return out;
+}
+
+/* Hisse için özet verisini toplayıp kutuyu doldur */
+function renderOzet(sym){
+  var box=$('ozetText'); if(!box) return;
+  var s=find(sym); if(!s){ box.innerHTML=''; return; }
+  var fam=null, fib=null;
+  try{
+    var h=(typeof HIST!=='undefined' && HIST)?HIST[sym]:null;
+    if(h && h.d && h.d.length>60){
+      SIGFIB.look=Math.max(30, parseInt($('fibLook')&&$('fibLook').value,10)||120);
+      SIGFIB.near=Math.max(0.5, parseFloat($('fibNear')&&$('fibNear').value)||5);
+      var x=sigCtx(h.d, s);
+      // tüm indikatörleri değerlendirip AİLE bazında say
+      var byFam={};
+      SIGDEFS.forEach(function(d){
+        var r=null; try{ r=d.f(x); }catch(e){ r=null; }
+        if(r==null) return;
+        byFam[d.fam]=byFam[d.fam]||{usable:0, met:0};
+        byFam[d.fam].usable++; if(r.met) byFam[d.fam].met++;
+      });
+      var fu=0, fm=0, names=[];
+      SIGFAMS.forEach(function(F){
+        if(byFam[F.k] && byFam[F.k].usable){ fu++; if(byFam[F.k].met>0){ fm++; names.push(F.t.split(' /')[0]); } }
+      });
+      if(fu) fam={met:fm, usable:fu, names:names};
+      // fibonacci
+      var lg=fibLeg(h.d, SIGFIB.look);
+      if(lg && s.price!=null){
+        var nr=fibNearest(lg, s.price);
+        fib={ r:(nr.r*100).toFixed(1).replace('.0',''), dist:fmt(nr.dist,2), distN:nr.dist,
+              above:(s.price>=nr.level), dir:lg.dir };
+      }
+    }
+  }catch(e){}
+  var o=buildOzet(s, null, fam, fib);
+  var html='<p style="margin:0">'+o.sentences.join(' ')+'</p>';
+  if(o.question){
+    html+='<p style="margin:8px 0 0">'+o.question+
+      ' <button class="ghost accent" id="ozetShow" style="padding:3px 10px; margin-left:4px">Evet, göster</button></p>';
+  }
+  html+='<div class="hint" style="margin-top:8px">Bu özet göstergelerin <b>tanımı gereği</b> oluşan durumu anlatır; alım-satım önerisi değildir ve fiyatın ne yapacağını söylemez.</div>';
+  box.innerHTML=html;
+  var btn=$('ozetShow');
+  if(btn) btn.onclick=function(){
+    var c=indCfg();
+    if(o.action==='fib'){ fibAutoCompute(sym, SIGFIB.look||120); }
+    else if(o.action==='ma'){ c.ma50=true; c.ma200=true; save(); applyTF(); }
+    else if(o.action==='rsi'){ S.chartPane='rsi'; save(); applyTF(); }
+    else if(o.action==='bb'){ c.bb=true; save(); applyTF(); }
+    // düğmeleri boya
+    var b1=$('chInd'), b2=$('chInd2'), pb=$('chPane');
+    [b1,b2].forEach(function(box2){ if(box2) box2.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', !!c[b.dataset.ind]); }); });
+    if(pb) pb.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.pane===(S.chartPane||'none')); });
+    btn.textContent='✓ Grafikte gösterildi'; btn.disabled=true; btn.style.opacity='.7';
+    var cb=$('chBox'); if(cb) cb.scrollIntoView({behavior:'smooth', block:'center'});
+  };
+}
 var sigFromList=null;
 function initDetailChart(sym){
   CH.sym=sym; CH.pending=null; CH.hover=null;
@@ -3936,6 +4183,7 @@ function initDetailChart(sym){
   loadHistory(function(okHist){
     if(!okHist){ chMsg('history.js bulunamadı — fetch_data.py v3 ile Actions bir kez çalışmalı'); return; }
     if(!ensureChart()){ chMsg('grafik başlatılamadı'); return; }
+    if(typeof renderOzet==='function') renderOzet(sym);   // geçmiş gelince indikatörlü tam özet
     if(sigFromList===sym){
       var r=sigApplyToChart(sym);
       if(sigCfg().fib) fibAutoCompute(sym, SIGFIB.look);   // Fibonacci seçiliyse seviyeleri de çiz
@@ -3996,6 +4244,16 @@ function applyRole(){
   var ab=$('adminBox'); if(ab) ab.style.display=(ROLE==='admin')?'block':'none';   // yönetici kutusu gerçek role bağlı
   var ub=$('upsell'); if(ub) ub.style.display=isPremium()?'none':'block';
   // Önizleme kutusu: yalnız gerçek rolü premium/admin olanlara
+  // Oto-trader yalnız Premium/Admin'e görünür; erişimi olmayanda kapatılır.
+  var bb=$('botBar'), bn=$('botNote'), botOK=isPremium();
+  if(bb) bb.style.display = botOK?'block':'none';
+  if(bn) bn.style.display = botOK?'block':'none';
+  if(!botOK && typeof MARKETS!=='undefined' && S.botOn){
+    var changed=false;
+    MARKETS.forEach(function(m){ if(S.botOn[m]){ S.botOn[m]=false; changed=true; } });
+    if(changed){ if(typeof botTimer!=='undefined' && botTimer){ clearInterval(botTimer); botTimer=null; } save(); }
+    if(typeof updateBotBtn==='function') updateBotBtn();
+  }
   var pv=$('previewBox');
   if(pv) pv.style.display=(ROLE==='premium'||ROLE==='admin')?'block':'none';
   var pb=$('previewBtn');
@@ -4147,7 +4405,7 @@ function wireCloud(){
   var close=function(){ var o=$('authOv'); if(o) o.classList.remove('open'); };
   var cb=$('cloudBtn'); if(cb) cb.onclick=open;
   var ac=$('authClose'); if(ac) ac.onclick=close;
-  var ov=$('authOv'); if(ov) ov.onclick=function(e){ if(e.target===ov) close(); };
+  wireBackdrop($('authOv'), close);
   function creds(){ return { email:($('authEmail')?$('authEmail').value.trim():''), pass:($('authPass')?$('authPass').value:'') }; }
   function msg(t){ var m=$('authMsg'); if(m) m.innerHTML=t; }
   var su=$('authSignup'); if(su) su.onclick=function(){ if(!SB){ msg('Bulut yapılandırılmamış.'); return; } var c=creds(); if(!c.email||c.pass.length<6){ msg('Geçerli e-posta ve en az 6 haneli şifre gir.'); return; } msg('Kaydediliyor…');
