@@ -688,9 +688,9 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px">
           <span class="hint">Göstergeler:</span>
           <div class="seg" id="chInd">
-            <button data-ind="ema20" title="20 günlük üstel hareketli ortalama — son fiyatlara daha çok ağırlık verir, kısa vade eğilim.">EMA20</button>
-            <button data-ind="ma50" title="50 günlük basit ortalama — orta vade trend.">MA50</button>
-            <button data-ind="ma200" title="200 günlük basit ortalama — uzun vade trend; üstü boğa, altı ayı kabul edilir.">MA200</button>
+            <button data-ind="ema20" title="20 barlık üstel hareketli ortalama. Seçili periyodun barından hesaplanır: 1A/1Y görünümünde 20 gün, 5Y görünümünde 20 hafta.">EMA20</button>
+            <button data-ind="ma50" title="50 barlık basit ortalama. 1A/1Y görünümünde 50 gün, 5Y görünümünde 50 hafta, gün içi görünümde 50×15dk demektir.">MA50</button>
+            <button data-ind="ma200" title="200 barlık basit ortalama. 1Y görünümünde klasik 200 gün; 5Y görünümünde 200 hafta (~4 yıl) olur — aynı şey değildir.">MA200</button>
             <button data-ind="bb" title="Bollinger Bantları (20 gün, ±2 standart sapma) — oynaklık zarfı. Bantlar daralınca hareket yaklaşıyor, fiyat banda değince aşırı sayılır.">Bollinger</button>
           </div>
           <span class="hint">Alt panel:</span>
@@ -2895,6 +2895,14 @@ function fibLeg(bars, look){
   return {hi:hi, lo:lo, hiI:hiI, loI:loI, n:n, dir:(loI<hiI?'up':'down'),
           legPct:(hi-lo)/lo*100, ageBars:n-1-Math.max(hiI,loI)};
 }
+/* Fibonacci için seri seçimi TEK YERDEN yapılır; yoksa tarama/çizim/özet
+   farklı salınım bulur ve birbirini tutmayan seviyeler gösterir. */
+function fibPick(h, look){
+  var d=(h&&h.d)||[], w=(h&&h.w)||[];
+  if(!d.length && !w.length) return null;
+  if(look<=d.length || !w.length) return {bars:d, mult:1, barsLook:look, unit:'günlük'};
+  return {bars:w, mult:5, barsLook:Math.ceil(look/5), unit:'haftalık'};
+}
 function fibNearest(leg, price){
   var best=null;
   FIBLV.forEach(function(L){
@@ -2940,9 +2948,10 @@ function fibScan(){
     var d=h.d||[], w=h.w||[];
     if(d.length>maxDay) maxDay=d.length;
     // İstenen pencere günlük veriden uzunsa 5 yıllık HAFTALIK seriye geç (1 bar ≈ 5 işlem günü)
-    var bars, mult, barsLook;
-    if(look<=d.length || !w.length){ bars=d; mult=1; barsLook=look; }
-    else { bars=w; mult=5; barsLook=Math.ceil(look/5); usedW++; }
+    var fp=fibPick(h, look);
+    if(!fp) return;
+    var bars=fp.bars, mult=fp.mult, barsLook=fp.barsLook;
+    if(mult>1) usedW++;
     if(bars.length<20) return;
     scanned++;
     var span=Math.min(barsLook,bars.length)*mult; if(span>maxSpan) maxSpan=span;
@@ -3538,9 +3547,10 @@ function setToolBtn(v){
 function fibAutoCompute(sym, look){
   var s=find(sym); var h=HIST?HIST[sym]:null;
   if(!s||!h){ dlg('Veri yok','<p>Bu hisse için geçmiş veri bulunamadı.</p>',[{label:'Tamam',primary:true}]); return; }
-  var d=h.d||[], w=h.w||[], bars, mult;
-  if(look<=d.length || !w.length){ bars=d; mult=1; } else { bars=w; mult=5; }
-  var leg=fibLeg(bars, mult===1?look:Math.ceil(look/5));
+  var fp=fibPick(h, look);
+  if(!fp || !fp.bars.length){ dlg('Veri yok','<p>Bu hisse için geçmiş veri bulunamadı.</p>',[{label:'Tamam',primary:true}]); return; }
+  var bars=fp.bars, mult=fp.mult;
+  var leg=fibLeg(bars, fp.barsLook);
   if(!leg){ dlg('Hesaplanamadı','<p>Bu pencerede geçerli bir salınım bulunamadı.</p>',[{label:'Tamam',primary:true}]); return; }
   leg.ageDays=leg.ageBars*mult; leg.hiT=bars[leg.hiI][0]; leg.loT=bars[leg.loI][0]; leg.unit=(mult===1?'günlük':'haftalık');
   var near=fibNearest(leg, s.price);
@@ -3662,10 +3672,19 @@ function lineSer(key, color, width, dashed){
   }
   return IND[key];
 }
+/* Göstergeler EKRANDAKİ barlardan hesaplanır (grafik programlarının standardı):
+   5Y görünümü haftalık bar kullandığı için MA50 orada 50 HAFTA demektir.
+   Etiketler bu yüzden periyoda göre yazılır — yanlış bilgi vermemek için. */
+function tfUnit(){
+  if(CH.tf==='5Y') return {u:'hafta', short:'h', daily:false};
+  if(CH.tf==='1G'||CH.tf==='1H') return {u:'bar (15dk)', short:'bar', daily:false};
+  return {u:'gün', short:'g', daily:true};
+}
 function applyIndicators(bars){
   if(!CH.chart||!bars||!bars.length) return;
   var t=bars.map(function(b){return b[0];}), c=bars.map(function(b){return b[4];});
   var cfg=indCfg(), n=bars.length-1, read=[];
+  var U=tfUnit();
   function put(key,color,arr,w,dash,label,dec){
     var s=lineSer(key,color,w,dash);
     if(!arr){ s.setData([]); return; }
@@ -3673,9 +3692,9 @@ function applyIndicators(bars){
     s.setData(d);
     if(label && arr[n]!=null) read.push('<b style="color:'+color+'">'+label+'</b> '+fmt(arr[n],dec==null?2:dec));
   }
-  put('ema20','#f59e0b', cfg.ema20?indEMA(c,20):null, 1.5, false, cfg.ema20?'EMA20':null);
-  put('ma50','#3b82f6',  cfg.ma50?indSMA(c,50):null,  1.5, false, cfg.ma50?'MA50':null);
-  put('ma200','#8b5cf6', cfg.ma200?indSMA(c,200):null,1.5, false, cfg.ma200?'MA200':null);
+  put('ema20','#f59e0b', cfg.ema20?indEMA(c,20):null, 1.5, false, cfg.ema20?('EMA20 ('+20+' '+U.u+')'):null);
+  put('ma50','#3b82f6',  cfg.ma50?indSMA(c,50):null,  1.5, false, cfg.ma50?('MA50 ('+50+' '+U.u+')'):null);
+  put('ma200','#8b5cf6', cfg.ma200?indSMA(c,200):null,1.5, false, cfg.ma200?('MA200 ('+200+' '+U.u+')'):null);
   if(cfg.bb){
     var bb=indBB(c,20,2);
     put('bbU','#94a0ad', bb.up, 1, true, 'BB üst');
@@ -3822,8 +3841,11 @@ function applyIndicators(bars){
     }
   }
   var rd=$('chRead');
-  if(rd) rd.innerHTML = read.length? ('Son değerler — '+read.join(' &nbsp;·&nbsp; ')) :
-    '<span class="cov">Gösterge seçilmedi. Not: <code>history.js</code> hacim tutmadığı için VWAP/OBV gibi hacim tabanlı göstergeler hesaplanamıyor.</span>';
+  var warn = (!U.daily && (cfg.ema20||cfg.ma50||cfg.ma200||cfg.bb||cfg.st||cfg.ichi||cfg.kc||cfg.sar||S.chartPane!=='none'))
+    ? '<div class="hint down" style="margin-top:4px">⚠ Bu periyot <b>'+(CH.tf==='5Y'?'haftalık':'15 dakikalık')+'</b> bar kullanır; göstergeler bu barlardan hesaplanır. Örnek: burada <b>MA50 = 50 '+U.u+'</b>, klasik 50 <b>günlük</b> ortalama değildir. Günlük karşılıkları için <b>1Y</b> periyoduna geç.</div>'
+    : '';
+  if(rd) rd.innerHTML = (read.length? ('Son değerler — '+read.join(' &nbsp;·&nbsp; ')) :
+    '<span class="cov">Gösterge seçilmedi. Not: <code>history.js</code> hacim tutmadığı için VWAP/OBV gibi hacim tabanlı göstergeler hesaplanamıyor.</span>') + warn;
 }
 /* ---------- gelişmiş göstergeler (formülleri kamuya açık; "premium" olan erişim, matematik değil) ----------*/
 /* ATR (Wilder yumuşatması) */
@@ -4039,7 +4061,7 @@ function buildOzet(s, ctx, famInfo, fibInfo){
     ], h, 2);
   }
   var det=[];
-  if(trendTxt) det.push('trend '+trendTxt+(s.ma50!=null?(' (fiyat 50 günlük ortalamanın '+(s.price>s.ma50?'üstünde':'altında')+')'):''));
+  if(trendTxt) det.push('trend '+trendTxt+(s.ma50!=null?(' (fiyat <b>50 günlük</b> ortalamanın '+(s.price>s.ma50?'üstünde':'altında')+')'):''));
   if(s.rsi14!=null) det.push('RSI '+Math.round(s.rsi14)+(s.rsi14>70?' (aşırı alım bölgesi)':s.rsi14<30?' (aşırı satım bölgesi)':''));
   if(s.ret1m!=null) det.push('1 aylık '+fmtP(s.ret1m));
   if(!det.length){
@@ -4059,10 +4081,12 @@ function buildOzet(s, ctx, famInfo, fibInfo){
   }
   if(fibInfo){
     var konum = fibInfo.above ? 'üstünde tutuyor' : 'altına sarkmış';
+    var src = fibInfo.unit ? (' — '+fibInfo.unit+' veriye göre') : '';
+    var lvl = fibInfo.level ? (' ('+fibInfo.level+')') : '';
     var fibPhrase = pick([
-      'Fibonacci tarafında fiyat %'+fibInfo.r+' seviyesinin '+konum,
-      '%'+fibInfo.r+' Fibonacci seviyesine %'+fibInfo.dist+' uzaklıkta ve seviyenin '+konum,
-      'Salınımın %'+fibInfo.r+' seviyesi yakın: fiyat bu seviyenin '+konum
+      'Fibonacci tarafında fiyat %'+fibInfo.r+' seviyesinin'+lvl+' '+konum+src,
+      '%'+fibInfo.r+' Fibonacci seviyesine'+lvl+' %'+fibInfo.dist+' uzaklıkta ve seviyenin '+konum+src,
+      'Salınımın %'+fibInfo.r+' seviyesi'+lvl+' yakın: fiyat bu seviyenin '+konum+src
     ], h, 4);
     s2 += (s2? '; ' : '') + fibPhrase;
   }
@@ -4140,11 +4164,14 @@ function renderOzet(sym){
       });
       if(fu) fam={met:fm, usable:fu, names:names};
       // fibonacci
-      var lg=fibLeg(h.d, SIGFIB.look);
-      if(lg && s.price!=null){
-        var nr=fibNearest(lg, s.price);
-        fib={ r:(nr.r*100).toFixed(1).replace('.0',''), dist:fmt(nr.dist,2), distN:nr.dist,
-              above:(s.price>=nr.level), dir:lg.dir };
+      var fp=fibPick(h, SIGFIB.look);
+      if(fp && fp.bars.length>20){
+        var lg=fibLeg(fp.bars, fp.barsLook);
+        if(lg && s.price!=null){
+          var nr=fibNearest(lg, s.price);
+          fib={ r:(nr.r*100).toFixed(1).replace('.0',''), dist:fmt(nr.dist,2), distN:nr.dist,
+                level:fmt(nr.level), above:(s.price>=nr.level), dir:lg.dir, unit:fp.unit };
+        }
       }
     }
   }catch(e){}
@@ -4154,7 +4181,7 @@ function renderOzet(sym){
     html+='<p style="margin:8px 0 0">'+o.question+
       ' <button class="ghost accent" id="ozetShow" style="padding:3px 10px; margin-left:4px">Evet, göster</button></p>';
   }
-  html+='<div class="hint" style="margin-top:8px">Bu özet göstergelerin <b>tanımı gereği</b> oluşan durumu anlatır; alım-satım önerisi değildir ve fiyatın ne yapacağını söylemez.</div>';
+  html+='<div class="hint" style="margin-top:8px">Bu özet göstergelerin <b>tanımı gereği</b> oluşan durumu anlatır; alım-satım önerisi değildir ve fiyatın ne yapacağını söylemez. Buradaki ortalamalar her zaman <b>günlük</b> veriden hesaplanır — grafikte 5Y (haftalık) periyodu seçiliyse oradaki çizgiler farklı bir ortalamayı gösterir.</div>';
   box.innerHTML=html;
   var btn=$('ozetShow');
   if(btn) btn.onclick=function(){
