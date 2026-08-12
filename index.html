@@ -251,8 +251,17 @@
   .chart .ylab{fill:var(--faint); font-size:10px; font-family:"Plus Jakarta Sans"; text-anchor:end}
   .chart .xlab{fill:var(--faint); font-size:10px; font-family:"Plus Jakarta Sans"}
   .seg{display:flex; gap:4px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:3px; width:max-content}
+  #sigPick .seg{border:1.5px solid #c8d3e0; background:var(--surface); box-shadow:0 1px 3px rgba(16,21,28,.06)}
   .seg button{border:none; background:transparent; padding:6px 16px; border-radius:999px; font-weight:700; font-size:13px; color:var(--dim); cursor:pointer}
   .seg button.on{background:var(--brand); color:#fff}
+  /* Tüm Liste: 15 sütun tek ekrana sığsın */
+  #allTable{font-size:12.5px; table-layout:auto}
+  #allTable th, #allTable td{padding:9px 7px}
+  #allTable th:first-child, #allTable td:first-child{padding-left:10px}
+  #allTable td:last-child, #allTable th:last-child{padding-right:10px}
+  #allTable .nm{font-size:10.5px}
+  #allTable .miniact{padding:4px 8px; font-size:11.5px}
+  #allTable .q{margin-right:3px}
   .disclaimer{margin-top:18px; color:var(--faint); font-size:11.5px; line-height:1.6; border-top:1px solid var(--line); padding-top:14px}
 </style>
   <script>
@@ -334,7 +343,6 @@
         <button data-m="NASDAQ">NASDAQ</button>
       </div>
       <span class="ratebox" id="rateBox"></span>
-      <button class="ghost" id="autoBtn" title="10 dakikada bir verileri tazeler"></button>
       <button class="ghost" id="cloudBtn" title="Profil — notlarım, bulut hesabı ve cihazlar arası eşitleme">☁ Bulut</button>
     </div>
   </header>
@@ -458,7 +466,7 @@
     </section>
 
     <section class="view card" id="v-all">
-      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
+      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><button class="ghost accent" id="allXlsBtn" title="Görünen listeyi Excel’de açılacak CSV olarak indirir">⤓ Excel'e indir</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="allTable"><thead><tr id="allHead"></tr></thead><tbody id="allBody"></tbody></table></div>
     </section>
 
@@ -670,7 +678,7 @@
           <div class="seg" id="chType"><button class="on" data-ct="candle">Mum</button><button data-ct="line">Çizgi</button></div>
           <div class="seg" id="chTool"><button class="on" data-tool="cursor">🖱 İmleç</button><button data-tool="fib">φ Fib</button></div>
           <button class="ghost" id="chUndo">↩ Son çizim</button>
-          <button class="ghost" id="chClear">Çizimleri temizle</button>
+          <button class="ghost" id="chClear" title="Çizimleri siler ve gösterge/alt panel seçimlerini sıfırlar">Temizle</button>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px">
           <span class="hint">Göstergeler:</span>
@@ -1539,7 +1547,11 @@ $('mktSwitch').querySelectorAll('button').forEach(function(b){
     if(typeof btReset==='function') btReset();
     fibLastMk=null; if($('fibBuy')){ $('fibBuy').innerHTML=''; $('fibSell').innerHTML=''; $('fibInfo').textContent=''; }
     sigLastMk=null; if($('sigBody')){ $('sigBody').innerHTML=''; $('sigInfo').textContent=''; }
-    renderAll(); applyRole(); goView(defView()); };
+    var cur=document.querySelector('.tab.active');
+    var keep=cur?cur.dataset.v:null;
+    var onDetail=$('v-detail') && $('v-detail').classList.contains('active');
+    renderAll(); applyRole();
+    goView((keep && !onDetail && canView(keep)) ? keep : defView()); };
 });
 
 /* header meta */
@@ -1883,7 +1895,7 @@ buildFilterRow();
 $('clearFilters').onclick=function(){ colFilters={}; $('screenFilterRow').querySelectorAll('.colf').forEach(function(i){i.value='';}); qScreen=''; $('searchScreen').value=''; renderScreen(); };
 
 /* ---------- all list ---------- */
-var qAll='', sortKA='symbol', sortDirA=1;
+var qAll='', sortKA='symbol', sortDirA=1, ALL_VIEW=[];
 /* Tüm Liste: Orta/Uzun sekmesindeki sütunların tamamı (Skor hariç) + hacim */
 var ACOLS=[
   {k:'symbol',t:'Hisse',l:true,tip:'Hisse kodu ve şirket adı.'},
@@ -1900,7 +1912,6 @@ var ACOLS=[
   {k:'roe',t:'Özsr.K %',tip:'Özsermaye Kârlılığı (ROE). Yüksek iyi.'},
   {k:'debtToEquity',t:'Borç/Özsr',tip:'Borcun özsermayeye oranı. Düşük = daha sağlam. Finans hisselerinde anlamı farklıdır.'},
   {k:'netMargin',t:'Marj %',tip:'Net kâr marjı: satışın yüzde kaçı net kâra dönüşüyor.'},
-  {k:'scoreCoverage',t:'Veri',tip:'Temel oranlardan kaçının mevcut olduğu. Düşükse verilere temkinli yaklaş.'},
   {k:'act',t:''}
 ];
 function buildHeadAll(){
@@ -1943,11 +1954,31 @@ function renderAllList(){
       '<td>'+(s.roe==null?'<span class="na">—</span>':qDot('roe',s.roe)+fmt(s.roe)+'%')+'</td>'+
       '<td>'+(s.debtToEquity==null?'<span class="na">—</span>':qDot('de',s.debtToEquity)+fmt(s.debtToEquity))+'</td>'+
       '<td>'+(s.netMargin==null?'<span class="na">—</span>':qDot('margin',s.netMargin)+fmt(s.netMargin)+'%')+'</td>'+
-      '<td><span class="cov">'+(s.scoreCoverage||0)+'</span></td>'+
       '<td><button class="miniact" data-sym="'+s.symbol+'">Sim</button></td></tr>';
-  }).join('') || '<tr><td colspan="16" class="empty">eşleşen hisse yok</td></tr>';
+  }).join('') || '<tr><td colspan="15" class="empty">eşleşen hisse yok</td></tr>';
+  ALL_VIEW=rows;   // Excel dışa aktarımı ekrandaki sıralama/filtreyi birebir izler
   $('allBody').querySelectorAll('.sym').forEach(function(e){e.onclick=function(){openStock(e.dataset.sym);};});
   $('allBody').querySelectorAll('.miniact').forEach(function(b){b.onclick=function(){selectInSim(b.dataset.sym);};});
+}
+function exportAllCSV(){
+  if(!ALL_VIEW || !ALL_VIEW.length){ dlg('Liste boş','<p>Dışa aktarılacak hisse yok.</p>',[{label:'Tamam',primary:true}]); return; }
+  function trendTxt(s){
+    if(s.ma50==null||s.price==null) return '';
+    if(s.ma200!=null && s.price>s.ma50 && s.ma50>s.ma200) return 'Güçlü yükseliş';
+    if(s.price>s.ma50) return 'Yukarı';
+    return 'Zayıf';
+  }
+  function num(v,d){ return v==null||isNaN(v)?'':Number(v).toFixed(d==null?2:d).replace('.',','); }
+  var rows=[['Sembol','Şirket','Sektör','Para birimi','Fiyat','Gün %','Hacim','Trend',
+             'Göreli Güç %','1A %','RSI','ATR %','F/K','P/D','Özsermaye Kârlılığı %','Borç/Özsermaye','Net Marj %']];
+  ALL_VIEW.forEach(function(s){
+    rows.push([ clean(s.symbol), s.name||'', sektorTR(s.sector), s.currency||ccyCode(s.market),
+      num(s.price), num(s.changePct), (s.volume==null?'':s.volume), trendTxt(s),
+      num(s._rs,1), num(s.ret1m,1), num(s.rsi14,0), num(s.atrPct,1),
+      num(s.pe), num(s.pb), num(s.roe,1), num(s.debtToEquity), num(s.netMargin,1) ]);
+  });
+  var d=new Date(), pad=function(x){return (x<10?'0':'')+x;};
+  downloadCSV('borsa-pano-'+MK+'-tum-liste-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.csv', toCSV(rows));
 }
 $('searchAll').oninput=function(e){qAll=e.target.value; renderAllList();};
 
@@ -2900,7 +2931,7 @@ var SIGFAMS=[
 ];
 
 /* ---------- Sinyal taraması ---------- */
-var sigLastMk=null;
+var sigLastMk=null, sigUserRan=false;
 function sigCfg(){ if(!S.sigPick) S.sigPick={ma200:true, macd:true, bb:true}; return S.sigPick; }
 function sigPaint(){
   var box=$('sigPick'); if(!box) return;
@@ -2939,7 +2970,12 @@ function sigScan(){
   var cfg=sigCfg();
   var picked=SIGDEFS.filter(function(d){ return cfg[d.k]; });
   if(!picked.length){
-    dlg('Gösterge seçilmedi','<p>En az bir gösterge seçmelisin. Yukarıdaki listeden istediklerine tıkla.</p>',[{label:'Tamam',primary:true}]);
+    if(sigUserRan){
+      dlg('İndikatör seçilmedi','<p>En az bir indikatör seçmelisin. Yukarıdaki listeden istediklerine tıkla.</p>',[{label:'Tamam',primary:true}]);
+    } else {
+      $('sigInfo').innerHTML='Başlamak için yukarıdan indikatör seç, sonra <b>Tara</b> düğmesine bas.';
+      $('sigBody').innerHTML='';
+    }
     return;
   }
   var famsPicked={}; picked.forEach(function(d){ famsPicked[d.fam]=1; });
@@ -3057,20 +3093,14 @@ function refreshData(){
   s.onerror=function(){ if(s.parentNode) s.parentNode.removeChild(s); };
   document.head.appendChild(s);
 }
-function updateAutoBtn(){
-  var b=$('autoBtn'); if(!b) return;
-  if(S.auto){ b.textContent='⟳ Oto 10dk: açık'; b.style.color='var(--brand)'; b.style.borderColor='var(--brand)'; }
-  else { b.textContent='⟳ Oto: kapalı'; b.style.color=''; b.style.borderColor=''; }
-}
-function setAuto(on){
-  S.auto=on; save();
+function updateAutoBtn(){ /* Oto yenileme her zaman açık; buton kaldırıldı. */ }
+function setAuto(){
+  S.auto=true;
   if(autoTimer){ clearInterval(autoTimer); autoTimer=null; }
-  if(on){ autoTimer=setInterval(refreshData, 10*60*1000); }
-  updateAutoBtn();
+  autoTimer=setInterval(refreshData, 10*60*1000);
 }
-$('autoBtn').onclick=function(){ setAuto(!S.auto); };
-if(S.auto===undefined) S.auto=true;
-setAuto(S.auto);
+S.auto=true;
+setAuto();
 MARKETS.forEach(function(m){
   $('botBtn'+m).onclick=function(){ setBot(m, !S.botOn[m]); };
   var inp=$('botThr'+m); inp.value=(S.botThr[m]!=null?S.botThr[m]:70);
@@ -3095,8 +3125,9 @@ function wireDoc(btnId, ovId){ var ov=$(ovId); if(!ov) return; var b=$(btnId); i
 wireDoc('docBtn','docOv'); wireDoc('docBtnShort','docOvShort'); wireDoc('docBtnMid','docOvMid'); wireDoc('docBtnBT','docOvBT'); wireDoc('docBtnFib','docOvFib'); wireDoc('docBtnSig','docOvSig');
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ ['docOv','docOvShort','docOvMid','docOvBT','docOvFib','docOvSig'].forEach(function(id){ var o=$(id); if(o) o.classList.remove('open'); }); } });
 if($('fibRun')) $('fibRun').onclick=fibGo;
+if($('allXlsBtn')) $('allXlsBtn').onclick=exportAllCSV;
 sigPaint();
-if($('sigRun')) $('sigRun').onclick=sigGo;
+if($('sigRun')) $('sigRun').onclick=function(){ sigUserRan=true; sigGo(); };
 if($('sigAll')) $('sigAll').onclick=function(){ var c=sigCfg(); SIGDEFS.forEach(function(d){c[d.k]=true;}); save(); sigPaint(); };
 if($('sigNone')) $('sigNone').onclick=function(){ S.sigPick={}; save(); sigPaint(); };
 ['btStrat','btFib'].forEach(function(id){ var e=$(id); if(e) e.onchange=btActiveTxt; });
@@ -3337,10 +3368,35 @@ function fibAutoCompute(sym, look){
   var u=$('chUndo'); if(u) u.onclick=function(){ var a=chDrawings(); if(a.length){ a.pop(); save(); redrawOverlay(); } };
   var c=$('chClear'); if(c) c.onclick=function(){
     var n=chDrawings().length;
-    if(!n){ dlg('Çizim yok','<p>Bu hissede silinecek çizim bulunmuyor.</p>',[{label:'Tamam',primary:true}]); return; }
-    dlg('Çizimleri temizle',
-      '<p><b>'+clean(CH.sym||'')+'</b> hissesindeki <b>'+n+'</b> çizim silinsin mi? Bu işlem geri alınamaz ve bulut hesabına da yansır.</p>',
-      [{label:'Evet, sil', primary:true, fn:function(){ S.chartDrawings[CH.sym]=[]; save(); redrawOverlay(); }},
+    var cfg=indCfg();
+    var indNames=[];
+    [['ema20','EMA20'],['ma50','MA50'],['ma200','MA200'],['bb','Bollinger'],
+     ['st','SuperTrend'],['ichi','Ichimoku'],['kc','Keltner'],['sar','SAR'],['piv','Pivot']]
+      .forEach(function(x){ if(cfg[x[0]]) indNames.push(x[1]); });
+    var paneName={rsi:'RSI', macd:'MACD', stoch:'Stokastik', atr:'ATR%'}[S.chartPane]||null;
+    var parts=[];
+    if(n) parts.push('<b>'+n+'</b> çizim');
+    if(indNames.length) parts.push('<b>'+indNames.length+'</b> gösterge ('+indNames.join(', ')+')');
+    if(paneName) parts.push('alt panel (<b>'+paneName+'</b>)');
+    if(!parts.length){
+      dlg('Temizlenecek bir şey yok','<p>Bu hissede çizim yok ve açık gösterge bulunmuyor.</p>',[{label:'Tamam',primary:true}]);
+      return;
+    }
+    dlg('Grafiği temizle',
+      '<p><b>'+clean(CH.sym||'')+'</b> grafiğinde şunlar sıfırlansın mı?</p><ul><li>'+parts.join('</li><li>')+'</li></ul>'+
+      '<p class="hint">Çizimlerin silinmesi geri alınamaz ve bulut hesabına yansır. Gösterge seçimleri tüm hisseler için ortaktır; kapatılınca varsayılana döner.</p>',
+      [{label:'Evet, temizle', primary:true, fn:function(){
+          if(n) S.chartDrawings[CH.sym]=[];
+          S.chartInd={ema20:false, ma50:false, ma200:false, bb:false, st:false, ichi:false, kc:false, sar:false, piv:false};
+          S.chartPane='none';
+          save();
+          var b1=$('chInd'), b2=$('chInd2'), pb=$('chPane');
+          if(b1) b1.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+          if(b2) b2.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+          if(pb) pb.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.dataset.pane==='none'); });
+          CH.auto=null; var fb=$('fibAutoBar'); if(fb) fb.style.display='none';
+          applyTF(); redrawOverlay();
+        }},
        {label:'Vazgeç'}]);
   };
 })();
