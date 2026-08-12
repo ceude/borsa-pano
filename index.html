@@ -471,7 +471,7 @@
     </section>
 
     <section class="view card" id="v-all">
-      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><button class="ghost accent" id="allXlsBtn" title="Görünen listeyi Excel’de açılacak CSV olarak indirir">⤓ Excel'e indir</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
+      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><button class="ghost accent" id="allXlsBtn" title="Görünen listeyi biçimlendirilmiş Excel dosyası (.xlsx) olarak indirir">⤓ Excel'e indir</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="allTable"><thead><tr id="allHead"></tr></thead><tbody id="allBody"></tbody></table></div>
     </section>
 
@@ -1750,6 +1750,129 @@ function renderMarketSummary(){
     '<div class="lbl">En zayıf sektörler</div>'+rows(secArr.slice(-3).reverse());
 }
 /* ---------- CSV dışa aktarma ---------- */
+/* ---------- Kütüphanesiz XLSX üretici (ZIP "store" + minimal OOXML) ---------- */
+var CRCT=(function(){ var t=[],c,n,k; for(n=0;n<256;n++){ c=n; for(k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[n]=c>>>0; } return t; })();
+function crc32(u8){ var c=0xFFFFFFFF; for(var i=0;i<u8.length;i++) c=CRCT[(c^u8[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function utf8(str){
+  if(typeof TextEncoder!=='undefined') return new TextEncoder().encode(str);
+  var b=[],i,c; for(i=0;i<str.length;i++){ c=str.charCodeAt(i);
+    if(c<128) b.push(c);
+    else if(c<2048){ b.push(192|c>>6,128|c&63); }
+    else { b.push(224|c>>12,128|(c>>6)&63,128|c&63); } }
+  return new Uint8Array(b);
+}
+function zipBuild(files){                       // files: [{name, data:Uint8Array}]
+  var chunks=[], central=[], offset=0;
+  function u16(v){ return [v&255,(v>>8)&255]; }
+  function u32(v){ return [v&255,(v>>8)&255,(v>>16)&255,(v>>24)&255]; }
+  files.forEach(function(f){
+    var nm=utf8(f.name), crc=crc32(f.data), len=f.data.length;
+    var lh=[].concat([0x50,0x4b,0x03,0x04], u16(20), u16(0), u16(0), u16(0), u16(0),
+                     u32(crc), u32(len), u32(len), u16(nm.length), u16(0));
+    chunks.push(new Uint8Array(lh), nm, f.data);
+    central.push({nm:nm, crc:crc, len:len, off:offset});
+    offset += lh.length + nm.length + len;
+  });
+  var cd=[], cdLen=0;
+  central.forEach(function(c){
+    var h=[].concat([0x50,0x4b,0x01,0x02], u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+                    u32(c.crc), u32(c.len), u32(c.len), u16(c.nm.length),
+                    u16(0), u16(0), u16(0), u16(0), u32(0), u32(c.off));
+    cd.push(new Uint8Array(h), c.nm); cdLen += h.length + c.nm.length;
+  });
+  var eocd=new Uint8Array([].concat([0x50,0x4b,0x05,0x06], u16(0), u16(0),
+    u16(files.length), u16(files.length), u32(cdLen), u32(offset), u16(0)));
+  var all=chunks.concat(cd, [eocd]), total=0, i;
+  for(i=0;i<all.length;i++) total+=all[i].length;
+  var out=new Uint8Array(total), p=0;
+  for(i=0;i<all.length;i++){ out.set(all[i], p); p+=all[i].length; }
+  return out;
+}
+function xmlEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function colName(n){ var s=''; while(n>0){ var m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=(n-m-1)/26; } return s; }
+/* rows: ilk satır başlık (metin), sonrası hücre dizisi.
+   Hücre: {v:sayı, f:biçim} ya da düz metin/sayı/null */
+function buildXlsx(sheetName, rows, colWidths){
+  var sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
+    '<sheetViews><sheetView workbookViewId="0">'+
+      '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>'+
+      '<selection pane="bottomLeft" activeCell="A2" sqref="A2"/>'+
+    '</sheetView></sheetViews>';
+  if(colWidths && colWidths.length){
+    sheet+='<cols>'+colWidths.map(function(w,i){
+      return '<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>';
+    }).join('')+'</cols>';
+  }
+  sheet+='<sheetData>';
+  rows.forEach(function(r,ri){
+    sheet+='<row r="'+(ri+1)+'">';
+    r.forEach(function(cell,ci){
+      var ref=colName(ci+1)+(ri+1);
+      if(cell==null||cell==='') return;
+      if(ri===0){ sheet+='<c r="'+ref+'" s="1" t="inlineStr"><is><t>'+xmlEsc(cell)+'</t></is></c>'; return; }
+      if(typeof cell==='object' && cell.v!=null && !isNaN(cell.v)){
+        sheet+='<c r="'+ref+'" s="'+(cell.f||0)+'"><v>'+Number(cell.v)+'</v></c>';
+      } else if(typeof cell==='number' && !isNaN(cell)){
+        sheet+='<c r="'+ref+'"><v>'+cell+'</v></c>';
+      } else {
+        sheet+='<c r="'+ref+'" t="inlineStr"><is><t>'+xmlEsc(cell)+'</t></is></c>';
+      }
+    });
+    sheet+='</row>';
+  });
+  sheet+='</sheetData>';
+  sheet+='<autoFilter ref="A1:'+colName(rows[0].length)+rows.length+'"/>';
+  sheet+='</worksheet>';
+
+  var styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+    '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
+    '<numFmts count="3">'+
+      '<numFmt numFmtId="164" formatCode="#,##0.00"/>'+
+      '<numFmt numFmtId="165" formatCode="#,##0"/>'+
+      '<numFmt numFmtId="166" formatCode="+0.00%;-0.00%;0.00%"/>'+
+    '</numFmts>'+
+    '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font>'+
+      '<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts>'+
+    '<fills count="3"><fill><patternFill patternType="none"/></fill>'+
+      '<fill><patternFill patternType="gray125"/></fill>'+
+      '<fill><patternFill patternType="solid"><fgColor rgb="FF0BBFA6"/><bgColor indexed="64"/></patternFill></fill></fills>'+
+    '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'+
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'+
+    '<cellXfs count="4">'+
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'+
+      '<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"><alignment vertical="center"/></xf>'+
+      '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>'+
+      '<xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>'+
+    '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+
+  var files=[
+    {name:'[Content_Types].xml', data:utf8('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+      '<Default Extension="xml" ContentType="application/xml"/>'+
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'+
+      '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'+
+      '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+
+      '</Types>')},
+    {name:'_rels/.rels', data:utf8('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'+
+      '</Relationships>')},
+    {name:'xl/workbook.xml', data:utf8('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '+
+      'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'+
+      '<sheets><sheet name="'+xmlEsc(sheetName).slice(0,31)+'" sheetId="1" r:id="rId1"/></sheets></workbook>')},
+    {name:'xl/_rels/workbook.xml.rels', data:utf8('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>'+
+      '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'+
+      '</Relationships>')},
+    {name:'xl/styles.xml', data:utf8(styles)},
+    {name:'xl/worksheets/sheet1.xml', data:utf8(sheet)}
+  ];
+  return zipBuild(files);
+}
 function toCSV(rows){ return rows.map(function(r){ return r.map(function(c){ var v=(c==null?'':String(c)); if(/[";\n]/.test(v)) v='"'+v.replace(/"/g,'""')+'"'; return v; }).join(';'); }).join('\r\n'); }
 function downloadCSV(name,csv){ var b=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}); var u=URL.createObjectURL(b); var a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(u);},600); }
 function logToRows(log){ var rows=[['Tarih','İşlem','Sembol','Adet','Dolum Fiyatı','Ham Fiyat','Ücret','Tutar','K/Z','K/Z %','Bot','Sebep']];
@@ -1979,17 +2102,27 @@ function exportAllCSV(){
     if(s.price>s.ma50) return 'Yukarı';
     return 'Zayıf';
   }
-  function num(v,d){ return v==null||isNaN(v)?'':Number(v).toFixed(d==null?2:d).replace('.',','); }
+  var N=function(v,f){ return (v==null||isNaN(v))?null:{v:Number(v), f:(f==null?2:f)}; };  // f:2 → #,##0.00 · f:3 → #,##0
   var rows=[['Sembol','Şirket','Sektör','Para birimi','Fiyat','Gün %','Hacim','Trend',
              'Göreli Güç %','1A %','RSI','ATR %','F/K','P/D','Özsermaye Kârlılığı %','Borç/Özsermaye','Net Marj %']];
   ALL_VIEW.forEach(function(s){
     rows.push([ clean(s.symbol), s.name||'', sektorTR(s.sector), s.currency||ccyCode(s.market),
-      num(s.price), num(s.changePct), (s.volume==null?'':s.volume), trendTxt(s),
-      num(s._rs,1), num(s.ret1m,1), num(s.rsi14,0), num(s.atrPct,1),
-      num(s.pe), num(s.pb), num(s.roe,1), num(s.debtToEquity), num(s.netMargin,1) ]);
+      N(s.price), N(s.changePct), N(s.volume,3), trendTxt(s),
+      N(s._rs), N(s.ret1m), N(s.rsi14,3), N(s.atrPct),
+      N(s.pe), N(s.pb), N(s.roe), N(s.debtToEquity), N(s.netMargin) ]);
   });
+  var widths=[10,30,20,11,11,10,14,15,13,10,8,9,9,9,20,17,12];
   var d=new Date(), pad=function(x){return (x<10?'0':'')+x;};
-  downloadCSV('borsa-pano-'+MK+'-tum-liste-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.csv', toCSV(rows));
+  var name='borsa-pano-'+MK+'-tum-liste-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.xlsx';
+  try{
+    var buf=buildXlsx(MK+' Tüm Liste', rows, widths);
+    var blob=new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 800);
+  }catch(e){
+    dlg('Dosya oluşturulamadı','<p>Excel dosyası üretilirken bir sorun oluştu: '+xmlEsc(e.message||e)+'</p>',[{label:'Tamam',primary:true}]);
+  }
 }
 $('searchAll').oninput=function(e){qAll=e.target.value; renderAllList();};
 
