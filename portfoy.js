@@ -51,7 +51,10 @@ function injectCSS(){
   '.pfarrow{color:var(--faint); font-weight:700}'+
   '.pftxE,.pftxD{border:none; background:transparent; cursor:pointer; font-size:12.5px; padding:2px 5px; margin-left:2px; opacity:.65; border-radius:6px}'+
   '.pftxE:hover,.pftxD:hover{opacity:1; background:var(--line2)}'+
-  '.log .e .t{white-space:nowrap}';
+  '.log .e .t{white-space:nowrap}'+
+  '.pfchart{position:relative}'+
+  '.pfchart .pfdot{cursor:pointer}'+
+  '.pftip{position:absolute; z-index:20; background:var(--surface); border:1px solid var(--line); font-size:12px; padding:6px 9px; border-radius:8px; pointer-events:none; box-shadow:0 6px 18px rgba(0,0,0,.20); max-width:240px; line-height:1.35}';
   var st=document.createElement('style'); st.id='pfStyle'; st.textContent=css; document.head.appendChild(st);
 }
 
@@ -77,7 +80,7 @@ function hideRealPortfolio(){
   }
   var rv=$('v-real'); if(rv && rv.classList.contains('active') && B && B.goView) B.goView('all');
 }
-function pfShow(){ VIEW={mode:'list',id:null}; pfRender(); B.goView('portfolio'); }
+function pfShow(){ pfUnlocked=false; VIEW={mode:'list',id:null}; B.goView('portfolio'); pfRender(); }
 function wire(){ var o=$('pfOpen'); if(o) o.onclick=pfShow; var t=document.querySelector('.tab[data-v="portfolio"]'); if(t) t.onclick=pfShow; pf(); }
 
 /* --- veri modeli --- */
@@ -150,12 +153,15 @@ function pfStockClose(sym, dateStr){
 }
 
 /* --- varlık hesap motoru --- */
-function aNativeCcy(a){ if(a.type==='stock') return ccyCode(a.market||'BIST'); if(a.type==='gold') return 'TRY'; if(a.type==='fx') return a.holdCcy||'EUR'; return a.ccy||'TRY'; }
+function aNativeCcy(a){ if(a.type==='stock') return a.ccy||ccyCode(a.market||'BIST'); if(a.type==='gold') return 'TRY'; if(a.type==='fx') return a.holdCcy||'EUR'; return a.ccy||'TRY'; }
 function aUnitName(a){ if(a.type==='gold') return 'gram'; if(a.type==='fx') return a.holdCcy||''; return 'adet'; }
 function txPay(a,t){ return t.payCcy || aNativeCcy(a); }
 function aQty(a){ if(a.valMode==='amount') return null; var q=0; (a.tx||[]).forEach(function(t){ q+=(t.side==='sell'?-1:1)*t.qty; }); return q; }
 function aUnitTRYnow(a){
-  if(a.type==='stock'){ var s=a.symbol?find(a.symbol):null; return (s&&s.price!=null)?toTRY(s.price,ccyCode(a.market||'BIST')):null; }
+  if(a.type==='stock'){ var s=a.symbol?find(a.symbol):null, nc=aNativeCcy(a);
+    if(s&&s.price!=null) return toTRY(s.price, nc);
+    if(a.curUnit!=null) return toTRY(a.curUnit, nc);
+    return null; }
   if(a.type==='gold'){ return goldGramTRY(); }
   if(a.type==='fx'){ return toTRY(1, a.holdCcy||'EUR'); }
   return a.curUnit!=null?toTRY(a.curUnit, a.ccy||'TRY'):null;
@@ -169,14 +175,20 @@ function aValueIn(a,dc){ var v=aValueTRY(a); return v==null?null:frTRY(v,dc); }
 function aValueNative(a){ var v=aValueTRY(a); return v==null?null:frTRY(v,aNativeCcy(a)); }
 function aCurUnitDisp(a){
   if(a.valMode==='amount') return null;
-  if(a.type==='stock'){ var s=a.symbol?find(a.symbol):null; return (s&&s.price!=null)?pfConv(s.price,ccyCode(a.market||'BIST'),pcy()):null; }
+  if(a.type==='stock'){ var s=a.symbol?find(a.symbol):null, nc=aNativeCcy(a);
+    if(s&&s.price!=null) return pfConv(s.price, nc, pcy());
+    if(a.curUnit!=null) return pfConv(a.curUnit, nc, pcy());
+    return null; }
   if(a.type==='gold'){ var g=goldGramTRY(); return g==null?null:frTRY(g,pcy()); }
   if(a.type==='fx'){ return pfConv(1, a.holdCcy||'EUR', pcy()); }
   return a.curUnit!=null?pfConv(a.curUnit, a.ccy||'TRY', pcy()):null;
 }
 function aCurUnitIn(a,dc){
   if(a.valMode==='amount') return null;
-  if(a.type==='stock'){ var s=a.symbol?find(a.symbol):null; return (s&&s.price!=null)?pfConv(s.price,ccyCode(a.market||'BIST'),dc):null; }
+  if(a.type==='stock'){ var s=a.symbol?find(a.symbol):null, nc=aNativeCcy(a);
+    if(s&&s.price!=null) return pfConv(s.price, nc, dc);
+    if(a.curUnit!=null) return pfConv(a.curUnit, nc, dc);
+    return null; }
   if(a.type==='gold'){ var g=goldGramTRY(); return g==null?null:frTRY(g,dc); }
   if(a.type==='fx'){ return pfConv(1, a.holdCcy||'EUR', dc); }
   return a.curUnit!=null?pfConv(a.curUnit, a.ccy||'TRY', dc):null;
@@ -225,13 +237,45 @@ function pfConvHist(v, hc, d, date){
   return {v:out, warn:warn};
 }
 function pfHasField(field){ return (pf().hist.points||[]).some(function(p){ return p[field]!=null && !isNaN(p[field]); }); }
-function pfSeries(field){ field=field||'value'; var d=pcy(), map={}, H=pf().hist, warn=false, hc=H.ccy||'TRY';
-  (H.points||[]).forEach(function(p){ var raw=p[field]; if(raw==null||isNaN(raw)) return;
+function pfSeries(field){ field=field||'value'; var d=pcy(), map={}, notes={}, H=pf().hist, warn=false, hc=H.ccy||'TRY';
+  (H.points||[]).forEach(function(p){ if(p.note) notes[p.date]=p.note; var raw=p[field]; if(raw==null||isNaN(raw)) return;
     var c=pfConvHist(raw, hc, d, p.date); if(c.warn) warn=true;
     if(c.v!=null&&!isNaN(c.v)) map[p.date]={y:c.v}; });
-  if(field==='value'){ (pf().snaps||[]).forEach(function(s){ if(s[d]!=null) map[s.date]={y:s[d]}; }); }
-  var pts=Object.keys(map).sort().map(function(k){ return {y:map[k].y, label:k.slice(5)}; });
+  if(field==='value'){ (pf().snaps||[]).forEach(function(s){ if(s[d]!=null && map[s.date]==null) map[s.date]={y:s[d]}; }); }
+  var pts=Object.keys(map).sort().map(function(k){ return {y:map[k].y, label:k.slice(5), date:k, note:notes[k]||''}; });
   return {pts:pts, warn:warn}; }
+
+/* Notlu günleri kırmızı nokta + hover ipucu ile çizen kendi SVG grafiğimiz */
+function pfLineChart(pts, color, sym){
+  if(!pts || !pts.length) return '';
+  var W=680, H=210, PL=54, PR=14, PT=14, PB=26, n=pts.length;
+  var ys=pts.map(function(p){return p.y;}), mn=Math.min.apply(null,ys), mx=Math.max.apply(null,ys);
+  if(mn===mx){ var pad=Math.abs(mn)*0.05||1; mn-=pad; mx+=pad; }
+  function X(i){ return PL + (n===1?(W-PL-PR)/2:(i/(n-1))*(W-PL-PR)); }
+  function Y(v){ return PT + (1-(v-mn)/(mx-mn))*(H-PT-PB); }
+  var line=pts.map(function(p,i){ return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.y).toFixed(1); }).join(' ');
+  var grid='';
+  [mn,(mn+mx)/2,mx].forEach(function(v){ var y=Y(v).toFixed(1);
+    grid+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>'+
+      '<text x="'+(PL-6)+'" y="'+(Y(v)+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--faint)">'+(sym||'')+fmt(v,0)+'</text>'; });
+  var xlab='';
+  [0, n>2?Math.floor((n-1)/2):null, n>1?n-1:null].forEach(function(i){ if(i==null) return;
+    xlab+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="var(--faint)">'+pts[i].label+'</text>'; });
+  function isNote(p){ var t=(p.note||'').trim().toUpperCase(); return !!t && t!=='YOK'; }
+  var dots=pts.map(function(p,i){ if(!isNote(p)) return '';
+    var tip=(p.date+' · '+(sym||'')+fmt(p.y)+(p.note?(' · '+p.note):'')).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    return '<circle class="pfdot" cx="'+X(i).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="4.5" fill="#ef4444" stroke="var(--surface)" stroke-width="1.5" data-tip="'+tip+'"></circle>'; }).join('');
+  return '<div class="pfchart"><svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet">'+
+    grid+'<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+xlab+
+    '</svg><div class="pftip" style="display:none"></div></div>';
+}
+function pfWireChart(box){ var wrap=box.querySelector('.pfchart'); if(!wrap) return; var tip=wrap.querySelector('.pftip');
+  wrap.querySelectorAll('.pfdot').forEach(function(c){
+    c.addEventListener('mouseenter', function(){ tip.textContent=c.getAttribute('data-tip'); tip.style.display='block'; });
+    c.addEventListener('mousemove', function(ev){ var r=wrap.getBoundingClientRect(); tip.style.left=(ev.clientX-r.left+12)+'px'; tip.style.top=(ev.clientY-r.top+12)+'px'; });
+    c.addEventListener('mouseleave', function(){ tip.style.display='none'; });
+  });
+}
 
 function pfResolve(sym){ sym=(sym||'').trim().toUpperCase(); if(!sym) return null;
   if(find(sym)) return sym; if(find(sym+'.IS')) return sym+'.IS'; if(find(sym+'.DE')) return sym+'.DE'; return null; }
@@ -245,9 +289,39 @@ function pfFxAsset(hc, name){ var A=pf().assets, n=(name||'').trim().toLowerCase
 
 /* =============== RENDER =============== */
 function pfRender(){ var box=$('pfBody'); if(!box) return;
+  if(!pfUnlocked){ pfRenderLock(box); return; }
   if(!ratesReady() && !ratesTried) pfLoadRates(function(ok){ if(ok) pfRender(); });
   if(VIEW.mode==='asset' && pf().assets[VIEW.id]){ if(!VIEW.ccy) VIEW.ccy=pcy(); pfRenderAsset(box, pf().assets[VIEW.id]); }
   else { VIEW={mode:'list',id:null}; pfRenderList(box); } }
+
+/* Hassas veri: her açılışta hesap şifresi sorulur (otomatik giriş yok) */
+function pfRenderLock(box){
+  box.innerHTML='<div class="card" style="max-width:380px; margin:44px auto; text-align:center">'+
+    '<div style="font-size:34px">🔒</div>'+
+    '<h2 style="margin:8px 0 4px; font-size:20px">Yatırımlarım kilitli</h2>'+
+    '<div class="sub" style="margin-bottom:14px">Hassas veri. Devam etmek için hesap şifreni gir.</div>'+
+    '<input class="fld" id="pfPw" type="password" placeholder="şifre" autocomplete="current-password" style="width:100%; text-align:center">'+
+    '<div class="hint down" id="pfPwMsg" style="min-height:16px; margin:8px 0"></div>'+
+    '<button class="go buy" id="pfPwBtn" style="width:100%; padding:11px">Kilidi aç</button></div>';
+  var inp=$('pfPw'), btn=$('pfPwBtn'), msg=$('pfPwMsg');
+  function submit(){ var pw=inp.value||''; if(!pw){ msg.textContent='Şifre gir.'; return; }
+    btn.disabled=true; btn.textContent='kontrol ediliyor…'; msg.textContent='';
+    pfVerifyPw(pw, function(ok){
+      if(ok===true){ pfUnlocked=true; pfRender(); }
+      else if(ok===false){ btn.disabled=false; btn.textContent='Kilidi aç'; msg.textContent='Şifre yanlış.'; inp.value=''; inp.focus(); }
+      else { btn.disabled=false; btn.textContent='Kilidi aç'; msg.textContent='Şifre doğrulama bağlı değil (B.verifyPassword eksik).'; }
+    });
+  }
+  btn.onclick=submit; inp.onkeydown=function(e){ if(e.key==='Enter') submit(); }; setTimeout(function(){ if($('pfPw')) $('pfPw').focus(); },50);
+}
+function pfVerifyPw(pw, cb){
+  if(B && typeof B.verifyPassword==='function'){
+    try{ Promise.resolve(B.verifyPassword(pw)).then(function(ok){ cb(!!ok); }).catch(function(){ cb(false); }); }
+    catch(e){ cb(false); }
+    return;
+  }
+  cb(null);
+}
 
 function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var curBtns=['TRY','USD','EUR'].map(function(c){ return '<button data-pc="'+c+'" class="'+(c===cur?'on':'')+'">'+psymCcy(c)+' '+c+'</button>'; }).join('');
@@ -289,7 +363,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var selDef=avail.filter(function(sd){return sd.k===pfSeriesSel;})[0]||avail[0];
   var ser=pfSeries(selDef.k);
   var selBtns=avail.length>1?('<div class="pfcur" id="pfSeriesSel" style="margin:0 0 10px; display:inline-flex">'+avail.map(function(sd){return '<button data-sk="'+sd.k+'" class="'+(sd.k===selDef.k?'on':'')+'">'+sd.t+'</button>';}).join('')+'</div>'):'';
-  var chart=ser.pts.length?(B.lineChart(ser.pts,selDef.c,psym())+(ser.warn?'<div class="hint down" style="margin-top:6px">⚠ Bazı geçmiş noktalar tarihsel kur olmadığı için güncel kurla çevrildi.</div>':'')):'<div class="empty">Grafik için "Günü kaydet" ya da geçmiş yükle.</div>';
+  var chart=ser.pts.length?(pfLineChart(ser.pts,selDef.c,psym())+(ser.warn?'<div class="hint down" style="margin-top:6px">⚠ Bazı geçmiş noktalar tarihsel kur olmadığı için güncel kurla çevrildi.</div>':'')):'<div class="empty">Grafik için "Günü kaydet" ya da geçmiş yükle.</div>';
   var notesArr=(P.hist.points||[]).filter(function(p){return p.note;}).sort(function(a,b){return a.date<b.date?1:-1;});
   var notesHtml=notesArr.length?('<details style="margin-top:10px"><summary style="cursor:pointer; font-weight:700; color:var(--dim); font-size:13px; padding:4px 0">Günlük notlar ('+notesArr.length+')</summary><div class="log" style="margin-top:6px">'+notesArr.map(function(p){return '<div class="e"><span>'+clean(p.note)+'</span><span class="t">'+p.date+'</span></div>';}).join('')+'</div></details>'):'';
   var syms=STOCKS().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);}).map(function(s){ return '<option value="'+clean(s.symbol)+'">'+(s.name||'')+'</option>'; }).join('');
@@ -303,16 +377,18 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     '<div class="disclaimer">Bu ekran senin girdiğin verilere dayanır ve bulut hesabınla eşitlenir. Hisse fiyatı ~15 dk gecikmeli panodan, gram altın TL fiyatı data.js\'ten; mevduat/fon değerlerini kendin güncellersin. $/€ maliyet, her alımın kendi günkü kurundan hesaplanır. Yatırım tavsiyesi değildir.</div>';
   box.querySelectorAll('#pfCur button').forEach(function(b){ b.onclick=function(){ pf().disp=b.dataset.pc; save(); pfRender(); }; });
   var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
+  pfWireChart(box);
   box.querySelectorAll('tr[data-open]').forEach(function(tr){ tr.onclick=function(){ VIEW={mode:'asset',id:tr.dataset.open}; pfRender(); }; });
   $('pfTypeBar').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfAddType=b.dataset.t; $('pfTypeBar').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===pfAddType); }); pfPaintQuick(syms); }; });
   pfPaintQuick(syms);
 }
 var pfAddType='stock';
 var pfSeriesSel='value';
+var pfUnlocked=false;   /* her sayfa yüklemesinde (oturumda) false başlar; her açılışta şifre sorulur */
 function pfPaintQuick(syms){ var bar=$('pfQuickBar'); if(!bar) return;
   var tools='<button class="ghost" id="pfSaveDayBtn">Günü kaydet</button><button class="ghost" id="pfUploadBtn">⤒ Geçmiş yükle</button><button class="ghost" id="pfCsvBtn">⤓ Dışa aktar</button>';
   if(pfAddType==='stock'){
-    bar.innerHTML='<input class="search fld" id="pfQSym" list="pfQList" placeholder="hisse ara (örn. ENKAI) → AL"><datalist id="pfQList">'+(syms||'')+'</datalist><button class="go buy" id="pfQBuy" style="padding:10px 18px">AL</button><span style="flex:1"></span>'+tools;
+    bar.innerHTML='<input class="search fld" id="pfQSym" list="pfQList" placeholder="hisse ara veya kendi sembolünü yaz → AL"><datalist id="pfQList">'+(syms||'')+'</datalist><button class="go buy" id="pfQBuy" style="padding:10px 18px">AL</button><span style="flex:1"></span>'+tools;
     $('pfQBuy').onclick=pfQuickBuy; $('pfQSym').onkeydown=function(e){ if(e.key==='Enter') pfQuickBuy(); };
   } else if(pfAddType==='gold'){
     bar.innerHTML='<div class="hint" style="flex:1; min-width:160px"><b>Gram Altın</b> — kaç gram, ne ile ödedin?</div><button class="go buy" id="pfGoldBtn" style="padding:10px 18px">＋ Altın al</button><span style="flex:1"></span>'+tools;
@@ -327,15 +403,45 @@ function pfPaintQuick(syms){ var bar=$('pfQuickBar'); if(!bar) return;
   }
   $('pfSaveDayBtn').onclick=pfSaveDay; $('pfUploadBtn').onclick=pfUpload; $('pfCsvBtn').onclick=pfExport;
 }
-function pfQuickBuy(){ var raw=$('pfQSym').value, sym=pfResolve(raw); if(!sym){ dlg('Bulunamadı','<p><b>'+(raw||'')+'</b> panodaki hisseler arasında yok.</p>',[{label:'Tamam',primary:true}]); return; }
+function pfQuickBuy(){ var raw=$('pfQSym').value, sym=pfResolve(raw);
+  if(!sym){ var up=(raw||'').trim().toUpperCase(); if(!up){ dlg('Sembol gir','<p>Önce bir sembol yaz.</p>',[{label:'Tamam',primary:true}]); return; }
+    var ex=pfAssetForSymbol(up); if(ex){ pfTxDialog(ex,null,'buy'); return; }
+    pfManualStock(up); return; }
   var a=pfAssetForSymbol(sym); if(a){ pfTxDialog(a,null,'buy'); } else pfTxDialog(null, sym); }
+
+/* Panoda olmayan (canlı fiyatı gelmeyen) hisseyi manuel ekle/düzenle */
+function pfManualStock(sym, asset){
+  var isNew=!asset, mkOpts=['BIST','NASDAQ','DAX','OTHER'], curMk=asset?(asset.market||'BIST'):'BIST', curCcy=asset?aNativeCcy(asset):'TRY';
+  dlg(isNew?('Manuel hisse ekle — '+clean(sym)):((asset.name||clean(asset.symbol||''))+' — manuel hisse'),
+    (isNew?'<div class="hint" style="margin-bottom:8px">Bu sembol panoda yok; canlı fiyat gelmez. Adet/fiyatları sen girersin, güncel fiyatı elle güncellersin. İleride pano listesine girerse otomatik canlı fiyata geçer.</div>':'')+
+    (isNew?('<div class="tpfield"><label>Sembol</label><input class="fld" id="msSym" style="width:100%" value="'+clean(sym)+'"></div>'):'')+
+    '<div class="tpfield"><label>Ad (ops.)</label><input class="fld" id="msName" style="width:100%" value="'+(asset?(asset.name||'').replace(/"/g,'&quot;'):'')+'"></div>'+
+    '<div class="tpfield"><label>Pazar / borsa</label><select class="fld" id="msMkt" style="width:100%">'+mkOpts.map(function(m){return '<option'+(m===curMk?' selected':'')+'>'+m+'</option>';}).join('')+'</select></div>'+
+    '<div class="tpfield"><label>Para birimi</label><select class="fld" id="msCcy" style="width:100%">'+['TRY','USD','EUR'].map(function(c){return '<option'+(c===curCcy?' selected':'')+'>'+c+'</option>';}).join('')+'</select></div>'+
+    '<div class="tpfield"><label>Güncel fiyat (elle)</label><input class="fld" id="msCur" type="number" step="any" style="width:100%" value="'+(asset&&asset.curUnit!=null?asset.curUnit:'')+'"></div>'+
+    (isNew?('<div class="tpfield"><label>Alış adedi</label><input class="fld" id="msQty" type="number" step="any" style="width:100%"></div>'+
+      '<div class="tpfield"><label>Alış fiyatı</label><input class="fld" id="msPx" type="number" step="any" style="width:100%"></div>'+
+      '<div class="tpfield"><label>Tarih</label><input class="fld" id="msDate" type="date" value="'+new Date().toISOString().slice(0,10)+'" style="width:100%"></div>'):'')+
+    '<div class="tpfield"><label>Not (ops.)</label><input class="fld" id="msNote" style="width:100%" value="'+(asset?(asset.note||'').replace(/"/g,'&quot;'):'')+'"></div>',
+    [{label:isNew?'AL':'Kaydet',primary:true,fn:function(){
+      var mk=$('msMkt').value, ccy=$('msCcy').value, cur=parseFloat($('msCur').value), note=$('msNote').value||'', name=($('msName').value||'').trim();
+      if(asset){ asset.market=mk; asset.ccy=ccy; asset.curUnit=isNaN(cur)?null:cur; asset.manual=true; if(name)asset.name=name; asset.note=note; save(); pfRender(); return; }
+      var s2=($('msSym').value||sym||'').trim().toUpperCase(); if(!s2) return false;
+      var qq=parseFloat($('msQty').value), px=parseFloat($('msPx').value);
+      if(isNaN(qq)||qq<=0||isNaN(px)) return false;
+      var target=pfAssetForSymbol(s2)||{id:genId(), type:'stock', symbol:s2, market:mk, ccy:ccy, name:name||s2, valMode:'qty', tx:[], manual:true};
+      target.market=mk; target.ccy=ccy; if(name)target.name=name; target.manual=true; if(!isNaN(cur)) target.curUnit=cur; if(note)target.note=note;
+      var d=$('msDate').value, tt=d?new Date(d+'T12:00:00').getTime():Date.now();
+      target.tx=target.tx||[]; target.tx.push({t:tt, side:'buy', qty:qq, px:px, note:note});
+      pf().assets[target.id]=target; save(); VIEW={mode:'asset', id:target.id}; pfRender();
+    }},{label:'Vazgeç'}]); }
 
 /* =============== VARLIK sayfası =============== */
 function pfRenderAsset(box, a){
   var dc=VIEW.ccy||pcy(), dsym=psymCcy(dc);
   function d$(v){ return v==null?'—':dsym+fmt(v); }
   var q=aQty(a), rem=aRemCost(a,dc), ac=(rem.qty!=null&&rem.qty>0)?rem.cost/rem.qty:null, u=aCurUnitIn(a,dc), v=aValueIn(a,dc), c=rem.cost, pnl=(v!=null&&c!=null)?v-c:null, pct=(c>0&&pnl!=null)?pnl/c*100:null, nc=aNativeCcy(a);
-  var real=aRealizedIn(a,dc), isStock=(a.type==='stock'), unit=aUnitName(a);
+  var real=aRealizedIn(a,dc), isStock=(a.type==='stock'), inPanel=(a.type==='stock' && !!find(a.symbol)), unit=aUnitName(a);
   var ccyBtns='<div class="pfcur" id="pfAssetCur" style="margin-top:8px">'+['TRY','USD','EUR'].map(function(cc){ return '<button data-ac="'+cc+'" class="'+(cc===dc?'on':'')+'">'+psymCcy(cc)+' '+cc+'</button>'; }).join('')+'</div>';
   var head='<button class="back" id="pfBack">← Yatırımlarım</button>'+
     '<div class="dhead"><div><h2 style="margin:0; font-size:24px">'+(a.name||clean(a.symbol||'—'))+(a.symbol?' <span class="nm" style="font-size:15px">'+clean(a.symbol)+'</span>':'')+' <span class="pfbadge">'+pfTypeLabel(a.type)+'</span></h2>'+
@@ -352,7 +458,7 @@ function pfRenderAsset(box, a){
     '</div>';
   var actions='<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px">'+
     (a.valMode==='qty'?'<button class="go buy" id="pfBuy" style="padding:10px 18px">AL</button><button class="go sell" id="pfSell" style="padding:10px 18px">SAT</button>':'')+
-    (isStock?'<button class="ghost accent" id="pfChartFull">📈 Grafik & RSI (detay)</button>':'')+
+    (inPanel?'<button class="ghost accent" id="pfChartFull">📈 Grafik & RSI (detay)</button>':'')+
     '<button class="ghost" id="pfEdit">Düzenle</button><button class="ghost" id="pfDel">Sil</button></div>';
   var tx=(a.tx||[]).slice().sort(function(x,y){return y.t-x.t;});
   var txHtml=tx.length?tx.map(function(x){ var oi=(a.tx||[]).indexOf(x); var sc=x.side==='buy'?'up':'down', st=x.side==='buy'?'AL':'SAT', pay=txPay(a,x), tot=x.qty*x.px, tsec=Math.floor(x.t/1000);
@@ -360,7 +466,7 @@ function pfRenderAsset(box, a){
     var alt=(usd!=null&&eur!=null)?(' <span class="cov">(≈ $'+fmt(usd)+' · €'+fmt(eur)+')</span>'):'';
     return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+fmt(x.qty,x.qty%1?4:0)+' '+unit+' × '+psymCcy(pay)+fmt(x.px)+' = '+psymCcy(pay)+fmt(tot)+alt+(x.note?(' · '+x.note):'')+'</span><span class="t">'+new Date(x.t).toLocaleDateString('tr-TR')+' <button class="pftxE" data-txi="'+oi+'" title="Düzenle">✎</button><button class="pftxD" data-txi="'+oi+'" title="Sil">🗑</button></span></div>'; }).join(''):'<div class="empty">işlem yok</div>';
   box.innerHTML=head+metrics+actions+
-    (isStock?'<h3 style="font-size:16px; margin:0 0 8px">Fiyat geçmişi</h3><div id="pfAssetChart"></div>':'')+
+    (inPanel?'<h3 style="font-size:16px; margin:0 0 8px">Fiyat geçmişi</h3><div id="pfAssetChart"></div>':'')+
     '<h3 style="font-size:16px; margin:20px 0 8px">Bu varlıktaki işlemlerim <span class="nm" style="font-size:12px; font-weight:400">(✎ düzenle · 🗑 sil)</span></h3><div class="log scroll" style="max-height:300px">'+txHtml+'</div>'+
     '<div class="disclaimer">Değerler <b>'+dc+'</b> cinsinden. Ort. maliyet, her alımın <b>kendi günkü kuruyla</b> '+dc+' karşılığının ağırlıklı ortalamasıdır — yani '+dc+' getirisi gerçek kur farkını içerir. Üstteki TL/USD/EUR düğmeleriyle getirini karşılaştır. Yatırım tavsiyesi değildir.</div>';
   $('pfBack').onclick=function(){ VIEW={mode:'list',id:null}; pfRender(); };
@@ -372,10 +478,12 @@ function pfRenderAsset(box, a){
   $('pfDel').onclick=function(){ pfDel(a.id); };
   box.querySelectorAll('.pftxE').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation(); pfEditTx(a, parseInt(b.dataset.txi,10)); }; });
   box.querySelectorAll('.pftxD').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation(); pfDelTx(a, parseInt(b.dataset.txi,10)); }; });
-  if(isStock) pfAssetChart(a, $('pfAssetChart'));
+  if(inPanel) pfAssetChart(a, $('pfAssetChart'));
 }
 function pfAssetBuy(a, side){ if(a.type==='gold') pfBuyGold(a, side); else if(a.type==='fx') pfBuyFx(a, side); else pfTxDialog(a, null, side); }
-function pfEditAsset(a){ if(a.type==='stock'||a.type==='gold'||a.type==='fx'){
+function pfEditAsset(a){
+  if(a.type==='stock' && (a.manual || a.curUnit!=null || !find(a.symbol))){ pfManualStock(a.symbol, a); return; }
+  if(a.type==='stock'||a.type==='gold'||a.type==='fx'){
     dlg('Notu düzenle','<div class="tpfield"><label>Not</label><input class="fld" id="pfEdNote" style="width:100%" value="'+(a.note||'').replace(/"/g,'&quot;')+'"></div><div class="hint">Bu varlık AL/SAT ile yönetilir; buradan notu değiştirebilir, işlemleri ise listedeki ✎ ile düzeltebilirsin.</div>',[{label:'Kaydet',primary:true,fn:function(){ a.note=$('pfEdNote').value||''; save(); pfRender(); }},{label:'Vazgeç'}]);
   } else pfAddOther(a.id); }
 function pfAssetChart(a, mount){ if(!mount) return;
