@@ -77,6 +77,30 @@ function toTRY(v,c){ var R=RATES(); if(v==null)return null; if(c==='TRY')return 
 function frTRY(v,c){ var R=RATES(); if(v==null)return null; if(c==='TRY')return v; if(c==='EUR')return R.EURTRY?v/R.EURTRY:null; if(c==='USD')return R.USDTRY?v/R.USDTRY:null; return v; }
 function pfConv(v,from,to){ return frTRY(toTRY(v,from),to); }
 
+/* --- tarihsel kur (rates.js: window.RATE_HISTORY = [[epochSec,usdtry,eurtry],...] artan sırada) --- */
+var RATEHIST=null, ratesTried=false, ratesLoading=false;
+function ratesReady(){ return !!(RATEHIST && RATEHIST.length); }
+function pfLoadRates(cb){ if(ratesReady()){ if(cb)cb(true); return; }
+  if(window.RATE_HISTORY){ RATEHIST=window.RATE_HISTORY; if(cb)cb(true); return; }
+  if(ratesTried){ if(cb)cb(false); return; }
+  if(ratesLoading){ setTimeout(function(){pfLoadRates(cb);},250); return; }
+  ratesLoading=true;
+  var s=document.createElement('script');
+  s.src='rates.js'+((location.protocol.indexOf('http')===0)?('?t='+Math.floor(Date.now()/3600000)):'');
+  s.onload=function(){ RATEHIST=window.RATE_HISTORY||null; ratesLoading=false; ratesTried=true; if(cb)cb(ratesReady()); if(s.parentNode)s.parentNode.removeChild(s); };
+  s.onerror=function(){ ratesLoading=false; ratesTried=true; if(cb)cb(false); if(s.parentNode)s.parentNode.removeChild(s); };
+  document.head.appendChild(s);
+}
+function pfRateAt(tsec){ if(!ratesReady()) return null; var R=RATEHIST, lo=0, hi=R.length-1, best=R[0];
+  if(tsec<=R[0][0]) best=R[0]; else if(tsec>=R[hi][0]) best=R[hi];
+  else { while(lo<=hi){ var m=(lo+hi)>>1; if(R[m][0]<=tsec){ best=R[m]; lo=m+1; } else hi=m-1; } }
+  return {usdtry:best[1], eurtry:best[2]}; }
+function pfRateAtDate(dateStr){ var t=Date.parse(dateStr+'T12:00:00Z'); if(isNaN(t)) return null; return pfRateAt(Math.floor(t/1000)); }
+function convAtRate(v,from,to,r){ if(v==null||!r) return null;
+  var tryv = from==='TRY'?v : from==='USD'?v*r.usdtry : v*r.eurtry;
+  return to==='TRY'?tryv : to==='USD'?tryv/r.usdtry : tryv/r.eurtry; }
+function toDispAtDate(v,from,to,tsec){ if(from===to) return v; var r=pfRateAt(tsec); if(!r) return null; return convAtRate(v,from,to,r); }
+
 function aNativeCcy(a){ return a.type==='stock'? ccyCode(a.market||'BIST') : (a.ccy||'TRY'); }
 function aQty(a){ if(a.valMode==='amount') return null; var q=0; (a.tx||[]).forEach(function(t){ q+=(t.side==='sell'?-1:1)*t.qty; }); return q; }
 function aAvgCost(a){ if(a.valMode==='amount') return null; var q=0,cost=0;
@@ -88,7 +112,14 @@ function aCurUnit(a){ if(a.type==='stock'&&a.symbol){ var s=find(a.symbol); retu
 function aValueNative(a){ if(a.valMode==='amount') return a.curValue!=null?a.curValue:null; var q=aQty(a),u=aCurUnit(a); return (q!=null&&u!=null)?q*u:null; }
 function aCostNative(a){ if(a.valMode==='amount') return a.cost!=null?a.cost:null; var q=aQty(a),ac=aAvgCost(a); return (q!=null&&ac!=null)?q*ac:null; }
 function aValueDisp(a){ var v=aValueNative(a); return v==null?null:pfConv(v,aNativeCcy(a),pcy()); }
-function aCostDisp(a){ var c=aCostNative(a); return c==null?null:pfConv(c,aNativeCcy(a),pcy()); }
+function aInvestedDisp(a){ var disp=pcy(), nc=aNativeCcy(a);
+  if(a.valMode==='amount'){ var c=aCostNative(a); return c==null?null:pfConv(c,nc,disp); }
+  var sum=0, any=false;
+  (a.tx||[]).forEach(function(t){ var native=t.px*t.qty; var d=toDispAtDate(native,nc,disp,Math.floor(t.t/1000)); if(d==null) d=pfConv(native,nc,disp); if(d!=null){ sum+=(t.side==='sell'?-1:1)*d; any=true; } });
+  return any?sum:null; }
+function aCostDisp(a){ var disp=pcy(), nc=aNativeCcy(a);
+  if(disp===nc || !ratesReady()){ var c=aCostNative(a); return c==null?null:pfConv(c,nc,disp); }
+  return aInvestedDisp(a); }
 function aRealizedNative(a){ if(a.valMode==='amount') return 0; var q=0,cost=0,real=0;
   (a.tx||[]).slice().sort(function(x,y){return x.t-y.t;}).forEach(function(t){
     if(t.side==='sell'){ if(q>0){ var s=Math.min(t.qty,q),avg=cost/q; real+=(t.px-avg)*s; cost-=avg*s; q-=s; } }
@@ -105,9 +136,9 @@ function pfSnapVals(){ var o={TRY:0,USD:0,EUR:0},has=false;
 function pfSaveDay(){ var v=pfSnapVals(); if(!v){ dlg('Kayıt yok','<p>Önce en az bir varlık ekle.</p>',[{label:'Tamam',primary:true}]); return; }
   var d=new Date().toISOString().slice(0,10); pf().snaps=pf().snaps.filter(function(s){return s.date!==d;});
   pf().snaps.push({date:d,TRY:v.TRY,USD:v.USD,EUR:v.EUR}); save(); pfRender(); }
-function pfHistRate(date){ var R=pf().hist.rates||[]; if(!R.length) return null; var best=null;
-  R.forEach(function(r){ if(r.date<=date){ if(!best||r.date>best.date) best=r; } }); if(!best) best=R[0];
-  return best?{usdtry:best.usdtry, eurtry:best.eurtry}:null; }
+function pfHistRate(date){ var R=pf().hist.rates||[];
+  if(R.length){ var best=null; R.forEach(function(r){ if(r.date<=date){ if(!best||r.date>best.date) best=r; } }); if(!best) best=R[0]; return {usdtry:best.usdtry, eurtry:best.eurtry}; }
+  return pfRateAtDate(date); }
 function pfSeries(){ var d=pcy(), map={}, H=pf().hist, warn=false, hc=H.ccy||'TRY';
   (H.points||[]).forEach(function(p){ var val;
     if(d===hc) val=p.value;
@@ -128,6 +159,7 @@ function pfAssetForName(name,type){ var A=pf().assets, n=(name||'').trim().toLow
 
 /* =============== RENDER dispatcher =============== */
 function pfRender(){ var box=$('pfBody'); if(!box) return;
+  if(pcy()!=='TRY' && !ratesReady() && !ratesTried) pfLoadRates(function(ok){ if(ok) pfRender(); });
   if(VIEW.mode==='asset' && pf().assets[VIEW.id]) pfRenderAsset(box, pf().assets[VIEW.id]);
   else { VIEW={mode:'list',id:null}; pfRenderList(box); } }
 
