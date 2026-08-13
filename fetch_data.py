@@ -26,8 +26,59 @@ import yfinance as yf
 import pandas as pd
 
 # =====================================================================
-#  SEMBOL LİSTELERİ — KENDİ LİSTELERİNLE DEĞİŞTİR
-#  (mevcut fetch_data.py'ndaki listeleri aynen buraya yapıştır)
+#  BIST100 — canlı çek (İş Yatırım), olmazsa geniş yedek listeye düş.
+#  Üyelik 3 ayda bir değişir; geçersiz semboller aşağıda otomatik atlanır.
+# =====================================================================
+BIST100_FALLBACK = [
+    "AEFES","AGHOL","AKBNK","AKCNS","AKFGY","AKFYE","AKSA","AKSEN","ALARK","ALBRK",
+    "ALFAS","ANSGR","ARCLK","ASELS","ASTOR","AYDEM","AYGAZ","BERA","BIMAS","BINHO",
+    "BRSAN","BRYAT","BUCIM","CANTE","CCOLA","CIMSA","CLEBI","CWENE","DOAS","DOHOL",
+    "ECILC","ECZYT","EGEEN","EKGYO","ENERY","ENJSA","ENKAI","EREGL","EUPWR","FROTO",
+    "GARAN","GESAN","GLYHO","GUBRF","GWIND","HALKB","HEKTS","IPEKE","ISCTR","ISDMR",
+    "ISGYO","ISMEN","IZENR","KARSN","KCAER","KCHOL","KLSER","KMPUR","KONTR","KONYA",
+    "KOZAA","KOZAL","KRDMD","KTLEV","MAVI","MGROS","MIATK","MPARK","ODAS","OTKAR",
+    "OYAKC","PETKM","PGSUS","QUAGR","REEDR","SAHOL","SASA","SDTTR","SISE","SKBNK",
+    "SMRTG","SOKM","TABGD","TAVHL","TCELL","THYAO","TKFEN","TMSN","TOASO","TSKB",
+    "TTKOM","TTRAK","TUKAS","TUPRS","TURSG","ULKER","VAKBN","VESTL","YEOTK","YKBNK",
+    "YYLGD","ZOREN","ZRGYO",
+]
+
+def get_bist100():
+    """XU100 bileşenlerini İş Yatırım'dan çek; olmazsa yedek listeyi kullan.
+    Dönüş: yfinance sembolleri (.IS ekli)."""
+    codes = None
+    try:
+        import urllib.request
+        url = ("https://www.isyatirim.com.tr/_layouts/15/IsYatirim.Website/Common/"
+               "Data.aspx/IndexComponent?endeks=XU100")
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0",
+            "Referer": "https://www.isyatirim.com.tr/",
+            "Accept": "application/json, text/plain, */*",
+        })
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            js = json.loads(resp.read().decode("utf-8", "ignore"))
+        rows = js.get("value") or js.get("d") or []
+        got = []
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            c = (r.get("HISSE_KODU") or r.get("Kod") or r.get("code") or "").strip().upper()
+            if c and c.isalnum():
+                got.append(c)
+        got = sorted(set(got))
+        if len(got) >= 80:                       # makul sayıda geldiyse kabul et
+            codes = got
+            print(f"BIST100 canlı çekildi: {len(codes)} sembol")
+    except Exception as e:
+        print("BIST100 canlı çekilemedi, yedek liste kullanılacak:", e)
+    if not codes:
+        codes = sorted(set(BIST100_FALLBACK))
+        print(f"BIST100 yedek liste: {len(codes)} sembol")
+    return [c + ".IS" for c in codes]
+
+# =====================================================================
+#  SEMBOL LİSTELERİ
 # =====================================================================
 SYMBOLS = {
     "DAX": [
@@ -48,13 +99,7 @@ SYMBOLS = {
         "VRSK","XEL","AZN","LULU","CCEP","TTWO","IDXX","CSGP","ZS","TEAM",
         "DXCM","MCHP","BIIB","ON","WBD","GFS","MDB","CEG","ARM","SMCI",
     ],
-    "BIST": [
-        "THYAO.IS","ASELS.IS","AKBNK.IS","GARAN.IS","ISCTR.IS","YKBNK.IS","SISE.IS",
-        "EREGL.IS","KCHOL.IS","SAHOL.IS","TUPRS.IS","BIMAS.IS","FROTO.IS","TOASO.IS",
-        "TCELL.IS","TTKOM.IS","PGSUS.IS","EKGYO.IS","PETKM.IS","KRDMD.IS","ARCLK.IS",
-        "ENKAI.IS","HEKTS.IS","SASA.IS","KOZAL.IS","KOZAA.IS","GUBRF.IS","ALARK.IS",
-        "VESTL.IS","ODAS.IS",
-    ],
+    "BIST": get_bist100(),
 }
 
 BENCH = {"DAX": "^GDAXI", "NASDAQ": "^NDX", "BIST": "XU100.IS"}
@@ -160,7 +205,7 @@ except Exception as e:
     intra_batch = None
 
 print("kurlar ve endeksler…")
-fx = yf.download(["EURTRY=X", "USDTRY=X"], period="5d", interval="1d",
+fx = yf.download(["EURTRY=X", "USDTRY=X", "GC=F"], period="5d", interval="1d",
                  group_by="ticker", progress=False)
 bench_batch = yf.download(list(BENCH.values()), period="3mo", interval="1d",
                           group_by="ticker", progress=False)
@@ -173,6 +218,13 @@ def last_close(batch, sym):
 
 rates = {"EURTRY": r2(last_close(fx, "EURTRY=X"), 4),
          "USDTRY": r2(last_close(fx, "USDTRY=X"), 4)}
+
+# gram altın TL: GC=F (ons/USD) → gram/USD → gram/TL
+_gold_oz_usd = last_close(fx, "GC=F")
+if _gold_oz_usd and rates.get("USDTRY"):
+    rates["goldGramTRY"] = r2(_gold_oz_usd / 31.1034768 * rates["USDTRY"], 2)
+else:
+    rates["goldGramTRY"] = None
 
 benchmarks = {}
 for mkt, idx in BENCH.items():
