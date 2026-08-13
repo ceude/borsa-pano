@@ -44,36 +44,25 @@ BIST100_FALLBACK = [
 ]
 
 def get_bist_all():
-    """BIST TÜM (XUTUM) bileşenleri — Yıldız+Ana+Alt pazar (borsanın neredeyse tamamı).
-    Canlı çekilemezse ~100'lük yedek listeye düşer. Dönüş: .IS ekli yfinance sembolleri."""
+    """Tüm BIST hisse kodlarını mynet'ten çek (İş Yatırım XUTUM artık 401 veriyor).
+    Olmazsa ~100'lük yedek listeye düşer. Dönüş: .IS ekli yfinance sembolleri."""
+    import urllib.request, re
     codes = None
     try:
-        import urllib.request
-        url = ("https://www.isyatirim.com.tr/_layouts/15/IsYatirim.Website/Common/"
-               "Data.aspx/IndexComponent?endeks=XUTUM")
-        req = urllib.request.Request(url, headers={
-            "User-Agent": "Mozilla/5.0",
-            "Referer": "https://www.isyatirim.com.tr/",
-            "Accept": "application/json, text/plain, */*",
-        })
-        with urllib.request.urlopen(req, timeout=20) as resp:
-            js = json.loads(resp.read().decode("utf-8", "ignore"))
-        rows = js.get("value") or js.get("d") or []
-        got = []
-        for r in rows:
-            if not isinstance(r, dict):
-                continue
-            c = (r.get("HISSE_KODU") or r.get("Kod") or r.get("code") or "").strip().upper()
-            if c and c.isalnum():
-                got.append(c)
-        got = sorted(set(got))
-        if len(got) >= 300:                       # XUTUM ~500+; makul geldiyse kabul
+        req = urllib.request.Request("https://finans.mynet.com/borsa/hisseler/",
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            html = resp.read().decode("utf-8", "ignore")
+        got = re.findall(r'/borsa/hisseler/([a-z0-9]+)-[a-z0-9\-]+/', html)
+        got = sorted({c.upper() for c in got})
+        got = [c for c in got if re.fullmatch(r'[A-Z][A-Z0-9]{2,4}', c)]  # 3-5 karakter: hisse; rights/sertifika (6-7) elenir
+        if len(got) >= 300:
             codes = got
-            print(f"BIST TÜM (XUTUM) canlı çekildi: {len(codes)} sembol")
+            print(f"BIST tüm liste (mynet) çekildi: {len(codes)} sembol")
         else:
-            print(f"XUTUM az döndü ({len(got)}), yedek listeye düşülüyor")
+            print(f"mynet az döndü ({len(got)}), yedek listeye düşülüyor")
     except Exception as e:
-        print("BIST TÜM canlı çekilemedi, yedek liste:", e)
+        print("BIST tüm liste çekilemedi (mynet), yedek liste:", e)
     if not codes:
         codes = sorted(set(BIST100_FALLBACK))
         print(f"BIST yedek liste (~100): {len(codes)} sembol")
