@@ -317,8 +317,10 @@ function pfRenderLock(box){
   btn.onclick=submit; inp.onkeydown=function(e){ if(e.key==='Enter') submit(); }; setTimeout(function(){ if($('pfPw')) $('pfPw').focus(); },50);
 }
 function pfVerifyPw(pw, cb){
-  if(B && typeof B.verifyPassword==='function'){
-    try{ Promise.resolve(B.verifyPassword(pw)).then(function(ok){ cb(!!ok); }).catch(function(){ cb(false); }); }
+  var fn = (B && typeof B.verifyPassword==='function') ? B.verifyPassword
+         : (typeof window.PF_VERIFY==='function') ? window.PF_VERIFY : null;
+  if(fn){
+    try{ Promise.resolve(fn(pw)).then(function(ok){ cb(!!ok); }).catch(function(){ cb(false); }); }
     catch(e){ cb(false); }
     return;
   }
