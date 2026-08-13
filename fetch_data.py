@@ -43,20 +43,20 @@ BIST100_FALLBACK = [
     "YYLGD","ZOREN","ZRGYO",
 ]
 
-def get_bist100():
-    """XU100 bileşenlerini İş Yatırım'dan çek; olmazsa yedek listeyi kullan.
-    Dönüş: yfinance sembolleri (.IS ekli)."""
+def get_bist_all():
+    """BIST TÜM (XUTUM) bileşenleri — Yıldız+Ana+Alt pazar (borsanın neredeyse tamamı).
+    Canlı çekilemezse ~100'lük yedek listeye düşer. Dönüş: .IS ekli yfinance sembolleri."""
     codes = None
     try:
         import urllib.request
         url = ("https://www.isyatirim.com.tr/_layouts/15/IsYatirim.Website/Common/"
-               "Data.aspx/IndexComponent?endeks=XU100")
+               "Data.aspx/IndexComponent?endeks=XUTUM")
         req = urllib.request.Request(url, headers={
             "User-Agent": "Mozilla/5.0",
             "Referer": "https://www.isyatirim.com.tr/",
             "Accept": "application/json, text/plain, */*",
         })
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=20) as resp:
             js = json.loads(resp.read().decode("utf-8", "ignore"))
         rows = js.get("value") or js.get("d") or []
         got = []
@@ -67,14 +67,16 @@ def get_bist100():
             if c and c.isalnum():
                 got.append(c)
         got = sorted(set(got))
-        if len(got) >= 80:                       # makul sayıda geldiyse kabul et
+        if len(got) >= 300:                       # XUTUM ~500+; makul geldiyse kabul
             codes = got
-            print(f"BIST100 canlı çekildi: {len(codes)} sembol")
+            print(f"BIST TÜM (XUTUM) canlı çekildi: {len(codes)} sembol")
+        else:
+            print(f"XUTUM az döndü ({len(got)}), yedek listeye düşülüyor")
     except Exception as e:
-        print("BIST100 canlı çekilemedi, yedek liste kullanılacak:", e)
+        print("BIST TÜM canlı çekilemedi, yedek liste:", e)
     if not codes:
         codes = sorted(set(BIST100_FALLBACK))
-        print(f"BIST100 yedek liste: {len(codes)} sembol")
+        print(f"BIST yedek liste (~100): {len(codes)} sembol")
     return [c + ".IS" for c in codes]
 
 # =====================================================================
@@ -99,7 +101,7 @@ SYMBOLS = {
         "VRSK","XEL","AZN","LULU","CCEP","TTWO","IDXX","CSGP","ZS","TEAM",
         "DXCM","MCHP","BIIB","ON","WBD","GFS","MDB","CEG","ARM","SMCI",
     ],
-    "BIST": get_bist100(),
+    "BIST": get_bist_all(),
 }
 
 BENCH = {"DAX": "^GDAXI", "NASDAQ": "^NDX", "BIST": "XU100.IS"}
