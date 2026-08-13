@@ -216,15 +216,20 @@ function pfSaveDay(){ var v=pfSnapVals(); if(!v){ dlg('Kayıt yok','<p>Önce en 
 function pfHistRate(date){ var R=pf().hist.rates||[];
   if(R.length){ var best=null; R.forEach(function(r){ if(r.date<=date){ if(!best||r.date>best.date) best=r; } }); if(!best) best=R[0]; return {usdtry:best.usdtry, eurtry:best.eurtry}; }
   return pfRateAtDate(date); }
-function pfSeries(){ var d=pcy(), map={}, H=pf().hist, warn=false, hc=H.ccy||'TRY';
-  (H.points||[]).forEach(function(p){ var val;
-    if(d===hc) val=p.value;
-    else { var r=pfHistRate(p.date);
-      var tryv = hc==='TRY'?p.value:(hc==='USD'?(r?p.value*r.usdtry:pfConv(p.value,'USD','TRY')):(r?p.value*r.eurtry:pfConv(p.value,'EUR','TRY')));
-      if(d==='TRY') val=tryv; else if(d==='USD') val=r?tryv/r.usdtry:pfConv(tryv,'TRY','USD'); else val=r?tryv/r.eurtry:pfConv(tryv,'TRY','EUR');
-      if(!r) warn=true; }
-    if(val!=null&&!isNaN(val)) map[p.date]={y:val}; });
-  (pf().snaps||[]).forEach(function(s){ if(s[d]!=null) map[s.date]={y:s[d]}; });
+function pfConvHist(v, hc, d, date){
+  if(v==null) return {v:null,warn:false};
+  if(d===hc) return {v:v,warn:false};
+  var r=pfHistRate(date), warn=!r;
+  var tryv = hc==='TRY'?v:(hc==='USD'?(r?v*r.usdtry:pfConv(v,'USD','TRY')):(r?v*r.eurtry:pfConv(v,'EUR','TRY')));
+  var out = d==='TRY'?tryv:(d==='USD'?(r?tryv/r.usdtry:pfConv(tryv,'TRY','USD')):(r?tryv/r.eurtry:pfConv(tryv,'TRY','EUR')));
+  return {v:out, warn:warn};
+}
+function pfHasField(field){ return (pf().hist.points||[]).some(function(p){ return p[field]!=null && !isNaN(p[field]); }); }
+function pfSeries(field){ field=field||'value'; var d=pcy(), map={}, H=pf().hist, warn=false, hc=H.ccy||'TRY';
+  (H.points||[]).forEach(function(p){ var raw=p[field]; if(raw==null||isNaN(raw)) return;
+    var c=pfConvHist(raw, hc, d, p.date); if(c.warn) warn=true;
+    if(c.v!=null&&!isNaN(c.v)) map[p.date]={y:c.v}; });
+  if(field==='value'){ (pf().snaps||[]).forEach(function(s){ if(s[d]!=null) map[s.date]={y:s[d]}; }); }
   var pts=Object.keys(map).sort().map(function(k){ return {y:map[k].y, label:k.slice(5)}; });
   return {pts:pts, warn:warn}; }
 
@@ -277,23 +282,33 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
           '<td class="'+pnlCls(real)+'">'+(real?((real>0?'+':'')+pf$(real)):pf$(0))+'</td>'+
           '<td class="nm">'+new Date(lt).toLocaleDateString('tr-TR')+'</td><td class="pfarrow">›</td></tr>'; }).join('')+'</tbody></table></div></details>';
   }
-  var ser=pfSeries();
-  var chart=ser.pts.length?(B.lineChart(ser.pts,'#0bbfa6',psym())+(ser.warn?'<div class="hint down" style="margin-top:6px">⚠ Bazı geçmiş noktalar tarihsel kur olmadığı için güncel kurla çevrildi.</div>':'')):'<div class="empty">Toplam portföy grafiği için "Günü kaydet" ya da geçmiş yükle.</div>';
+  var seriesDefs=[{k:'value',t:'Toplam',c:'#0bbfa6'},{k:'borsa',t:'Borsa',c:'#3b82f6'},{k:'doviz',t:'Döviz',c:'#f59e0b'},{k:'altin',t:'Altın',c:'#e0b000'}];
+  var avail=seriesDefs.filter(function(sd){ return sd.k==='value' ? (pfHasField('value')||(P.snaps&&P.snaps.length)) : pfHasField(sd.k); });
+  if(!avail.length) avail=[seriesDefs[0]];
+  if(!avail.some(function(sd){return sd.k===pfSeriesSel;})) pfSeriesSel='value';
+  var selDef=avail.filter(function(sd){return sd.k===pfSeriesSel;})[0]||avail[0];
+  var ser=pfSeries(selDef.k);
+  var selBtns=avail.length>1?('<div class="pfcur" id="pfSeriesSel" style="margin:0 0 10px; display:inline-flex">'+avail.map(function(sd){return '<button data-sk="'+sd.k+'" class="'+(sd.k===selDef.k?'on':'')+'">'+sd.t+'</button>';}).join('')+'</div>'):'';
+  var chart=ser.pts.length?(B.lineChart(ser.pts,selDef.c,psym())+(ser.warn?'<div class="hint down" style="margin-top:6px">⚠ Bazı geçmiş noktalar tarihsel kur olmadığı için güncel kurla çevrildi.</div>':'')):'<div class="empty">Grafik için "Günü kaydet" ya da geçmiş yükle.</div>';
+  var notesArr=(P.hist.points||[]).filter(function(p){return p.note;}).sort(function(a,b){return a.date<b.date?1:-1;});
+  var notesHtml=notesArr.length?('<details style="margin-top:10px"><summary style="cursor:pointer; font-weight:700; color:var(--dim); font-size:13px; padding:4px 0">Günlük notlar ('+notesArr.length+')</summary><div class="log" style="margin-top:6px">'+notesArr.map(function(p){return '<div class="e"><span>'+clean(p.note)+'</span><span class="t">'+p.date+'</span></div>';}).join('')+'</div></details>'):'';
   var syms=STOCKS().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);}).map(function(s){ return '<option value="'+clean(s.symbol)+'">'+(s.name||'')+'</option>'; }).join('');
   box.innerHTML=''+
     '<div class="pfhead"><div><h2 style="margin:0; font-size:22px">Yatırımlarım</h2><div class="sub">Her varlık tek satır. Satıra tıkla → o varlığın sayfası. Değerler '+psym()+'.</div></div><div class="pfcur" id="pfCur">'+curBtns+'</div></div>'+
     stat+
     '<div class="pftypes" id="pfTypeBar">'+PF_TYPES.map(function(T){ return '<button data-t="'+T.k+'"'+(T.k===pfAddType?' class="on"':'')+'>'+T.t+'</button>'; }).join('')+'</div>'+
     '<div class="pfquick" id="pfQuickBar"></div>'+
-    '<h3 style="font-size:16px; margin:0 0 8px">Toplam portföy değeri</h3>'+chart+
+    '<h3 style="font-size:16px; margin:0 0 8px">Portföy grafiği</h3>'+selBtns+chart+notesHtml+
     '<div style="margin-top:18px">'+listHtml+closedHtml+'</div>'+
     '<div class="disclaimer">Bu ekran senin girdiğin verilere dayanır ve bulut hesabınla eşitlenir. Hisse fiyatı ~15 dk gecikmeli panodan, gram altın TL fiyatı data.js\'ten; mevduat/fon değerlerini kendin güncellersin. $/€ maliyet, her alımın kendi günkü kurundan hesaplanır. Yatırım tavsiyesi değildir.</div>';
   box.querySelectorAll('#pfCur button').forEach(function(b){ b.onclick=function(){ pf().disp=b.dataset.pc; save(); pfRender(); }; });
+  var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
   box.querySelectorAll('tr[data-open]').forEach(function(tr){ tr.onclick=function(){ VIEW={mode:'asset',id:tr.dataset.open}; pfRender(); }; });
   $('pfTypeBar').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfAddType=b.dataset.t; $('pfTypeBar').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===pfAddType); }); pfPaintQuick(syms); }; });
   pfPaintQuick(syms);
 }
 var pfAddType='stock';
+var pfSeriesSel='value';
 function pfPaintQuick(syms){ var bar=$('pfQuickBar'); if(!bar) return;
   var tools='<button class="ghost" id="pfSaveDayBtn">Günü kaydet</button><button class="ghost" id="pfUploadBtn">⤒ Geçmiş yükle</button><button class="ghost" id="pfCsvBtn">⤓ Dışa aktar</button>';
   if(pfAddType==='stock'){
@@ -571,8 +586,9 @@ function pfParse(file,cb){ pfLoadXLSX(function(ok){ if(!ok){ cb(null,'XLSX küt�
   var fr=new FileReader(); fr.onload=function(){ try{ var wb=XLSX.read(new Uint8Array(fr.result),{type:'array',cellDates:true});
     var ws=wb.Sheets[wb.SheetNames[0]]; cb(XLSX.utils.sheet_to_json(ws,{header:1,raw:true}),null); }catch(e){ cb(null,e.message||'okunamadı'); } };
   fr.onerror=function(){ cb(null,'dosya okunamadı'); }; fr.readAsArrayBuffer(file); }); }
-function pfUpload(){ dlg('Toplam portföy geçmişini yükle',
-  '<p>Excel/CSV: <b>ilk sütun tarih</b>, <b>ikinci sütun toplam değer</b>. Başlık satırı otomatik atlanır. Üstteki <b>toplam portföy grafiğini</b> besler.</p>'+
+function pfUpload(){ dlg('Portföy geçmişini yükle',
+  '<p>Excel/CSV sütun sırası:<br><b>1) Tarih*&nbsp;&nbsp;2) Toplam varlık*&nbsp;&nbsp;3) Güne ait not&nbsp;&nbsp;4) Borsa&nbsp;&nbsp;5) Döviz&nbsp;&nbsp;6) Altın</b><br>İlk iki sütun zorunlu (*), son dördü opsiyonel — boş bırakabilirsin. Başlık satırı otomatik atlanır.</p>'+
+  '<div class="hint" style="margin:-2px 0 10px">Borsa+Döviz+Altın toplamı "Toplam varlık"a eşit olmak zorunda değil (kripto/vadesiz vb. hariç). Her seri, grafik üstündeki düğmelerden ayrı çizilir.</div>'+
   '<div class="tpfield"><label>Serinin para birimi</label><select class="fld" id="pfuCcy" style="width:100%"><option>TRY</option><option>USD</option><option>EUR</option></select></div>'+
   '<div class="tpfield"><label>Dosya</label><input class="fld" id="pfuFile" type="file" accept=".xlsx,.xls,.csv" style="width:100%"></div>'+
   '<div class="hint" id="pfuMsg" style="margin-top:8px"></div>',
@@ -580,7 +596,13 @@ function pfUpload(){ dlg('Toplam portföy geçmişini yükle',
 function pfDoUpload(){ var f=$('pfuFile').files[0]; if(!f){ $('pfuMsg').textContent='Dosya seç.'; return; }
   var ccy=$('pfuCcy').value; $('pfuMsg').textContent='okunuyor…';
   pfParse(f,function(rows,err){ if(err){ $('pfuMsg').innerHTML='<span class="down">'+err+'</span>'; return; }
-    var pts=[]; rows.forEach(function(r){ if(!r||r.length<2) return; var d=pfDate(r[0]),v=pfNum(r[1]); if(d&&v!=null) pts.push({date:d,value:v}); });
+    var pts=[]; rows.forEach(function(r){ if(!r||r.length<2) return; var d=pfDate(r[0]),v=pfNum(r[1]); if(!d||v==null) return;
+      var o={date:d, value:v};
+      var note=(r.length>2 && r[2]!=null)?String(r[2]).trim():''; if(note) o.note=note;
+      var b=pfNum(r[3]); if(b!=null) o.borsa=b;
+      var x=pfNum(r[4]); if(x!=null) o.doviz=x;
+      var g=pfNum(r[5]); if(g!=null) o.altin=g;
+      pts.push(o); });
     if(!pts.length){ $('pfuMsg').innerHTML='<span class="down">Geçerli tarih/değer bulunamadı.</span>'; return; }
     var seen={}; pts.forEach(function(p){ seen[p.date]=p; }); var out=Object.keys(seen).sort().map(function(k){ return seen[k]; });
     pf().hist={ccy:ccy,points:out,rates:(pf().hist&&pf().hist.rates)||[]}; save(); dlgClose(); pfRender(); }); }
