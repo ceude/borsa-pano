@@ -2453,7 +2453,7 @@ function renderReal(){
 }
 
 /* ---------- line chart ---------- */
-function lineChart(points, color){
+function lineChart(points, color, symOverride){
   if(!points.length) return '<div class="empty">veri yok</div>';
   var W=760,H=280,Pl=68,Pr=18,Pt=18,Pb=36;
   var ys=points.map(function(p){return p.y;});
@@ -2467,7 +2467,7 @@ function lineChart(points, color){
   var xl='';[0,Math.floor(points.length/2),points.length-1].forEach(function(i){ if(points[i]) xl+='<text class="xlab" x="'+px(i).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle">'+points[i].label+'</text>'; });
   var dots=points.map(function(p,i){
     var cx=px(i).toFixed(1), cy=py(p.y).toFixed(1);
-    var tip=(p.label?p.label+'  ':'')+ccySym(MK)+fmt(p.y);
+    var tip=(p.label?p.label+'  ':'')+(symOverride||ccySym(MK))+fmt(p.y);
     return '<circle cx="'+cx+'" cy="'+cy+'" r="9" fill="transparent" style="cursor:pointer"><title>'+tip+'</title></circle>'+
            '<circle cx="'+cx+'" cy="'+cy+'" r="3.5" fill="'+color+'"/>';
   }).join('');
@@ -3264,6 +3264,7 @@ function renderAll(){
   if(window.__refreshCostInputs) window.__refreshCostInputs();
   renderGunun(); renderScreen(); renderAllList(); renderMovers(); updateSimPx(); renderSim(); renderSimChart(); renderReal(); renderRealChart();
   renderTrade();
+  if(window.PF && document.getElementById('v-portfolio') && document.getElementById('v-portfolio').classList.contains('active')) window.PF.render();
 }
 
 /* ---------- otomatik yenileme ---------- */
@@ -4527,7 +4528,15 @@ function initSupabase(){
 }
 wireCloud();
 initSupabase();
-
+/* ---- portföy modülü köprüsü (portfoy.js) ---- */
+window.__PF_BRIDGE={
+  find:find, save:save, dlg:dlg, dlgClose:dlgClose, lineChart:lineChart,
+  ccyCode:ccyCode, clean:clean, fmt:fmt, pnlCls:pnlCls, genId:genId,
+  goView:goView, toCSV:toCSV, downloadCSV:downloadCSV, openStock:openStock, $:$,
+  get S(){return S;}, get STOCKS(){return STOCKS;}, get RATES(){return RATES;},
+  get MK(){return MK;}, get HIST(){return HIST;}
+};
+if(typeof window.PF_INIT==='function') window.PF_INIT(window.__PF_BRIDGE);
 /* ---------- boot ---------- */
 function showLogin(){
   var lg=$('loginGate'); if(lg) lg.style.display='flex';
@@ -4576,5 +4585,6 @@ function loadData(cb){
 }
 loadData(startApp);
 </script>
+<script src="portfoy.js"></script>
 </body>
 </html>
