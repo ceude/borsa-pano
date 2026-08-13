@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Borsa Pano — veri çekici (TAM SÜRÜM v3)
+Borsa Pano — veri çekici (TAM SÜRÜM v4)
 ======================================
 Üretilenler:
-  data.js     -> window.STOCK_DATA   : fiyat + temeller + teknikler (pano her 10 dk indirir)
-  history.js  -> window.STOCK_HISTORY: grafik serileri (15m/5g gün içi, günlük 1y, haftalık 5y)
+  data.js     -> window.STOCK_DATA    : fiyat + temeller + teknikler (pano her 10 dk indirir)
+  history.js  -> window.STOCK_HISTORY : grafik serileri (15m/5g gün içi, günlük 1y, haftalık 5y)
+  rates.js    -> window.RATE_HISTORY  : 10 yıllık günlük USDTRY/EURTRY (portföy $/€ çevirisi)
+
+Yenilikler (v4):
+  - rates.js: 10 yıllık günlük tarihsel kur -> [[epochSaniye, usdtry, eurtry], ...]
+    portfoy.js bunu $/€ toggle'ında bir kez yükler; geçmiş değerleri O GÜNKÜ kurdan çevirir.
 
 Yenilikler (v3):
   - 5 yıllık günlük geçmiş (tek toplu istek, hızlı)
@@ -12,8 +17,8 @@ Yenilikler (v3):
   - earningsGrowth / revenueGrowth (Orta/Uzun skorda büyüme metrikleri)
   - history.js: hisse detayındaki etkileşimli grafik için OHLC serileri
 
-GitHub Actions notu: workflow'un commit adımına history.js'i de ekle
-(örn. `git add data.js history.js`).
+GitHub Actions notu: workflow'un commit adımına rates.js'i de ekle
+(örn. `git add data.js history.js rates.js`).
 """
 
 import json, math, time, datetime
@@ -56,6 +61,7 @@ BENCH = {"DAX": "^GDAXI", "NASDAQ": "^NDX", "BIST": "XU100.IS"}
 
 OUT_DATA    = "data.js"
 OUT_HISTORY = "history.js"
+OUT_RATES   = "rates.js"
 
 # =====================================================================
 #  yardımcılar
@@ -175,6 +181,46 @@ for mkt, idx in BENCH.items():
     benchmarks[mkt] = ret_n(c, 21) if c is not None else None
 
 # =====================================================================
+#  1b) TARİHSEL KUR — 10 yıllık günlük USDTRY / EURTRY -> rates.js
+#      Portföy ekranı $/€ toggle'ında bunu bir kez yükler ve geçmiş
+#      değerleri O GÜNKÜ kurdan çevirir.
+# =====================================================================
+def write_rates_js(path=OUT_RATES, period="10y"):
+    try:
+        fxh = yf.download(["USDTRY=X", "EURTRY=X"], period=period, interval="1d",
+                          group_by="ticker", progress=False)
+
+        def close_series(sym):
+            df = sub_df(fxh, sym)
+            if df is None or "Close" not in df:
+                return None
+            return df["Close"].dropna()
+
+        u = close_series("USDTRY=X")
+        e = close_series("EURTRY=X")
+        if u is None or e is None or len(u) == 0 or len(e) == 0:
+            print("rates.js: kur verisi alınamadı, atlandı.")
+            return
+
+        df = pd.concat([u.rename("usd"), e.rename("eur")], axis=1).dropna().sort_index()
+
+        rows = []
+        for ts, row in df.iterrows():
+            epoch = int(ts.timestamp()) if hasattr(ts, "timestamp") else int(ts)
+            rows.append([epoch, round(float(row["usd"]), 4), round(float(row["eur"]), 4)])
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("window.RATE_HISTORY=" + json.dumps(rows, separators=(",", ":")) + ";")
+
+        print(f"rates.js yazıldı: {len(rows)} gün "
+              f"({datetime.datetime.utcfromtimestamp(rows[0][0]).date()} → "
+              f"{datetime.datetime.utcfromtimestamp(rows[-1][0]).date()})")
+    except Exception as ex:
+        print("rates.js hata:", ex)
+
+write_rates_js()
+
+# =====================================================================
 #  2) sembol döngüsü
 # =====================================================================
 stocks, history, market_times = [], {}, {}
@@ -292,4 +338,7 @@ with open(OUT_HISTORY, "w", encoding="utf-8") as f:
     f.write("window.STOCK_HISTORY=" + json.dumps(history, ensure_ascii=False, separators=(",", ":")) + ";")
 
 import os
-print(f"tamam: {len(stocks)} hisse · data.js {os.path.getsize(OUT_DATA)//1024} KB · history.js {os.path.getsize(OUT_HISTORY)//1024} KB")
+sizes = f"data.js {os.path.getsize(OUT_DATA)//1024} KB · history.js {os.path.getsize(OUT_HISTORY)//1024} KB"
+if os.path.exists(OUT_RATES):
+    sizes += f" · rates.js {os.path.getsize(OUT_RATES)//1024} KB"
+print(f"tamam: {len(stocks)} hisse · {sizes}")
