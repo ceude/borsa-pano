@@ -4404,6 +4404,14 @@ function startRealtime(){
       var r=payload['new']; if(r && r.rev>SB_REV){ SB_REV=r.rev; adoptRemote(r.data); setSyncStatus('başka cihazdan güncellendi '+hhmm()); }
     }).subscribe();
 }
+  // Yatırımlarım kilidi — hesap şifresini Supabase ile doğrular
+window.PF_VERIFY = async function(pw){
+  try{
+    if(typeof SB_USER === 'undefined' || !SB_USER) return false;   // giriş yapılmamış
+    const { error } = await SB.auth.signInWithPassword({ email: SB_USER.email, password: pw });
+    return !error;                                                  // şifre doğruysa true
+  }catch(e){ return false; }
+};
 function stopRealtime(){ if(realtimeCh){ try{SB.removeChannel(realtimeCh);}catch(e){} realtimeCh=null; } }
 var afterLoginBusy=false;
 function afterLogin(){
