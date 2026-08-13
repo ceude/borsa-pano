@@ -4452,14 +4452,7 @@ function loadCloud(){
     if(typeof enterApp==='function') enterApp();
   });
 }
-  // B = köprü nesnen; 'supabase' senin client değişkenin
-B.verifyPassword = async function(pw){
-  try{
-    const email = (await supabase.auth.getUser()).data.user.email;
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
-    return !error;                 // şifre doğruysa true
-  }catch(e){ return false; }
-};
+
 function updateAuthBar(){
   var b=$('cloudBtn'); var so=$('authSignedOut'), si=$('authSignedIn');
   if(!cloudCfgOk()){
