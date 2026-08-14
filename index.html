@@ -1621,8 +1621,16 @@ function renderTicker(){
       '<span class="px">'+fmt(s.price)+'</span><span class="ch '+c+'">'+a+
       (s.changePct==null?'':fmt(Math.abs(s.changePct))+'%')+'</span></span>';
   }).join('');
-  $('tickerTrack').innerHTML = html+html;
-  $('tickerTrack').querySelectorAll('.tk').forEach(function(t){ t.onclick=function(){openStock(t.dataset.sym);}; });
+  var tr=$('tickerTrack');
+  tr.innerHTML = html+html;
+  tr.querySelectorAll('.tk').forEach(function(t){ t.onclick=function(){openStock(t.dataset.sym);}; });
+  /* Hız hisse sayısından bağımsız olsun: süre = mesafe / hız.
+     CSS animasyonu -50% kaydırdığı için kat edilen mesafe içeriğin YARISI (tek kopya). */
+  requestAnimationFrame(function(){
+    var PXPS = 55;                                   // px/saniye — küçült = daha yavaş
+    var dist = tr.scrollWidth / 2;
+    if(dist > 0) tr.style.animationDuration = Math.max(30, Math.round(dist / PXPS)) + 's';
+  });
 }
 
 /* ---------- tabs ---------- */
