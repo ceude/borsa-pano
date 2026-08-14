@@ -469,11 +469,14 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var dt=pfDayTotals(cur);
   var dayCard = dt ? ('<div><div class="k">Bugün'+(dt.unknown>0?' <span class="cov" title="Canlı fiyatı olmayan varlıklar (döviz, altın, mevduat vb.) bu hesaba girmez">*</span>':'')+'</div><div class="v '+pnlCls(dt.chg)+'">'+
       (dt.chg>0?'+':'')+pf$(dt.chg)+(dt.pct!=null?' <span style="font-size:15px">('+(dt.pct>0?'+':'')+fmt(dt.pct,2)+'%)</span>':'')+'</div></div>') : '';
+  var realTot=0, realHas=false;
+  Object.keys(P.assets).forEach(function(id){ var r=aRealizedDisp(P.assets[id]); if(r!=null && !isNaN(r) && r!==0){ realTot+=r; realHas=true; } });
+  var realCard = realHas ? ('<div><div class="k">Satışlardan K/Z</div><div class="v '+pnlCls(realTot)+'">'+(realTot>0?'+':'')+pf$(realTot)+'</div></div>') : '';
   var stat='<div class="stat">'+
     '<div><div class="k">Toplam varlık</div><div class="v">'+pf$(t.value)+'</div></div>'+
     '<div><div class="k">Toplam maliyet</div><div class="v">'+pf$(t.cost)+'</div></div>'+
     '<div><div class="k">Toplam K/Z</div><div class="v '+pnlCls(t.pnl)+'">'+(t.pnl==null?'—':(t.pnl>0?'+':'')+pf$(t.pnl)+(t.cost>0?' ('+(t.pnl>0?'+':'')+fmt(t.pnl/t.cost*100,1)+'%)':''))+'</div></div>'+
-    dayCard+'</div>';
+    dayCard+realCard+'</div>';
   var allA=Object.keys(P.assets).map(function(id){ return P.assets[id]; });
   function isClosed(a){ return a.valMode==='qty' && (a.tx&&a.tx.length) && (aQty(a)||0)<=0.0000001; }
   var rows=allA.filter(function(a){ return !isClosed(a); }).sort(function(a,b){ return (aValueDisp(b)||0)-(aValueDisp(a)||0); });
