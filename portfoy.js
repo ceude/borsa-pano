@@ -477,6 +477,23 @@ function pfDayTotals(dc){
 }
 /* Döviz işleminde ödeme para birimi, tutulan dövizle aynı ama birim fiyat 1'den çok uzaksa
    neredeyse kesin yanlış girilmiştir (ör. TL kuru girilip ödeme EUR bırakılmış). */
+/* Yüklediğin geçmiş tabloda (Borsa/Döviz/Altın/Fon…) bir tür sütunu varsa ve o türde
+   TEK varlık varsa, o sütun doğrudan bu varlığın değer geçmişidir — kaynak olarak kullan. */
+function pfHistSeriesFor(a, dc){
+  var key=PF_SERIES_MAP[a.type]; if(!key) return null;
+  var A=pf().assets, same=0;
+  Object.keys(A).forEach(function(id){ if(A[id].type===a.type) same++; });
+  if(same!==1) return null;                       /* tür toplamı olduğu için tek varlıkta geçerli */
+  var H=pf().hist, hc=H.ccy||'TRY', pts=[];
+  (H.points||[]).forEach(function(p){ var raw=p[key]; if(raw==null||isNaN(raw)) return;
+    var c=pfConvHist(raw, hc, dc, p.date);
+    if(c.v!=null&&!isNaN(c.v)) pts.push({y:c.v, date:p.date, note:p.note||''}); });
+  if(pts.length<2) return null;
+  pts.sort(function(x,y){ return x.date<y.date?-1:1; });
+  var today=new Date().toISOString().slice(0,10), cv=aValueIn(a,dc);
+  if(cv!=null && pts[pts.length-1].date<today) pts.push({y:cv, date:today, note:''});
+  return {pts:pts, src:'hist'};
+}
 /* Kümülatif DEĞER geçmişi — o varlıkta duran para (maliyet + kâr/zarar).
    Fiyat geçmişi olan türlerde hesaplanır: hisse (history.js) ve döviz (rates.js). */
 function pfValueSeries(a, dc){
@@ -517,7 +534,7 @@ function pfValueSeries(a, dc){
     var d=new Date(t.t), pz=function(x){return(x<10?'0':'')+x;};
     var ds=d.getFullYear()+'-'+pz(d.getMonth()+1)+'-'+pz(d.getDate());
     for(var i=0;i<pts.length;i++){ if(pts[i].date>=ds){ pts[i].note=t.note; break; } } });
-  return {pts:pts};
+  return {pts:pts, src:'price'};
 }
 /* Kümülatif yatırım geçmişi — her işlem tarihinde elde kalan pozisyonun maliyeti (disp cinsinden).
    Her tür için hesaplanabilir; notu olan işlemler grafikte kırmızı işaretlenir. */
@@ -867,15 +884,18 @@ function pfRenderAsset(box, a){
   box.querySelectorAll('.pftxD').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation(); pfDelTx(a, parseInt(b.dataset.txi,10)); }; });
   var cm=$('pfChMode'); if(cm) cm.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ VIEW.chart=b.dataset.cm; pfRender(); }; });
   if(VIEW.chart==='invest' && hasInv){
-    var vs=pfValueSeries(a, dc), mnt=$('pfAssetChart');
+    var vs=pfValueSeries(a, dc) || pfHistSeriesFor(a, dc), mnt=$('pfAssetChart');
     if(mnt){
       if(vs && vs.pts.length){
+        var srcTxt = (vs.src==='hist')
+          ? 'Kaynak: <b>yüklediğin geçmiş tablodaki '+pfTypeLabel(a.type)+' sütunu</b> (bu türdeki tek varlık olduğu için doğrudan bu varlığa ait). Son nokta bugünkü güncel değer.'
+          : 'Her tarih kendi günkü fiyat ve kuruyla hesaplandı.';
         mnt.innerHTML = pfLineChart(vs.pts, '#0bbfa6', dsym)+
-          '<div class="hint" style="margin-top:6px">Bu varlıkta duran <b>para</b> ('+dc+') — maliyet + kâr/zarar, her tarih kendi günkü fiyat ve kuruyla. Kırmızı noktalar: notu olan işlemler.</div>';
+          '<div class="hint" style="margin-top:6px">Bu varlıkta duran <b>para</b> ('+dc+') — maliyet + kâr/zarar. '+srcTxt+' Kırmızı noktalar: notu olan günler/işlemler.</div>';
       } else {
         var iv=pfInvestSeries(a, dc);
         mnt.innerHTML = iv.pts.length
-          ? (pfLineChart(iv.pts, '#8b5cf6', dsym)+'<div class="hint" style="margin-top:6px">Bu varlık için <b>fiyat geçmişi yok</b> (gram altın, fon, mevduat ve panoda olmayan hisseler), o yüzden değer geçmişi çizilemiyor. Grafik <b>kümülatif maliyeti</b> gösteriyor. Kırmızı noktalar: notu olan işlemler.</div>')
+          ? (pfLineChart(iv.pts, '#8b5cf6', dsym)+'<div class="hint" style="margin-top:6px">Bu varlık için ne fiyat geçmişi ne de yüklenmiş tür geçmişi var, o yüzden değer geçmişi çizilemiyor. Grafik <b>kümülatif maliyeti</b> gösteriyor. Kırmızı noktalar: notu olan işlemler.</div>')
           : '<div class="empty">işlem yok</div>';
       }
     }
