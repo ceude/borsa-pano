@@ -59,6 +59,7 @@ function injectCSS(){
   '.pfgrp td{background:var(--bg); color:var(--faint); font-weight:700; font-size:11px; letter-spacing:.03em; text-transform:uppercase; border-top:1px solid var(--line); padding-top:9px}'+
   '.pfgrp:hover td{background:var(--bg)}'+
   '.pfgrp .gsub{font-weight:700}'+
+  '.pfwarnflag{font-size:10px; font-weight:700; color:#7a2530; background:var(--down-bg); border:1px solid var(--down); border-radius:6px; padding:1px 6px; cursor:help}'+
   /* ---- mobil ---- */
   '@media(max-width:720px){'+
     '#v-portfolio{padding:14px 12px}'+
@@ -421,6 +422,31 @@ function pfDayTotals(dc){
   });
   return has?{chg:chg, pct:(base>0?chg/base*100:null), unknown:unknown}:null;
 }
+/* Döviz işleminde ödeme para birimi, tutulan dövizle aynı ama birim fiyat 1'den çok uzaksa
+   neredeyse kesin yanlış girilmiştir (ör. TL kuru girilip ödeme EUR bırakılmış). */
+/* Kümülatif yatırım geçmişi — her işlem tarihinde elde kalan pozisyonun maliyeti (disp cinsinden).
+   Her tür için hesaplanabilir; notu olan işlemler grafikte kırmızı işaretlenir. */
+function pfInvestSeries(a, dc){
+  if(a.valMode!=='qty' || !a.tx || !a.tx.length) return {pts:[]};
+  var q=0, cost=0, pts=[];
+  a.tx.slice().sort(function(x,y){return x.t-y.t;}).forEach(function(t){
+    var pay=txPay(a,t), line=convAtTime(t.px*t.qty, pay, dc, Math.floor(t.t/1000));
+    if(line==null) line=pfConv(t.px*t.qty, pay, dc);
+    if(t.side==='sell'){ if(q>0){ var s=Math.min(t.qty,q), avg=cost/q; cost-=avg*s; q-=s; } }
+    else { q+=t.qty; cost+=(line||0); }
+    var d=new Date(t.t), p=function(x){return(x<10?'0':'')+x;};
+    pts.push({y:cost, date:d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()), note:t.note||''});
+  });
+  var map={}; pts.forEach(function(x){ map[x.date]=map[x.date]?{y:x.y, note:(map[x.date].note||x.note)}:x; });
+  return {pts:Object.keys(map).sort().map(function(k){ return {y:map[k].y, date:k, note:map[k].note||''}; })};
+}
+function pfTxSuspect(a, t){
+  if(a.type!=='fx') return null;
+  var pay=txPay(a,t), hold=a.holdCcy||'EUR';
+  if(pay===hold && t.px!=null && (t.px>1.2 || t.px<0.8))
+    return 'Ödeme para birimi '+pay+' ama birim fiyat '+fmt(t.px)+' — bu bir '+pay+'/başka para kuru gibi görünüyor. Ödeme para birimi yanlış olabilir (₺ mi olacaktı?). Bu satır kâr/zararı çok bozar.';
+  return null;
+}
 function pfAssetRow(a){
   var q=aQty(a),ac=aAvgCostDisp(a),u=aCurUnitDisp(a),v=aValueDisp(a),c=aCostDisp(a),pnl=(v!=null&&c!=null)?v-c:null,pct=(c>0&&pnl!=null)?pnl/c*100:null,nc=aNativeCcy(a),vn=aValueNative(a);
   var dp=aDayPct(a), dc2=aDayChangeIn(a,pcy());
@@ -510,8 +536,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
   pfWireChart(box);
   var rr=$('pfRatesRetry'); if(rr) rr.onclick=function(){ ratesTried=false; ratesLoading=false; pfLoadRates(function(){ pfRender(); }); };
-  box.querySelectorAll('tr[data-open]').forEach(function(tr){ tr.onclick=function(){ VIEW={mode:'asset',id:tr.dataset.open}; pfRender(); }; });
-  $('pfTypeBar').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfAddType=b.dataset.t; $('pfTypeBar').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===pfAddType); }); pfPaintQuick(syms); }; });
+  box.querySelectorAll('tr[data-open]').forEach(function(tr){ tr.onclick=function(){ VIEW={mode:'asset',id:tr.dataset.open}; pfRender(); }; });  $('pfTypeBar').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfAddType=b.dataset.t; $('pfTypeBar').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===pfAddType); }); pfPaintQuick(syms); }; });
   pfPaintQuick(syms);
 }
 var pfAddType='stock';
@@ -599,9 +624,24 @@ function pfRenderAsset(box, a){
   var txHtml=tx.length?tx.map(function(x){ var oi=(a.tx||[]).indexOf(x); var sc=x.side==='buy'?'up':'down', st=x.side==='buy'?'AL':'SAT', pay=txPay(a,x), tot=x.qty*x.px, tsec=Math.floor(x.t/1000);
     var usd=convAtTime(tot,pay,'USD',tsec), eur=convAtTime(tot,pay,'EUR',tsec);
     var alt=(usd!=null&&eur!=null)?(' <span class="cov">(≈ $'+fmt(usd)+' · €'+fmt(eur)+')</span>'):'';
-    return '<div class="e"><span><b class="'+sc+'">'+st+'</b> '+fmt(x.qty,x.qty%1?4:0)+' '+unit+' × '+psymCcy(pay)+fmt(x.px)+' = '+psymCcy(pay)+fmt(tot)+alt+(x.note?(' · '+x.note):'')+'</span><span class="t">'+new Date(x.t).toLocaleDateString('tr-TR')+' <button class="pftxE" data-txi="'+oi+'" title="Düzenle">✎</button><button class="pftxD" data-txi="'+oi+'" title="Sil">🗑</button></span></div>'; }).join(''):'<div class="empty">işlem yok</div>';
-  box.innerHTML=head+metrics+actions+
-    (inPanel?'<h3 style="font-size:16px; margin:0 0 8px">Fiyat geçmişi</h3><div id="pfAssetChart"></div>':'')+
+    var susp=pfTxSuspect(a,x);
+    var flag=susp?(' <span class="pfwarnflag" title="'+susp.replace(/"/g,'&quot;')+'">⚠ kontrol et</span>'):'';
+    return '<div class="e"'+(susp?' style="background:var(--down-bg)"':'')+'><span><b class="'+sc+'">'+st+'</b> '+fmt(x.qty,x.qty%1?4:0)+' '+unit+' × '+psymCcy(pay)+fmt(x.px)+' = '+psymCcy(pay)+fmt(tot)+alt+flag+(x.note?(' · '+x.note):'')+'</span><span class="t">'+new Date(x.t).toLocaleDateString('tr-TR')+' <button class="pftxE" data-txi="'+oi+'" title="Düzenle">✎</button><button class="pftxD" data-txi="'+oi+'" title="Sil">🗑</button></span></div>'; }).join(''):'<div class="empty">işlem yok</div>';
+  var hasInv=(a.valMode==='qty' && a.tx && a.tx.length);
+  if(!VIEW.chart || (VIEW.chart==='price' && !inPanel)) VIEW.chart = inPanel?'price':'invest';
+  var chartSec='';
+  if(inPanel || hasInv){
+    var btns='';
+    if(inPanel && hasInv){
+      btns='<div class="pfcur" id="pfChMode" style="margin:0 0 10px; display:inline-flex">'+
+        '<button data-cm="price" class="'+(VIEW.chart==='price'?'on':'')+'">Fiyat geçmişi</button>'+
+        '<button data-cm="invest" class="'+(VIEW.chart==='invest'?'on':'')+'">Yatırım geçmişi</button></div>';
+    }
+    chartSec='<h3 style="font-size:16px; margin:0 0 8px">'+(VIEW.chart==='invest'?'Yatırım geçmişi (kümülatif maliyet)':'Fiyat geçmişi')+'</h3>'+btns+'<div id="pfAssetChart"></div>';
+  }
+  var suspN=(a.tx||[]).filter(function(t){ return pfTxSuspect(a,t); }).length;
+  var suspBar=suspN?('<div class="hint down" style="background:var(--down-bg); border:1px solid var(--down); border-radius:10px; padding:9px 11px; margin-bottom:14px">⚠ <b>'+suspN+' işlemde ödeme para birimi hatalı görünüyor</b> — aşağıdaki listede kırmızı satırlar. Bunlar kâr/zararı çok bozar; ✎ ile düzelt.</div>'):'';
+  box.innerHTML=head+suspBar+metrics+actions+chartSec+
     '<h3 style="font-size:16px; margin:20px 0 8px">Bu varlıktaki işlemlerim <span class="nm" style="font-size:12px; font-weight:400">(✎ düzenle · 🗑 sil)</span></h3><div class="log scroll" style="max-height:300px">'+txHtml+'</div>'+
     '<div class="disclaimer">Değerler <b>'+dc+'</b> cinsinden. Ort. maliyet, her alımın <b>kendi günkü kuruyla</b> '+dc+' karşılığının ağırlıklı ortalamasıdır — yani '+dc+' getirisi gerçek kur farkını içerir. Üstteki TL/USD/EUR düğmeleriyle getirini karşılaştır. Yatırım tavsiyesi değildir.</div>';
   $('pfBack').onclick=function(){ VIEW={mode:'list',id:null}; pfRender(); };
@@ -613,7 +653,15 @@ function pfRenderAsset(box, a){
   $('pfDel').onclick=function(){ pfDel(a.id); };
   box.querySelectorAll('.pftxE').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation(); pfEditTx(a, parseInt(b.dataset.txi,10)); }; });
   box.querySelectorAll('.pftxD').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation(); pfDelTx(a, parseInt(b.dataset.txi,10)); }; });
-  if(inPanel) pfAssetChart(a, $('pfAssetChart'));
+  var cm=$('pfChMode'); if(cm) cm.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ VIEW.chart=b.dataset.cm; pfRender(); }; });
+  if(VIEW.chart==='invest' && hasInv){
+    var iv=pfInvestSeries(a, dc), mnt=$('pfAssetChart');
+    if(mnt) mnt.innerHTML = iv.pts.length
+      ? (pfLineChart(iv.pts, '#0bbfa6', dsym)+'<div class="hint" style="margin-top:6px">Her işlem sonrası <b>elde kalan pozisyonun maliyeti</b> ('+dc+'). Satışta maliyet ortalama üzerinden düşer. Kırmızı noktalar: notu olan işlemler.</div>')
+      : '<div class="empty">işlem yok</div>';
+    pfWireChart(box);
+  }
+  else if(inPanel) pfAssetChart(a, $('pfAssetChart'));
 }
 function pfAssetBuy(a, side){ if(a.type==='gold') pfBuyGold(a, side); else if(a.type==='fx') pfBuyFx(a, side); else pfTxDialog(a, null, side); }
 function pfEditAsset(a){
