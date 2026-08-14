@@ -97,10 +97,11 @@ function injectCSS(){
     '#v-portfolio .stat .v{font-size:18px}'+
     '#v-portfolio table{font-size:12px}'+
     '#v-portfolio th,#v-portfolio td{padding:9px 6px}'+
-    /* Adet · Ort. maliyet · Güncel · Orijinal gizlenir; Varlık · Gün % · Değer · K/Z kalır */
+    /* Adet · Ort. maliyet · Güncel · Orijinal gizlenir; Varlık · Gün % · Değer · K/Z kalır.
+       Grup satırlarında da AYNI sütunlar gizlenmeli, yoksa ara toplamlar kayar. */
     '#v-portfolio thead th:nth-child(2),#v-portfolio thead th:nth-child(3),#v-portfolio thead th:nth-child(4),#v-portfolio thead th:nth-child(5),'+
-    '#v-portfolio tbody tr:not(.pfgrp) td:nth-child(2),#v-portfolio tbody tr:not(.pfgrp) td:nth-child(3),'+
-    '#v-portfolio tbody tr:not(.pfgrp) td:nth-child(4),#v-portfolio tbody tr:not(.pfgrp) td:nth-child(5){display:none}'+
+    '#v-portfolio tbody td:nth-child(2),#v-portfolio tbody td:nth-child(3),'+
+    '#v-portfolio tbody td:nth-child(4),#v-portfolio tbody td:nth-child(5){display:none}'+
     '#v-portfolio .metrics{grid-template-columns:repeat(2,1fr)}'+
     /* seri/para birimi düğmeleri ekrana sığsın, satır atlasın */
     '#v-portfolio .pfcur{border-radius:14px; width:100%; justify-content:flex-start}'+
@@ -822,7 +823,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
       var gd=0, gdBase=0, gdHas=false;
       g.list.forEach(function(a){ var d=aDayChangeIn(a,cur); if(d==null) return; var v=aValueDisp(a); if(v==null) return; gdHas=true; gd+=d; gdBase+=v-d; });
       var gdPct=(gdHas&&gdBase>0)?gd/gdBase*100:null;
-      var hdr='<tr class="pfgrp"><td class="l" colspan="5">'+pfTypeLabel(g.type)+' · '+g.list.length+'</td>'+
+      var hdr='<tr class="pfgrp"><td class="l">'+pfTypeLabel(g.type)+' · '+g.list.length+'</td><td></td><td></td><td></td><td></td>'+
         '<td class="gsub '+(gdHas?pnlCls(gd):'')+'">'+(gdPct==null?'':((gdPct>0?'+':'')+fmt(gdPct,2)+'%<div class="nm '+pnlCls(gd)+'">'+(gd>0?'+':'')+pf$(gd)+'</div>'))+'</td>'+
         '<td class="gsub">'+(g.val==null?'':pf$(g.val))+'</td>'+
         '<td class="gsub">'+(g.pnl==null?'':(g.pnl>0?'+':'')+pf$(g.pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
@@ -834,7 +835,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var closedHtml='';
   if(closed.length){
     closedHtml='<details style="margin-top:16px"><summary style="cursor:pointer; font-weight:700; color:var(--dim); font-size:13px; padding:6px 0">Kapanmış varlıklar ('+closed.length+') — elde adet kalmadı</summary>'+
-      '<div class="scroll" style="margin-top:8px"><table><thead><tr><th class="l">Varlık</th><th>Gerçekleşen K/Z</th><th>Son işlem</th><th></th></tr></thead><tbody>'+
+      '<div class="scroll" style="margin-top:8px"><table class="pfclosed"><thead><tr><th class="l">Varlık</th><th>Gerçekleşen K/Z</th><th>Son işlem</th><th></th></tr></thead><tbody>'+
       closed.map(function(a){ var real=aRealizedDisp(a), lt=a.tx[a.tx.length-1].t;
         return '<tr data-open="'+a.id+'"><td><b>'+(a.name||clean(a.symbol||'—'))+'</b>'+(a.symbol?' <span class="nm">'+clean(a.symbol)+'</span>':'')+' <span class="pfbadge">'+pfTypeLabel(a.type)+'</span></td>'+
           '<td class="'+pnlCls(real)+'">'+(real?((real>0?'+':'')+pf$(real)):pf$(0))+'</td>'+
