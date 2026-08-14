@@ -127,18 +127,35 @@ function hideRealPortfolio(){
   var rv=$('v-real'); if(rv && rv.classList.contains('active') && B && B.goView) B.goView('all');
 }
 function pfShow(){ pfUnlocked=false; VIEW={mode:'list',id:null}; B.goView('portfolio'); pfRender(); }
+var PF_IDLE_MS=60000, pfLastAct=Date.now(), pfIdleTimer=null;
+function pfTouchAct(){ pfLastAct=Date.now(); }
+/* Elle kilitle: veriyi kapat ve panoya dön */
+function pfLockNow(){
+  pfUnlocked=false; VIEW={mode:'list',id:null}; pfRender();
+  if(B && B.goView) B.goView('all');
+}
+function pfIdleCheck(){
+  if(!pfUnlocked) return;
+  if(Date.now()-pfLastAct < PF_IDLE_MS) return;
+  pfUnlocked=false; VIEW={mode:'list',id:null};
+  var v=$('v-portfolio');
+  if(v && v.classList.contains('active') && !document.hidden) pfRender();
+}
 function wire(){ var t=document.querySelector('.tab[data-v="portfolio"]'); if(t) t.onclick=pfShow; pf();
-  /* Tarayıcıda başka sekmeye geçilirse Yatırımlarım kilitlensin */
+  /* Kilit: anında değil, 60 sn HAREKETSİZLİK sonrası. Başka sekmedeyken/uygulamadayken
+     sayaç işlemeye devam eder; kısa bir hesap makinesi molası kilitlemez. */
+  ['mousemove','mousedown','keydown','touchstart','wheel','scroll'].forEach(function(ev){
+    document.addEventListener(ev, function(){ if(!document.hidden) pfTouchAct(); }, {passive:true});
+  });
   document.addEventListener('visibilitychange', function(){
-    if(document.hidden){ if(pfUnlocked){ pfUnlocked=false; VIEW={mode:'list',id:null}; } return; }
+    if(document.hidden) return;                       /* ayrılırken sayaç durmaz */
+    pfIdleCheck();                                    /* dönüşte süre dolduysa kilitle */
+    if(pfUnlocked) pfTouchAct();
     var v=$('v-portfolio');
     if(v && v.classList.contains('active') && !pfUnlocked) pfRender();
   });
-  window.addEventListener('blur', function(){ if(pfUnlocked){ pfUnlocked=false; VIEW={mode:'list',id:null}; } });
-  window.addEventListener('focus', function(){
-    var v=$('v-portfolio');
-    if(v && v.classList.contains('active') && !pfUnlocked) pfRender();
-  });
+  if(pfIdleTimer) clearInterval(pfIdleTimer);
+  pfIdleTimer=setInterval(pfIdleCheck, 5000);
 }
 
 /* --- veri modeli --- */
@@ -383,7 +400,7 @@ function pfRenderLock(box){
   box.innerHTML='<div class="card" style="max-width:380px; margin:44px auto; text-align:center">'+
     '<div style="font-size:34px">🔒</div>'+
     '<h2 style="margin:8px 0 4px; font-size:20px">Yatırımlarım kilitli</h2>'+
-    '<div class="sub" style="margin-bottom:14px">Hassas veri. Devam etmek için hesap şifreni gir.</div>'+
+    '<div class="sub" style="margin-bottom:14px">Hassas veri. Devam etmek için hesap şifreni gir.<br><span class="cov">60 sn hareketsizlikte tekrar kilitlenir.</span></div>'+
     '<input class="fld" id="pfPw" type="password" placeholder="şifre" autocomplete="current-password" style="width:100%; text-align:center">'+
     '<div class="hint down" id="pfPwMsg" style="min-height:16px; margin:8px 0"></div>'+
     '<button class="go buy" id="pfPwBtn" style="width:100%; padding:11px">Kilidi aç</button>'+
@@ -393,7 +410,7 @@ function pfRenderLock(box){
   function submit(){ var pw=inp.value||''; if(!pw){ msg.textContent='Şifre gir.'; return; }
     btn.disabled=true; btn.textContent='kontrol ediliyor…'; msg.textContent='';
     pfVerifyPw(pw, function(ok){
-      if(ok===true){ pfUnlocked=true; pfRender(); }
+      if(ok===true){ pfUnlocked=true; pfTouchAct(); pfRender(); }
       else if(ok===false){ btn.disabled=false; btn.textContent='Kilidi aç'; msg.textContent='Şifre yanlış.'; inp.value=''; inp.focus(); }
       else { btn.disabled=false; btn.textContent='Kilidi aç'; msg.textContent='Şifre doğrulama bağlı değil (B.verifyPassword eksik).'; }
     });
@@ -572,11 +589,11 @@ function pfOdoApply(root){
     var full=(vEl.textContent||'').trim();
     var prev=pfStatPrev[label];
     pfStatPrev[label]=full;
-    if(reduce || prev===full) return;                 // değişmediyse kıpırdatma
-    var origHTML=vEl.innerHTML;                       // animasyon bitince aynen geri konur
+    var animate = !reduce && prev!==full;             /* ilk açılışta sıfırdan yukarı sayar */
     var cur=full.replace(/\D/g,''), pv=(prev||'').replace(/\D/g,'');
     var off=cur.length-pv.length, n=0, cols=[], EM=1.2;
-    /* metin düğümlerini gez, rakamları makara sütununa çevir */
+    /* metin düğümlerini gez, rakamları makara sütununa çevir (her zaman —
+       böylece animasyonlu ve animasyonsuz kartlar birebir aynı yerleşimde durur) */
     (function walk(node){
       var kids=Array.prototype.slice.call(node.childNodes);
       kids.forEach(function(ch){
@@ -591,9 +608,10 @@ function pfOdoApply(root){
               for(var loop=0; loop<2; loop++) for(var d=0; d<=9; d++){
                 var s=document.createElement('span'); s.className='odoD'; s.textContent=d; col.appendChild(s);
               }
-              col.style.transform='translateY(-'+(from*EM)+'em)';
+              var to=(10+(+c))*EM;
+              col.style.transform='translateY(-'+(animate?(from*EM):to)+'em)';
               wrap.appendChild(col); frag.appendChild(wrap);
-              cols.push({col:col, to:(10+(+c))*EM});
+              if(animate) cols.push({col:col, to:to});
             } else {
               var t=document.createElement('span'); t.className='odoS'; t.textContent=c; frag.appendChild(t);
             }
@@ -602,14 +620,13 @@ function pfOdoApply(root){
         } else if(ch.nodeType===1) walk(ch);
       });
     })(vEl);
-    if(!cols.length){ vEl.innerHTML=origHTML; return; }
+    if(!cols.length) return;
     requestAnimationFrame(function(){ requestAnimationFrame(function(){
       cols.forEach(function(o,i){
         o.col.style.transition='transform 900ms cubic-bezier(.16,.84,.28,1) '+(i*45)+'ms';
         o.col.style.transform='translateY(-'+o.to+'em)';
       });
     }); });
-    setTimeout(function(){ if(vEl.isConnected!==false) vEl.innerHTML=origHTML; }, 900+cols.length*45+120);
   });
 }
 /* ---- Portföy dağılımı (halka + lejant) ---- */
@@ -745,7 +762,8 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     '</div></details>'):'';
   var syms=STOCKS().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);}).map(function(s){ return '<option value="'+clean(s.symbol)+'">'+(s.name||'')+'</option>'; }).join('');
   box.innerHTML=''+
-    '<div class="pfhead"><div><h2 style="margin:0; font-size:22px">Yatırımlarım</h2><div class="sub">Her varlık tek satır. Satıra tıkla → o varlığın sayfası. Değerler '+psym()+'.</div></div><div class="pfcur" id="pfCur">'+curBtns+'</div></div>'+
+    '<div class="pfhead"><div><h2 style="margin:0; font-size:22px">Yatırımlarım</h2><div class="sub">Her varlık tek satır. Satıra tıkla → o varlığın sayfası. Değerler '+psym()+'.</div></div>'+
+    '<div style="display:flex; align-items:center; gap:8px"><button class="ghost" id="pfLockBtn" title="Kilitle ve panoya dön">🔒 Kilitle</button><div class="pfcur" id="pfCur">'+curBtns+'</div></div></div>'+
     stat+costWarn+
     '<div class="pftypes" id="pfTypeBar">'+PF_TYPES.map(function(T){ return '<button data-t="'+T.k+'"'+(T.k===pfAddType?' class="on"':'')+'>'+T.t+'</button>'; }).join('')+'</div>'+
     '<div class="pfquick" id="pfQuickBar"></div>'+
@@ -757,6 +775,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
   pfWireChart(box);
   pfOdoApply(box);
+  var lb=$('pfLockBtn'); if(lb) lb.onclick=pfLockNow;
   var dm=$('pfDistMode'); if(dm) dm.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfDistMode=b.dataset.dm; pfRender(); }; });
   var dbox=$('pfDistBox');
   if(dbox) dbox.querySelectorAll('.pfleg').forEach(function(l){
@@ -837,7 +856,7 @@ function pfRenderAsset(box, a){
   var q=aQty(a), rem=aRemCost(a,dc), ac=(rem.qty!=null&&rem.qty>0)?rem.cost/rem.qty:null, u=aCurUnitIn(a,dc), v=aValueIn(a,dc), c=rem.cost, pnl=(v!=null&&c!=null)?v-c:null, pct=(c>0&&pnl!=null)?pnl/c*100:null, nc=aNativeCcy(a);
   var real=aRealizedIn(a,dc), isStock=(a.type==='stock'), inPanel=(a.type==='stock' && !!find(a.symbol)), unit=aUnitName(a);
   var ccyBtns='<div class="pfcur" id="pfAssetCur" style="margin-top:8px">'+['TRY','USD','EUR'].map(function(cc){ return '<button data-ac="'+cc+'" class="'+(cc===dc?'on':'')+'">'+psymCcy(cc)+' '+cc+'</button>'; }).join('')+'</div>';
-  var head='<button class="back" id="pfBack">← Yatırımlarım</button>'+
+  var head='<div style="display:flex; align-items:center; justify-content:space-between; gap:10px"><button class="back" id="pfBack" style="margin-bottom:0">← Yatırımlarım</button><button class="ghost" id="pfLockBtn2" title="Kilitle ve panoya dön">🔒 Kilitle</button></div>'+
     '<div class="dhead"><div><h2 style="margin:0; font-size:24px">'+(a.name||clean(a.symbol||'—'))+(a.symbol?' <span class="nm" style="font-size:15px">'+clean(a.symbol)+'</span>':'')+' <span class="pfbadge">'+pfTypeLabel(a.type)+'</span></h2>'+
       '<div class="nm" style="font-size:13px; margin-top:4px">'+(a.note?a.note:('birim: '+unit))+pfManualNote(a)+'</div>'+ccyBtns+'</div>'+
       '<div style="text-align:right"><div class="px">'+d$(v)+'</div><div class="'+pnlCls(pnl)+'" style="font-weight:700">'+(pnl==null?'':(pnl>0?'+':'')+d$(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</div></div></div>';
@@ -880,6 +899,7 @@ function pfRenderAsset(box, a){
     '<h3 style="font-size:16px; margin:20px 0 8px">Bu varlıktaki işlemlerim <span class="nm" style="font-size:12px; font-weight:400">(✎ düzenle · 🗑 sil)</span></h3><div class="log scroll" style="max-height:300px">'+txHtml+'</div>'+
     '<div class="disclaimer">Değerler <b>'+dc+'</b> cinsinden. Ort. maliyet, her alımın <b>kendi günkü kuruyla</b> '+dc+' karşılığının ağırlıklı ortalamasıdır — yani '+dc+' getirisi gerçek kur farkını içerir. Üstteki TL/USD/EUR düğmeleriyle getirini karşılaştır. Yatırım tavsiyesi değildir.</div>';
   $('pfBack').onclick=function(){ VIEW={mode:'list',id:null}; pfRender(); };
+  var lb2=$('pfLockBtn2'); if(lb2) lb2.onclick=pfLockNow;
   box.querySelectorAll('#pfAssetCur button').forEach(function(b){ b.onclick=function(){ VIEW.ccy=b.dataset.ac; pfRender(); }; });
   var bb=$('pfBuy'); if(bb) bb.onclick=function(){ pfAssetBuy(a,'buy'); };
   var sb=$('pfSell'); if(sb) sb.onclick=function(){ pfAssetBuy(a,'sell'); };
