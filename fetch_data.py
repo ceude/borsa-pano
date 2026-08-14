@@ -211,11 +211,25 @@ rates = {"EURTRY": r2(last_close(fx, "EURTRY=X"), 4),
          "USDTRY": r2(last_close(fx, "USDTRY=X"), 4)}
 
 # gram altın TL: GC=F (ons/USD) → gram/USD → gram/TL
+# gram altın TL: GC=F (ons/USD) → gram/USD → gram/TL  (+ önceki gün)
 _gold_oz_usd = last_close(fx, "GC=F")
 if _gold_oz_usd and rates.get("USDTRY"):
     rates["goldGramTRY"] = r2(_gold_oz_usd / 31.1034768 * rates["USDTRY"], 2)
 else:
     rates["goldGramTRY"] = None
+
+# önceki gün: GC=F bir önceki kapanış × USDTRY bir önceki kapanış
+def prev_close(batch, sym):
+    df = sub_df(batch, sym)
+    if df is None or "Close" not in df: return None
+    s = df["Close"].dropna()
+    return float(s.iloc[-2]) if len(s) >= 2 else None
+
+_gold_prev = prev_close(fx, "GC=F")
+_usd_prev  = prev_close(fx, "USDTRY=X")
+rates["goldGramTRYPrev"] = r2(_gold_prev / 31.1034768 * _usd_prev, 2) if (_gold_prev and _usd_prev) else None
+rates["EURTRYPrev"] = r2(prev_close(fx, "EURTRY=X"), 4)
+rates["USDTRYPrev"] = r2(_usd_prev, 4)
 
 benchmarks = {}
 for mkt, idx in BENCH.items():
