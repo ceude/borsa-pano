@@ -59,11 +59,13 @@ function injectCSS(){
   '.pfgrp td{background:var(--bg); color:var(--faint); font-weight:700; font-size:11px; letter-spacing:.03em; text-transform:uppercase; border-top:1px solid var(--line); padding-top:9px}'+
   '.pfgrp:hover td{background:var(--bg)}'+
   '.pfgrp .gsub{font-weight:700}'+
+  '.pfgrp .gsub .nm{font-weight:600; text-transform:none; letter-spacing:0; font-size:10.5px; margin-top:1px}'+
   '.pfwarnflag{font-size:10px; font-weight:700; color:#7a2530; background:var(--down-bg); border:1px solid var(--down); border-radius:6px; padding:1px 6px; cursor:help}'+
   /* ---- rakam kayma (havaalanı tabelası) ---- */
-  '.odo{display:inline-block; height:1em; line-height:1em; overflow:hidden; vertical-align:bottom}'+
+  '.odo{display:inline-block; height:1.2em; line-height:1.2em; overflow:hidden; vertical-align:-0.2em}'+
   '.odoC{display:block; will-change:transform}'+
-  '.odoD{display:block; height:1em; line-height:1em; text-align:center}'+
+  '.odoD{display:block; height:1.2em; line-height:1.2em; text-align:center}'+
+  '.odoS{display:inline-block; height:1.2em; line-height:1.2em; vertical-align:-0.2em; white-space:pre}'+
   '@media (prefers-reduced-motion:reduce){ .odoC{transition:none!important} }'+
   /* ---- dağılım halkası ---- */
   '.pfdist{display:flex; gap:22px; align-items:center; flex-wrap:wrap; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:16px 18px}'+
@@ -571,8 +573,9 @@ function pfOdoApply(root){
     var prev=pfStatPrev[label];
     pfStatPrev[label]=full;
     if(reduce || prev===full) return;                 // değişmediyse kıpırdatma
+    var origHTML=vEl.innerHTML;                       // animasyon bitince aynen geri konur
     var cur=full.replace(/\D/g,''), pv=(prev||'').replace(/\D/g,'');
-    var off=cur.length-pv.length, n=0, cols=[];
+    var off=cur.length-pv.length, n=0, cols=[], EM=1.2;
     /* metin düğümlerini gez, rakamları makara sütununa çevir */
     (function walk(node){
       var kids=Array.prototype.slice.call(node.childNodes);
@@ -588,22 +591,25 @@ function pfOdoApply(root){
               for(var loop=0; loop<2; loop++) for(var d=0; d<=9; d++){
                 var s=document.createElement('span'); s.className='odoD'; s.textContent=d; col.appendChild(s);
               }
-              col.style.transform='translateY(-'+from+'em)';
+              col.style.transform='translateY(-'+(from*EM)+'em)';
               wrap.appendChild(col); frag.appendChild(wrap);
-              cols.push({col:col, to:10+(+c)});
-            } else frag.appendChild(document.createTextNode(c));
+              cols.push({col:col, to:(10+(+c))*EM});
+            } else {
+              var t=document.createElement('span'); t.className='odoS'; t.textContent=c; frag.appendChild(t);
+            }
           });
           node.replaceChild(frag, ch);
         } else if(ch.nodeType===1) walk(ch);
       });
     })(vEl);
-    if(!cols.length) return;
+    if(!cols.length){ vEl.innerHTML=origHTML; return; }
     requestAnimationFrame(function(){ requestAnimationFrame(function(){
       cols.forEach(function(o,i){
         o.col.style.transition='transform 900ms cubic-bezier(.16,.84,.28,1) '+(i*45)+'ms';
         o.col.style.transform='translateY(-'+o.to+'em)';
       });
     }); });
+    setTimeout(function(){ if(vEl.isConnected!==false) vEl.innerHTML=origHTML; }, 900+cols.length*45+120);
   });
 }
 /* ---- Portföy dağılımı (halka + lejant) ---- */
@@ -702,7 +708,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
       g.list.forEach(function(a){ var d=aDayChangeIn(a,cur); if(d==null) return; var v=aValueDisp(a); if(v==null) return; gdHas=true; gd+=d; gdBase+=v-d; });
       var gdPct=(gdHas&&gdBase>0)?gd/gdBase*100:null;
       var hdr='<tr class="pfgrp"><td class="l" colspan="5">'+pfTypeLabel(g.type)+' · '+g.list.length+'</td>'+
-        '<td class="gsub '+(gdHas?pnlCls(gd):'')+'">'+(gdPct==null?'':(gdPct>0?'+':'')+fmt(gdPct,2)+'%')+'</td>'+
+        '<td class="gsub '+(gdHas?pnlCls(gd):'')+'">'+(gdPct==null?'':((gdPct>0?'+':'')+fmt(gdPct,2)+'%<div class="nm '+pnlCls(gd)+'">'+(gd>0?'+':'')+pf$(gd)+'</div>'))+'</td>'+
         '<td class="gsub">'+(g.val==null?'':pf$(g.val))+'</td>'+
         '<td class="gsub">'+(g.pnl==null?'':(g.pnl>0?'+':'')+pf$(g.pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
         '<td></td></tr>';
