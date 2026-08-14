@@ -403,28 +403,53 @@ function pfDlgErr(msg){
   if(h && h.nextSibling) b.insertBefore(el, h.nextSibling); else b.insertBefore(el, b.firstChild);
   if(b.parentNode) b.parentNode.scrollTop=0;
 }
-/* Bugünkü değişim — yalnız panodan canlı fiyat gelen varlıklarda (hisse) hesaplanabilir */
-function aDayPct(a){
-  if(a.type!=='stock' || a.valMode!=='qty') return null;
-  var s=a.symbol?find(a.symbol):null;
-  return (s && s.changePct!=null && !isNaN(s.changePct)) ? s.changePct : null;
+/* ---- Bugünkü değişim ----
+   Doğru model: bugünkü değer BUGÜNKÜ kurla, dünkü değer DÜNKÜ kurla hesaplanır.
+   Böylece TL hissesi %1,4 artarken EUR/TRY de yükseldiyse EUR bazındaki değişim farklı çıkar. */
+function pfPrevRates(){
+  if(!ratesReady()) return null;
+  var today=new Date().toISOString().slice(0,10), R=RATEHIST;
+  for(var i=R.length-1;i>=0;i--){
+    var d=new Date(R[i][0]*1000).toISOString().slice(0,10);
+    if(d<today) return {usdtry:R[i][1], eurtry:R[i][2]};
+  }
+  return null;
 }
-function aDayChangeIn(a, dc){
-  var p=aDayPct(a); if(p==null) return null;
-  var v=aValueIn(a,dc); if(v==null) return null;
-  var prevV = v/(1+p/100);
-  return v-prevV;
+function prevTRYper(ccy){                      /* 1 birim ccy dün kaç TL'ydi */
+  if(ccy==='TRY') return 1;
+  var r=pfPrevRates(); if(!r) return null;
+  return ccy==='USD'?r.usdtry:(ccy==='EUR'?r.eurtry:null);
 }
+function aUnitTRYprev(a){                      /* 1 birimin dünkü TL karşılığı */
+  if(a.type==='stock'){
+    var s=a.symbol?find(a.symbol):null; if(!s || s.prevClose==null) return null;
+    var pc=prevTRYper(aNativeCcy(a)); return pc==null?null:s.prevClose*pc;
+  }
+  if(a.type==='gold'){ var gp=RATES().goldGramTRYPrev; return (gp!=null&&!isNaN(gp))?gp:null; }
+  if(a.type==='fx'){ return prevTRYper(a.holdCcy||'EUR'); }
+  return null;                                 /* mevduat/fon/manuel: günlük veri yok */
+}
+function aDayIn(a, dc){
+  if(a.valMode!=='qty') return null;
+  var q=aQty(a); if(q==null||q<=0) return null;
+  var un=aUnitTRYnow(a), up=aUnitTRYprev(a); if(un==null||up==null) return null;
+  var nowV=frTRY(q*un, dc); if(nowV==null) return null;
+  var pd=prevTRYper(dc); if(pd==null||pd<=0) return null;
+  var prevV=(q*up)/pd;                         /* dünkü değer, DÜNKÜ kurla dc'ye çevrilir */
+  if(!isFinite(prevV)||prevV===0) return null;
+  return {now:nowV, prev:prevV, chg:nowV-prevV, pct:(nowV/prevV-1)*100};
+}
+function aDayPct(a){ var d=aDayIn(a,pcy()); return d?d.pct:null; }
+function aDayChangeIn(a, dc){ var d=aDayIn(a,dc); return d?d.chg:null; }
 function pfDayTotals(dc){
-  var chg=0, base=0, has=false, unknown=0;
+  var now=0, prev=0, has=false, unknown=0;
   Object.keys(pf().assets).forEach(function(id){ var a=pf().assets[id];
-    if(a.valMode==='qty' && (aQty(a)||0)<=0.0000001 && (a.tx&&a.tx.length)) return;   // kapanmış
-    var v=aValueIn(a,dc); if(v==null) return;
-    var d=aDayChangeIn(a,dc);
-    if(d==null){ if(v>0) unknown+=v; return; }
-    has=true; chg+=d; base+=v-d;
+    if(a.valMode==='qty' && (aQty(a)||0)<=0.0000001 && (a.tx&&a.tx.length)) return;   /* kapanmış */
+    var d=aDayIn(a,dc);
+    if(!d){ var v=aValueIn(a,dc); if(v!=null&&v>0) unknown+=v; return; }
+    has=true; now+=d.now; prev+=d.prev;
   });
-  return has?{chg:chg, pct:(base>0?chg/base*100:null), unknown:unknown}:null;
+  return has?{chg:now-prev, pct:(prev>0?(now/prev-1)*100:null), unknown:unknown}:null;
 }
 /* Döviz işleminde ödeme para birimi, tutulan dövizle aynı ama birim fiyat 1'den çok uzaksa
    neredeyse kesin yanlış girilmiştir (ör. TL kuru girilip ödeme EUR bırakılmış). */
@@ -518,7 +543,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     if(a.valMode==='amount' && (a.cost==null||isNaN(a.cost)) && a.curValue!=null) noCost.push(a.name||'—'); });
   var costWarn = noCost.length ? ('<div class="hint down" style="margin:-6px 0 12px">⚠ <b>'+noCost.length+'</b> varlıkta maliyet girilmemiş ('+noCost.slice(0,3).join(', ')+(noCost.length>3?' …':'')+'). Maliyeti 0 sayıldığı için <b>Toplam K/Z ve yüzde olduğundan yüksek</b> görünür — Düzenle ile anapara/maliyet gir.</div>') : '';
   var dt=pfDayTotals(cur);
-  var dayCard = dt ? ('<div><div class="k">Bugün'+(dt.unknown>0?' <span class="cov" title="Canlı fiyatı olmayan varlıklar (döviz, altın, mevduat vb.) bu hesaba girmez">*</span>':'')+'</div><div class="v '+pnlCls(dt.chg)+'">'+
+  var dayCard = dt ? ('<div><div class="k">Bugün'+(dt.unknown>0?' <span class="cov" title="Günlük verisi olmayan varlıklar (mevduat, fon, manuel fiyatlı hisse; gram altın fiyatı için data.js\'te önceki gün alanı yoksa altın da) bu hesaba girmez">*</span>':'')+'</div><div class="v '+pnlCls(dt.chg)+'">'+
       (dt.chg>0?'+':'')+pf$(dt.chg)+(dt.pct!=null?' <span style="font-size:15px">('+(dt.pct>0?'+':'')+fmt(dt.pct,2)+'%)</span>':'')+'</div></div>') : '';
   var realTot=0, realHas=false;
   Object.keys(P.assets).forEach(function(id){ var r=aRealizedDisp(P.assets[id]); if(r!=null && !isNaN(r) && r!==0){ realTot+=r; realHas=true; } });
@@ -555,7 +580,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
         '<td></td></tr>';
       return hdr + g.list.map(pfAssetRow).join('');
     }).join('');
-    listHtml='<div class="scroll"><table><thead><tr><th class="l">Varlık</th><th>Adet</th><th>Ort. maliyet</th><th>Güncel</th><th title="Kendi para biriminde güncel değer">Orijinal</th><th title="Bugünkü değişim — yalnız panodan canlı fiyat gelen hisselerde">Gün %</th><th title="'+psym()+' cinsinden değer">Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+body+'</tbody></table></div>';
+    listHtml='<div class="scroll"><table><thead><tr><th class="l">Varlık</th><th>Adet</th><th>Ort. maliyet</th><th>Güncel</th><th title="Kendi para biriminde güncel değer">Orijinal</th><th title="Bugünkü değişim — seçili para birimine göre. Hem varlığın fiyat hareketini hem o günkü kur hareketini içerir.">Gün %</th><th title="'+psym()+' cinsinden değer">Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+body+'</tbody></table></div>';
   }
   var closedHtml='';
   if(closed.length){
