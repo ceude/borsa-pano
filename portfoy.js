@@ -38,7 +38,9 @@ function injectCSS(){
   if(document.getElementById('pfStyle')) return;
   var css=''+
   '.pfhead{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px}'+
-  '.pfcur{display:flex; gap:4px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:3px}'+
+  '.pfcur{display:flex; flex-wrap:wrap; gap:4px; background:var(--bg); border:1px solid var(--line); border-radius:999px; padding:3px; max-width:100%}'+
+  '#v-portfolio{overflow-x:hidden}'+
+  '#v-portfolio .scroll{max-width:100%}'+
   '.pfcur button{border:none; background:transparent; padding:6px 14px; border-radius:999px; font-weight:700; font-size:13px; color:var(--dim); cursor:pointer}'+
   '.pfcur button.on{background:var(--brand); color:#fff}'+
   '.pfquick{display:flex; gap:8px; flex-wrap:wrap; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:8px 0 16px}'+
@@ -67,6 +69,12 @@ function injectCSS(){
   '.odoW{position:absolute; left:0; top:0; right:0; bottom:0; overflow:hidden}'+
   '.odoC{position:absolute; left:0; top:0; width:100%; display:block; will-change:transform}'+
   '.odoD{display:block; height:1.2em; line-height:1.2em; text-align:center}'+
+  '.pfring{transform-box:fill-box; transform-origin:center; animation:pfPulse 1.5s ease-out 3 both}'+
+  '.pfring2{animation-delay:.45s}'+
+  '.pfringdot{transform-box:fill-box; transform-origin:center; animation:pfPop 4.6s ease-out 1 both}'+
+  '@keyframes pfPulse{0%{transform:scale(.35); opacity:.85} 70%{opacity:.28} 100%{transform:scale(3.4); opacity:0}}'+
+  '@keyframes pfPop{0%{transform:scale(0); opacity:0} 8%{transform:scale(1.35); opacity:1} 20%{transform:scale(1)} 88%{opacity:1} 100%{opacity:0}}'+
+  '@media (prefers-reduced-motion:reduce){ .pfring{display:none} .pfringdot{animation:none} }'+
   '@media (prefers-reduced-motion:reduce){ .odoC{transition:none!important} }'+
   /* ---- dağılım halkası ---- */
   '.pfdist{display:flex; gap:22px; align-items:center; flex-wrap:wrap; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:16px 18px}'+
@@ -94,6 +102,14 @@ function injectCSS(){
     '#v-portfolio tbody tr:not(.pfgrp) td:nth-child(2),#v-portfolio tbody tr:not(.pfgrp) td:nth-child(3),'+
     '#v-portfolio tbody tr:not(.pfgrp) td:nth-child(4),#v-portfolio tbody tr:not(.pfgrp) td:nth-child(5){display:none}'+
     '#v-portfolio .metrics{grid-template-columns:repeat(2,1fr)}'+
+    /* seri/para birimi düğmeleri ekrana sığsın, satır atlasın */
+    '#v-portfolio .pfcur{border-radius:14px; width:100%; justify-content:flex-start}'+
+    '#v-portfolio .pfcur button{padding:6px 10px; font-size:12px; border-radius:10px; flex:0 0 auto}'+
+    '#pfSeriesSel{width:100%}'+
+    '#pfChartView{margin-left:0!important; width:auto}'+
+    '#v-portfolio .pfhead{flex-direction:column; align-items:stretch}'+
+    '.pfdist{gap:14px; padding:14px}'+
+    '.pflegend{min-width:0}'+
     '#v-portfolio .pfquick{flex-direction:column; align-items:stretch}'+
     '#v-portfolio .pfquick button,#v-portfolio .pfquick input{width:100%}'+
     '#v-portfolio .pfquick span[style*="flex:1"]{display:none}'+
@@ -310,21 +326,41 @@ function pfTypeTotals(dc){
     var key=PF_SERIES_MAP[a.type]; if(key) o[key]+=v; });
   return o.has?o:null;
 }
-function pfSaveDay(){ var v=pfSnapVals(); if(!v){ dlg('Kayıt yok','<p>Önce en az bir varlık ekle.</p>',[{label:'Tamam',primary:true}]); return; }
+function pfSaveDay(){
+  var v=pfSnapVals(); if(!v){ dlg('Kayıt yok','<p>Önce en az bir varlık ekle.</p>',[{label:'Tamam',primary:true}]); return; }
+  var d=new Date().toISOString().slice(0,10), H=pf().hist, hc=H.ccy||'TRY';
+  var old=null; (H.points||[]).forEach(function(p){ if(p.date===d) old=p; });
+  var tt=pfTypeTotals(pcy());
+  var labels={borsa:'Borsa', doviz:'Döviz', altin:'Altın', fon:'Fon', mevduat:'Mevduat', kripto:'Kripto', diger:'Diğer'};
+  var lines='';
+  if(tt){ for(var tk in PF_SERIES_MAP){ var k=PF_SERIES_MAP[tk]; if(tt[k]>0)
+    lines+='<div class="prow" style="padding:5px 0"><span>'+labels[k]+'</span><b>'+pf$(tt[k])+'</b></div>'; } }
+  dlg('Günü kaydet — '+pfDMY(d),
+    '<div class="prow" style="padding:6px 0; border-bottom:1px solid var(--line)"><span><b>Toplam</b></span><b>'+pf$(tt?tt.total:0)+'</b></div>'+lines+
+    '<div class="tpfield" style="margin-top:14px"><label>Güne ait not (ops.)</label>'+
+    '<input class="fld" id="pfsdNote" style="width:100%" placeholder="örn. maaş girdi / altın aldım" value="'+((old&&old.note)?old.note.replace(/"/g,'&quot;'):'')+'">'+
+    '<div class="tphelp">Notu olan günler grafikte kırmızı noktayla işaretlenir. Boş bırakabilirsin.</div></div>'+
+    (old?'<div class="hint">Bugün için zaten bir kayıt var — üzerine yazılacak.</div>':''),
+    [{label:'Kaydet',primary:true,fn:function(){ pfSaveDayDo(($('pfsdNote').value||'').trim()); }},{label:'Vazgeç'}]);
+}
+function pfSaveDayDo(note){
+  var v=pfSnapVals(); if(!v) return;
   var d=new Date().toISOString().slice(0,10);
   pf().snaps=pf().snaps.filter(function(s){return s.date!==d;});
   pf().snaps.push({date:d,TRY:v.TRY,USD:v.USD,EUR:v.EUR});
-  /* Grafiği tek kaynaktan beslemek için kırılımı da geçmiş serisine yaz (Excel ile aynı yapı) */
   var H=pf().hist; if(!H.ccy) H.ccy='TRY'; H.points=H.points||[];
   var tt=pfTypeTotals(H.ccy);
   if(tt){
     var old=null; H.points.forEach(function(p){ if(p.date===d) old=p; });
     var pt = old || {date:d};
     pt.value=tt.total;
-    for(var mk in PF_SERIES_MAP) pt[PF_SERIES_MAP[mk]]=tt[PF_SERIES_MAP[mk]];   // not varsa korunur
+    for(var mk in PF_SERIES_MAP) pt[PF_SERIES_MAP[mk]]=tt[PF_SERIES_MAP[mk]];
+    if(note) pt.note=note; else delete pt.note;
     if(!old){ H.points.push(pt); H.points.sort(function(x,y){ return x.date<y.date?-1:1; }); }
   }
-  save(); pfRender(); }
+  pfPulseDate=d; pfChartView='chart';
+  save(); pfRender();
+}
 function pfHistRate(date){ var R=pf().hist.rates||[];
   if(R.length){ var best=null; R.forEach(function(r){ if(r.date<=date){ if(!best||r.date>best.date) best=r; } }); if(!best) best=R[0]; return {usdtry:best.usdtry, eurtry:best.eurtry}; }
   return pfRateAtDate(date); }
@@ -365,17 +401,50 @@ function pfLineChart(pts, color, sym){
     xlab+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="var(--faint)">'+pfDMY(pts[i].date)+'</text>'; });
   function isNote(p){ var t=(p.note||'').trim().toUpperCase(); return !!t && t!=='YOK'; }
   var dots=pts.map(function(p,i){ if(!isNote(p)) return '';
-    var tip=(pfDMY(p.date)+' · '+(sym||'')+fmt(p.y)+(p.note?(' · '+p.note):'')).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-    return '<circle class="pfdot" cx="'+X(i).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="2.6" fill="#ef4444" stroke="var(--surface)" stroke-width="1" data-tip="'+tip+'"></circle>'; }).join('');
+    return '<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(p.y).toFixed(1)+'" r="2.6" fill="#ef4444" stroke="var(--surface)" stroke-width="1" pointer-events="none"></circle>'; }).join('');
+  /* her nokta için görünmez yakalama alanı — imleç nerede olursa olsun değer okunur */
+  var band=(n>1)?((W-PL-PR)/(n-1)):(W-PL-PR);
+  var hits=pts.map(function(p,i){
+    var cx=X(i), x=Math.max(PL-band/2, cx-band/2);
+    var tip=(pfDMY(p.date)+' · '+(sym||'')+fmt(p.y)+(isNote(p)?(' · '+p.note):'')).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    return '<rect class="pfhit" x="'+x.toFixed(1)+'" y="'+PT+'" width="'+Math.max(band,3).toFixed(1)+'" height="'+(H-PT-PB)+'" fill="transparent"'+
+      ' data-cx="'+cx.toFixed(1)+'" data-cy="'+Y(p.y).toFixed(1)+'" data-tip="'+tip+'"'+(isNote(p)?' data-note="1"':'')+'></rect>';
+  }).join('');
+  /* yeni kaydedilen günü belli et: genişleyip sönen halka */
+  var pulse='';
+  if(pfPulseDate){ pts.forEach(function(p,i){ if(p.date!==pfPulseDate) return;
+    var cx=X(i).toFixed(1), cy=Y(p.y).toFixed(1);
+    pulse='<circle class="pfring" cx="'+cx+'" cy="'+cy+'" r="6" fill="none" stroke="'+color+'" stroke-width="2.5" pointer-events="none"/>'+
+      '<circle class="pfring pfring2" cx="'+cx+'" cy="'+cy+'" r="6" fill="none" stroke="'+color+'" stroke-width="2" pointer-events="none"/>'+
+      '<circle class="pfringdot" cx="'+cx+'" cy="'+cy+'" r="4" fill="'+color+'" stroke="var(--surface)" stroke-width="2" pointer-events="none"/>';
+  }); }
   return '<div class="pfchart"><svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet">'+
-    grid+'<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+xlab+
-    '</svg><div class="pftip" style="display:none"></div></div>';
+    grid+'<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+xlab+pulse+
+    '<line class="pfguide" x1="0" y1="'+PT+'" x2="0" y2="'+(H-PB)+'" stroke="var(--faint)" stroke-width="1" stroke-dasharray="3 3" style="display:none" pointer-events="none"/>'+
+    '<circle class="pfhov" r="4" fill="'+color+'" stroke="var(--surface)" stroke-width="2" style="display:none" pointer-events="none"/>'+
+    hits+'</svg><div class="pftip" style="display:none"></div></div>';
 }
-function pfWireChart(box){ var wrap=box.querySelector('.pfchart'); if(!wrap) return; var tip=wrap.querySelector('.pftip');
-  wrap.querySelectorAll('.pfdot').forEach(function(c){
-    c.addEventListener('mouseenter', function(){ tip.textContent=c.getAttribute('data-tip'); tip.style.display='block'; });
-    c.addEventListener('mousemove', function(ev){ var r=wrap.getBoundingClientRect(); tip.style.left=(ev.clientX-r.left+12)+'px'; tip.style.top=(ev.clientY-r.top+12)+'px'; });
-    c.addEventListener('mouseleave', function(){ tip.style.display='none'; });
+function pfWireChart(box){ var wrap=box.querySelector('.pfchart'); if(!wrap) return;
+  var tip=wrap.querySelector('.pftip'), guide=wrap.querySelector('.pfguide'), hov=wrap.querySelector('.pfhov');
+  if(pfPulseDate && wrap.querySelector('.pfring')){
+    try{ wrap.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){}
+    setTimeout(function(){ pfPulseDate=null; }, 4800);
+  }
+  function place(ev){ var r=wrap.getBoundingClientRect();
+    var x=ev.clientX-r.left, y=ev.clientY-r.top;
+    tip.style.left=Math.min(Math.max(8,x+14), Math.max(8,r.width-tip.offsetWidth-8))+'px';
+    tip.style.top=Math.max(4, y-tip.offsetHeight-10)+'px'; }
+  wrap.querySelectorAll('.pfhit').forEach(function(h){
+    h.addEventListener('mouseenter', function(){
+      tip.textContent=h.getAttribute('data-tip'); tip.style.display='block';
+      var cx=h.getAttribute('data-cx'), cy=h.getAttribute('data-cy');
+      if(guide){ guide.setAttribute('x1',cx); guide.setAttribute('x2',cx); guide.style.display=''; }
+      if(hov){ hov.setAttribute('cx',cx); hov.setAttribute('cy',cy);
+        hov.setAttribute('fill', h.hasAttribute('data-note')?'#ef4444':hov.getAttribute('fill')); hov.style.display=''; }
+    });
+    h.addEventListener('mousemove', place);
+    h.addEventListener('mouseleave', function(){ tip.style.display='none';
+      if(guide) guide.style.display='none'; if(hov) hov.style.display='none'; });
   });
 }
 
@@ -634,6 +703,32 @@ function pfOdoApply(root){
 }
 /* ---- Portföy dağılımı (halka + lejant) ---- */
 var PF_PAL=['#0bbfa6','#3b82f6','#f59e0b','#e0b000','#8b5cf6','#0891b2','#ec4899','#94a0ad','#10b981','#f0556b','#6366f1','#14b8a6'];
+/* Geçmiş verinin tablo görünümü — tüm kırılımlar tek ekranda */
+function pfHistTable(){
+  var H=pf().hist, hc=H.ccy||'TRY', d=pcy(), pts=(H.points||[]).slice();
+  (pf().snaps||[]).forEach(function(s){ if(s[d]==null) return;
+    var found=false; pts.forEach(function(p){ if(p.date===s.date) found=true; });
+    if(!found) pts.push({date:s.date, _snap:s[d]}); });
+  if(!pts.length) return '<div class="empty">Henüz geçmiş kaydı yok — "Günü kaydet" ya da geçmiş yükle.</div>';
+  pts.sort(function(a,b){ return a.date<b.date?1:-1; });          /* en yeni üstte */
+  var keys=[]; for(var tk in PF_SERIES_MAP) keys.push(PF_SERIES_MAP[tk]);
+  var labels={borsa:'Borsa', doviz:'Döviz', altin:'Altın', fon:'Fon', mevduat:'Mevduat', kripto:'Kripto', diger:'Diğer'};
+  var cols=keys.filter(pfHasField);
+  var hasNote=pts.some(function(p){ var t=(p.note||'').trim().toUpperCase(); return !!t && t!=='YOK'; });
+  var head='<tr><th class="l">Tarih</th><th>Toplam</th>'+
+    cols.map(function(k){ return '<th>'+labels[k]+'</th>'; }).join('')+
+    (hasNote?'<th class="l">Not</th>':'')+'</tr>';
+  function cv(raw, date){ if(raw==null||isNaN(raw)) return null; var c=pfConvHist(raw, hc, d, date); return c.v; }
+  var rows=pts.map(function(p){
+    var tot=(p.value!=null)?cv(p.value,p.date):(p._snap!=null?p._snap:null);
+    var note=(p.note||'').trim(); if(note.toUpperCase()==='YOK') note='';
+    return '<tr><td class="l">'+pfDMY(p.date)+'</td><td><b>'+(tot==null?'—':pf$(tot))+'</b></td>'+
+      cols.map(function(k){ var v=cv(p[k],p.date); return '<td>'+(v==null?'<span class="na">—</span>':pf$(v))+'</td>'; }).join('')+
+      (hasNote?('<td class="l" style="white-space:normal; max-width:280px">'+(note?clean(note):'<span class="na">—</span>')+'</td>'):'')+'</tr>';
+  }).join('');
+  return '<div class="scroll" style="max-height:460px"><table><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="hint" style="margin-top:6px">'+pts.length+' gün · değerler '+d+' cinsinden, her tarih kendi günkü kuruyla çevrildi.</div>';
+}
 function pfDonut(items, total){
   var R=54, SW=22, C=2*Math.PI*R, off=0, segs='';
   items.forEach(function(it){
@@ -753,7 +848,11 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var selDef=avail.filter(function(sd){return sd.k===pfSeriesSel;})[0]||avail[0];
   var ser=pfSeries(selDef.k);
   var selBtns=avail.length>1?('<div class="pfcur" id="pfSeriesSel" style="margin:0 0 10px; display:inline-flex">'+avail.map(function(sd){return '<button data-sk="'+sd.k+'" class="'+(sd.k===selDef.k?'on':'')+'">'+sd.t+'</button>';}).join('')+'</div>'):'';
+  var viewBtns='<div class="pfcur" id="pfChartView" style="display:inline-flex; margin-left:auto">'+
+    '<button data-cv="chart" class="'+(pfChartView==='chart'?'on':'')+'">Grafik</button>'+
+    '<button data-cv="table" class="'+(pfChartView==='table'?'on':'')+'">Tablo</button></div>';
   var chart=ser.pts.length?(pfLineChart(ser.pts,selDef.c,psym())+(ser.warn?'<div class="hint down" style="margin-top:6px">⚠ Tarihsel kur (rates.js) yüklenemediği için USD/€ değerleri güncel kurla çevrildi. <button class="ghost" id="pfRatesRetry" style="padding:2px 9px; margin-left:4px">Kur geçmişini yükle</button></div>':'')):'<div class="empty">Grafik için "Günü kaydet" ya da geçmiş yükle.</div>';
+  if(pfChartView==='table'){ chart=pfHistTable(); selBtns=''; }
   var notesArr=(P.hist.points||[]).filter(function(p){return p.note;}).sort(function(a,b){return a.date<b.date?1:-1;});
   function isRealNote(p){ var t=(p.note||'').trim().toUpperCase(); return !!t && t!=='YOK'; }
   var yokN=notesArr.filter(function(p){ return !isRealNote(p); }).length;
@@ -770,7 +869,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     stat+costWarn+
     '<div class="pftypes" id="pfTypeBar">'+PF_TYPES.map(function(T){ return '<button data-t="'+T.k+'"'+(T.k===pfAddType?' class="on"':'')+'>'+T.t+'</button>'; }).join('')+'</div>'+
     '<div class="pfquick" id="pfQuickBar"></div>'+
-    '<h3 style="font-size:16px; margin:0 0 8px">Portföy grafiği</h3>'+selBtns+chart+notesHtml+
+    '<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 8px"><h3 style="font-size:16px; margin:0">Portföy grafiği</h3>'+viewBtns+'</div>'+selBtns+chart+notesHtml+
     '<div style="margin-top:18px">'+listHtml+closedHtml+'</div>'+
     pfDistHtml(P)+
     '<div class="disclaimer">Bu ekran senin girdiğin verilere dayanır ve bulut hesabınla eşitlenir. Hisse fiyatı ~15 dk gecikmeli panodan, gram altın TL fiyatı data.js\'ten; mevduat/fon değerlerini kendin güncellersin. $/€ maliyet, her alımın kendi günkü kurundan hesaplanır. Yatırım tavsiyesi değildir.</div>';
@@ -778,6 +877,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
   pfWireChart(box);
   pfOdoApply(box);
+  var cvb=$('pfChartView'); if(cvb) cvb.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfChartView=b.dataset.cv; pfRender(); }; });
   var lb=$('pfLockBtn'); if(lb) lb.onclick=pfLockNow;
   var dm=$('pfDistMode'); if(dm) dm.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfDistMode=b.dataset.dm; pfRender(); }; });
   var dbox=$('pfDistBox');
@@ -798,6 +898,8 @@ var pfSeriesSel='value';
 var pfHideYok=true;      /* "YOK" notları varsayılan olarak gizli */
 var pfNotesOpen=false;   /* açık/kapalı durumu render'lar arasında korunsun */
 var pfDistMode='type';   /* dağılım halkası: tür / varlık */
+var pfChartView='chart'; /* portföy geçmişi: grafik / tablo */
+var pfPulseDate=null;    /* yeni kaydedilen gün — grafikte bir kez vurgulanır */
 var pfUnlocked=false;   /* her sayfa yüklemesinde (oturumda) false başlar; her açılışta şifre sorulur */
 function pfPaintQuick(syms){ var bar=$('pfQuickBar'); if(!bar) return;
   var tools='<button class="ghost" id="pfSaveDayBtn">Günü kaydet</button><button class="ghost" id="pfUploadBtn">⤒ Geçmiş yükle</button><button class="ghost" id="pfCsvBtn">⤓ Dışa aktar</button>';
