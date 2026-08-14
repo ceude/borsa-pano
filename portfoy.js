@@ -65,8 +65,8 @@ function injectCSS(){
   '.odo{position:relative; display:inline-block; line-height:1.2}'+
   '.odoG{visibility:hidden}'+
   '.odoW{position:absolute; left:0; top:0; right:0; bottom:0; overflow:hidden}'+
-  '.odoC{position:absolute; left:0; top:0; width:100%; will-change:transform}'+
-  '.odoD{height:1.2em; line-height:1.2em; text-align:center}'+
+  '.odoC{position:absolute; left:0; top:0; width:100%; display:block; will-change:transform}'+
+  '.odoD{display:block; height:1.2em; line-height:1.2em; text-align:center}'+
   '@media (prefers-reduced-motion:reduce){ .odoC{transition:none!important} }'+
   /* ---- dağılım halkası ---- */
   '.pfdist{display:flex; gap:22px; align-items:center; flex-wrap:wrap; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:16px 18px}'+
