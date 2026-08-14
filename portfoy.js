@@ -60,6 +60,11 @@ function injectCSS(){
   '.pfgrp:hover td{background:var(--bg)}'+
   '.pfgrp .gsub{font-weight:700}'+
   '.pfwarnflag{font-size:10px; font-weight:700; color:#7a2530; background:var(--down-bg); border:1px solid var(--down); border-radius:6px; padding:1px 6px; cursor:help}'+
+  /* ---- rakam kayma (havaalanı tabelası) ---- */
+  '.odo{display:inline-block; height:1em; line-height:1em; overflow:hidden; vertical-align:bottom}'+
+  '.odoC{display:block; will-change:transform}'+
+  '.odoD{display:block; height:1em; line-height:1em; text-align:center}'+
+  '@media (prefers-reduced-motion:reduce){ .odoC{transition:none!important} }'+
   /* ---- mobil ---- */
   '@media(max-width:720px){'+
     '#v-portfolio{padding:14px 12px}'+
@@ -88,9 +93,8 @@ function injectCSS(){
 
 /* --- DOM enjeksiyonu --- */
 function injectDOM(){
-  if(!$('pfOpen')){ var sw=$('mktSwitch');
-    if(sw){ var b=document.createElement('button'); b.id='pfOpen'; b.className='ghost accent'; b.style.fontWeight='700'; b.textContent='🧭 Yatırımlarım';
-      sw.parentNode.insertBefore(b, sw.nextSibling); } }
+  /* Üstteki "🧭 Yatırımlarım" düğmesi kaldırıldı — erişim yalnız sekmeden. */
+  var old=$('pfOpen'); if(old && old.parentNode) old.parentNode.removeChild(old);
   if(!document.querySelector('.tab[data-v="portfolio"]')){ var nav=$('nav');
     if(nav){ var t=document.createElement('button'); t.className='tab'; t.dataset.v='portfolio'; t.title='Yatırımlarım'; t.textContent='Yatırımlarım'; nav.appendChild(t); } }
   if(!$('v-portfolio')){ var main=document.querySelector('main');
@@ -109,7 +113,7 @@ function hideRealPortfolio(){
   var rv=$('v-real'); if(rv && rv.classList.contains('active') && B && B.goView) B.goView('all');
 }
 function pfShow(){ pfUnlocked=false; VIEW={mode:'list',id:null}; B.goView('portfolio'); pfRender(); }
-function wire(){ var o=$('pfOpen'); if(o) o.onclick=pfShow; var t=document.querySelector('.tab[data-v="portfolio"]'); if(t) t.onclick=pfShow; pf(); }
+function wire(){ var t=document.querySelector('.tab[data-v="portfolio"]'); if(t) t.onclick=pfShow; pf(); }
 
 /* --- veri modeli --- */
 var PF_TYPES=[{k:'stock',t:'Hisse'},{k:'deposit',t:'Mevduat'},{k:'fund',t:'Yatırım Fonu'},
@@ -447,6 +451,53 @@ function pfTxSuspect(a, t){
     return 'Ödeme para birimi '+pay+' ama birim fiyat '+fmt(t.px)+' — bu bir '+pay+'/başka para kuru gibi görünüyor. Ödeme para birimi yanlış olabilir (₺ mi olacaktı?). Bu satır kâr/zararı çok bozar.';
   return null;
 }
+/* ---- rakamları eski değerden yenisine kaydırarak göster ---- */
+var pfStatPrev={};
+function pfOdoApply(root){
+  var box=root.querySelector('#pfStat'); if(!box) return;
+  var reduce=false; try{ reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches; }catch(e){}
+  Array.prototype.forEach.call(box.children, function(card){
+    var kEl=card.querySelector('.k'), vEl=card.querySelector('.v'); if(!kEl||!vEl) return;
+    var label=(kEl.textContent||'').trim().replace(/\s+/g,' ');
+    var full=(vEl.textContent||'').trim();
+    var prev=pfStatPrev[label];
+    pfStatPrev[label]=full;
+    if(reduce || prev===full) return;                 // değişmediyse kıpırdatma
+    var cur=full.replace(/\D/g,''), pv=(prev||'').replace(/\D/g,'');
+    var off=cur.length-pv.length, n=0, cols=[];
+    /* metin düğümlerini gez, rakamları makara sütununa çevir */
+    (function walk(node){
+      var kids=Array.prototype.slice.call(node.childNodes);
+      kids.forEach(function(ch){
+        if(ch.nodeType===3){
+          var txt=ch.nodeValue; if(!/\d/.test(txt)) return;
+          var frag=document.createDocumentFragment();
+          txt.split('').forEach(function(c){
+            if(c>='0' && c<='9'){
+              var pi=n-off, from=(pi>=0 && pv[pi]!=null) ? +pv[pi] : 0; n++;
+              var wrap=document.createElement('span'); wrap.className='odo';
+              var col=document.createElement('span'); col.className='odoC';
+              for(var loop=0; loop<2; loop++) for(var d=0; d<=9; d++){
+                var s=document.createElement('span'); s.className='odoD'; s.textContent=d; col.appendChild(s);
+              }
+              col.style.transform='translateY(-'+from+'em)';
+              wrap.appendChild(col); frag.appendChild(wrap);
+              cols.push({col:col, to:10+(+c)});
+            } else frag.appendChild(document.createTextNode(c));
+          });
+          node.replaceChild(frag, ch);
+        } else if(ch.nodeType===1) walk(ch);
+      });
+    })(vEl);
+    if(!cols.length) return;
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      cols.forEach(function(o,i){
+        o.col.style.transition='transform 900ms cubic-bezier(.16,.84,.28,1) '+(i*45)+'ms';
+        o.col.style.transform='translateY(-'+o.to+'em)';
+      });
+    }); });
+  });
+}
 function pfAssetRow(a){
   var q=aQty(a),ac=aAvgCostDisp(a),u=aCurUnitDisp(a),v=aValueDisp(a),c=aCostDisp(a),pnl=(v!=null&&c!=null)?v-c:null,pct=(c>0&&pnl!=null)?pnl/c*100:null,nc=aNativeCcy(a),vn=aValueNative(a);
   var dp=aDayPct(a), dc2=aDayChangeIn(a,pcy());
@@ -472,7 +523,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var realTot=0, realHas=false;
   Object.keys(P.assets).forEach(function(id){ var r=aRealizedDisp(P.assets[id]); if(r!=null && !isNaN(r) && r!==0){ realTot+=r; realHas=true; } });
   var realCard = realHas ? ('<div><div class="k">Satışlardan K/Z</div><div class="v '+pnlCls(realTot)+'">'+(realTot>0?'+':'')+pf$(realTot)+'</div></div>') : '';
-  var stat='<div class="stat">'+
+  var stat='<div class="stat" id="pfStat">'+
     '<div><div class="k">Toplam varlık</div><div class="v">'+pf$(t.value)+'</div></div>'+
     '<div><div class="k">Toplam maliyet</div><div class="v">'+pf$(t.cost)+'</div></div>'+
     '<div><div class="k">Toplam K/Z</div><div class="v '+pnlCls(t.pnl)+'">'+(t.pnl==null?'—':(t.pnl>0?'+':'')+pf$(t.pnl)+(t.cost>0?' ('+(t.pnl>0?'+':'')+fmt(t.pnl/t.cost*100,1)+'%)':''))+'</div></div>'+
@@ -545,6 +596,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   box.querySelectorAll('#pfCur button').forEach(function(b){ b.onclick=function(){ pf().disp=b.dataset.pc; save(); pfRender(); }; });
   var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
   pfWireChart(box);
+  pfOdoApply(box);
   var nb=$('pfNotesBox'); if(nb) nb.addEventListener('toggle', function(){ pfNotesOpen=nb.open; });
   var yb=$('pfYokBtn'); if(yb) yb.onclick=function(ev){ ev.preventDefault(); pfHideYok=!pfHideYok; pfNotesOpen=true; pfRender(); };
   var rr=$('pfRatesRetry'); if(rr) rr.onclick=function(){ ratesTried=false; ratesLoading=false; pfLoadRates(function(){ pfRender(); }); };
