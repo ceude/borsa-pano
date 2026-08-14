@@ -68,7 +68,7 @@ function injectCSS(){
     '#v-portfolio .stat .v{font-size:18px}'+
     '#v-portfolio table{font-size:12px}'+
     '#v-portfolio th,#v-portfolio td{padding:9px 6px}'+
-    /* Adet · Ort. maliyet · Güncel · Orijinal sütunlarını gizle; Varlık/Değer/K/Z kalsın */
+    /* Adet · Ort. maliyet · Güncel · Orijinal gizlenir; Varlık · Gün % · Değer · K/Z kalır */
     '#v-portfolio thead th:nth-child(2),#v-portfolio thead th:nth-child(3),#v-portfolio thead th:nth-child(4),#v-portfolio thead th:nth-child(5),'+
     '#v-portfolio tbody tr:not(.pfgrp) td:nth-child(2),#v-portfolio tbody tr:not(.pfgrp) td:nth-child(3),'+
     '#v-portfolio tbody tr:not(.pfgrp) td:nth-child(4),#v-portfolio tbody tr:not(.pfgrp) td:nth-child(5){display:none}'+
@@ -398,13 +398,38 @@ function pfDlgErr(msg){
   if(h && h.nextSibling) b.insertBefore(el, h.nextSibling); else b.insertBefore(el, b.firstChild);
   if(b.parentNode) b.parentNode.scrollTop=0;
 }
+/* Bugünkü değişim — yalnız panodan canlı fiyat gelen varlıklarda (hisse) hesaplanabilir */
+function aDayPct(a){
+  if(a.type!=='stock' || a.valMode!=='qty') return null;
+  var s=a.symbol?find(a.symbol):null;
+  return (s && s.changePct!=null && !isNaN(s.changePct)) ? s.changePct : null;
+}
+function aDayChangeIn(a, dc){
+  var p=aDayPct(a); if(p==null) return null;
+  var v=aValueIn(a,dc); if(v==null) return null;
+  var prevV = v/(1+p/100);
+  return v-prevV;
+}
+function pfDayTotals(dc){
+  var chg=0, base=0, has=false, unknown=0;
+  Object.keys(pf().assets).forEach(function(id){ var a=pf().assets[id];
+    if(a.valMode==='qty' && (aQty(a)||0)<=0.0000001 && (a.tx&&a.tx.length)) return;   // kapanmış
+    var v=aValueIn(a,dc); if(v==null) return;
+    var d=aDayChangeIn(a,dc);
+    if(d==null){ if(v>0) unknown+=v; return; }
+    has=true; chg+=d; base+=v-d;
+  });
+  return has?{chg:chg, pct:(base>0?chg/base*100:null), unknown:unknown}:null;
+}
 function pfAssetRow(a){
   var q=aQty(a),ac=aAvgCostDisp(a),u=aCurUnitDisp(a),v=aValueDisp(a),c=aCostDisp(a),pnl=(v!=null&&c!=null)?v-c:null,pct=(c>0&&pnl!=null)?pnl/c*100:null,nc=aNativeCcy(a),vn=aValueNative(a);
+  var dp=aDayPct(a), dc2=aDayChangeIn(a,pcy());
   return '<tr data-open="'+a.id+'"><td><b>'+(a.name||clean(a.symbol||'—'))+'</b>'+(a.symbol?' <span class="nm">'+clean(a.symbol)+'</span>':'')+' <span class="pfbadge">'+pfTypeLabel(a.type)+'</span><div class="nm">'+(a.note?a.note.slice(0,28):aUnitName(a))+pfManualNote(a)+'</div></td>'+
     '<td>'+(q==null?'—':fmt(q,q%1?4:0))+'</td>'+
     '<td>'+(ac==null?'—':psym()+fmt(ac))+'</td>'+
     '<td>'+(u==null?'—':psym()+fmt(u))+'</td>'+
     '<td><span class="nm" style="font-size:13px">'+(vn==null?'—':psymCcy(nc)+fmt(vn))+'</span></td>'+
+    '<td class="'+pnlCls(dp)+'">'+(dp==null?'<span class="na">—</span>':((dp>0?'+':'')+fmt(dp,2)+'%<div class="nm '+pnlCls(dc2)+'">'+(dc2==null?'':(dc2>0?'+':'')+pf$(dc2))+'</div>'))+'</td>'+
     '<td><b>'+pf$(v)+'</b></td>'+
     '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+pf$(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
     '<td class="pfarrow">›</td></tr>';
@@ -415,10 +440,14 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   Object.keys(P.assets).forEach(function(id){ var a=P.assets[id];
     if(a.valMode==='amount' && (a.cost==null||isNaN(a.cost)) && a.curValue!=null) noCost.push(a.name||'—'); });
   var costWarn = noCost.length ? ('<div class="hint down" style="margin:-6px 0 12px">⚠ <b>'+noCost.length+'</b> varlıkta maliyet girilmemiş ('+noCost.slice(0,3).join(', ')+(noCost.length>3?' …':'')+'). Maliyeti 0 sayıldığı için <b>Toplam K/Z ve yüzde olduğundan yüksek</b> görünür — Düzenle ile anapara/maliyet gir.</div>') : '';
+  var dt=pfDayTotals(cur);
+  var dayCard = dt ? ('<div><div class="k">Bugün'+(dt.unknown>0?' <span class="cov" title="Canlı fiyatı olmayan varlıklar (döviz, altın, mevduat vb.) bu hesaba girmez">*</span>':'')+'</div><div class="v '+pnlCls(dt.chg)+'">'+
+      (dt.chg>0?'+':'')+pf$(dt.chg)+(dt.pct!=null?' <span style="font-size:15px">('+(dt.pct>0?'+':'')+fmt(dt.pct,2)+'%)</span>':'')+'</div></div>') : '';
   var stat='<div class="stat">'+
     '<div><div class="k">Toplam varlık</div><div class="v">'+pf$(t.value)+'</div></div>'+
     '<div><div class="k">Toplam maliyet</div><div class="v">'+pf$(t.cost)+'</div></div>'+
-    '<div><div class="k">Toplam K/Z</div><div class="v '+pnlCls(t.pnl)+'">'+(t.pnl==null?'—':(t.pnl>0?'+':'')+pf$(t.pnl)+(t.cost>0?' ('+(t.pnl>0?'+':'')+fmt(t.pnl/t.cost*100,1)+'%)':''))+'</div></div></div>';
+    '<div><div class="k">Toplam K/Z</div><div class="v '+pnlCls(t.pnl)+'">'+(t.pnl==null?'—':(t.pnl>0?'+':'')+pf$(t.pnl)+(t.cost>0?' ('+(t.pnl>0?'+':'')+fmt(t.pnl/t.cost*100,1)+'%)':''))+'</div></div>'+
+    dayCard+'</div>';
   var allA=Object.keys(P.assets).map(function(id){ return P.assets[id]; });
   function isClosed(a){ return a.valMode==='qty' && (a.tx&&a.tx.length) && (aQty(a)||0)<=0.0000001; }
   var rows=allA.filter(function(a){ return !isClosed(a); }).sort(function(a,b){ return (aValueDisp(b)||0)-(aValueDisp(a)||0); });
@@ -436,13 +465,17 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     }).sort(function(a,b){ return (b.val||0)-(a.val||0); });
     var body=groupArr.map(function(g){
       var pct=(g.cost>0&&g.pnl!=null)?g.pnl/g.cost*100:null;
+      var gd=0, gdBase=0, gdHas=false;
+      g.list.forEach(function(a){ var d=aDayChangeIn(a,cur); if(d==null) return; var v=aValueDisp(a); if(v==null) return; gdHas=true; gd+=d; gdBase+=v-d; });
+      var gdPct=(gdHas&&gdBase>0)?gd/gdBase*100:null;
       var hdr='<tr class="pfgrp"><td class="l" colspan="5">'+pfTypeLabel(g.type)+' · '+g.list.length+'</td>'+
+        '<td class="gsub '+(gdHas?pnlCls(gd):'')+'">'+(gdPct==null?'':(gdPct>0?'+':'')+fmt(gdPct,2)+'%')+'</td>'+
         '<td class="gsub">'+(g.val==null?'':pf$(g.val))+'</td>'+
         '<td class="gsub">'+(g.pnl==null?'':(g.pnl>0?'+':'')+pf$(g.pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
         '<td></td></tr>';
       return hdr + g.list.map(pfAssetRow).join('');
     }).join('');
-    listHtml='<div class="scroll"><table><thead><tr><th class="l">Varlık</th><th>Adet</th><th>Ort. maliyet</th><th>Güncel</th><th title="Kendi para biriminde güncel değer">Orijinal</th><th title="'+psym()+' cinsinden değer">Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+body+'</tbody></table></div>';
+    listHtml='<div class="scroll"><table><thead><tr><th class="l">Varlık</th><th>Adet</th><th>Ort. maliyet</th><th>Güncel</th><th title="Kendi para biriminde güncel değer">Orijinal</th><th title="Bugünkü değişim — yalnız panodan canlı fiyat gelen hisselerde">Gün %</th><th title="'+psym()+' cinsinden değer">Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+body+'</tbody></table></div>';
   }
   var closedHtml='';
   if(closed.length){
@@ -552,6 +585,7 @@ function pfRenderAsset(box, a){
     '<div class="metric"><div class="k">Adet ('+unit+')</div><div class="v">'+(q==null?'—':fmt(q,q%1?4:0))+'</div></div>'+
     '<div class="metric"><div class="k">Ort. maliyet ('+dsym+'/'+unit+')</div><div class="v">'+(ac==null?(a.valMode==='amount'?'elle değer':'—'):dsym+fmt(ac))+'</div></div>'+
     '<div class="metric"><div class="k">Güncel birim ('+dsym+')</div><div class="v">'+(u==null?'—':dsym+fmt(u))+'</div></div>'+
+    (aDayPct(a)!=null?('<div class="metric"><div class="k">Bugün</div><div class="v '+pnlCls(aDayPct(a))+'">'+(aDayPct(a)>0?'+':'')+fmt(aDayPct(a),2)+'% <span style="font-size:13px">'+(function(){var x=aDayChangeIn(a,dc); return x==null?'':'('+(x>0?'+':'')+d$(x)+')';})()+'</span></div></div>'):'')+
     '<div class="metric"><div class="k">Toplam maliyet</div><div class="v">'+d$(c)+'</div></div>'+
     '<div class="metric"><div class="k">Güncel değer</div><div class="v">'+d$(v)+'</div></div>'+
     '<div class="metric"><div class="k">Açık K/Z ('+dc+')</div><div class="v '+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+d$(pnl))+'</div></div>'+
@@ -778,9 +812,9 @@ function pfDel(id){ var a=pf().assets[id]; if(!a)return;
     [{label:'Evet, sil',primary:true,fn:function(){ delete pf().assets[id]; VIEW={mode:'list',id:null}; save(); pfRender(); }},{label:'Vazgeç'}]); }
 
 /* =============== dışa aktar + geçmiş yükle =============== */
-function pfExport(){ var rows=[['Ad','Tür','Birim','Sembol','Adet','Ort. maliyet('+pcy()+')','Güncel birim('+pcy()+')','Değer('+pcy()+')','Maliyet('+pcy()+')','K/Z('+pcy()+')']];
+function pfExport(){ var rows=[['Ad','Tür','Birim','Sembol','Adet','Ort. maliyet('+pcy()+')','Güncel birim('+pcy()+')','Gün %','Değer('+pcy()+')','Maliyet('+pcy()+')','K/Z('+pcy()+')']];
   Object.keys(pf().assets).forEach(function(id){ var a=pf().assets[id],v=aValueDisp(a),c=aCostDisp(a);
-    rows.push([a.name,pfTypeLabel(a.type),aUnitName(a),a.symbol?clean(a.symbol):'',aQty(a),aAvgCostDisp(a),aCurUnitDisp(a),v,c,(v!=null&&c!=null)?v-c:'']); });
+    rows.push([a.name,pfTypeLabel(a.type),aUnitName(a),a.symbol?clean(a.symbol):'',aQty(a),aAvgCostDisp(a),aCurUnitDisp(a),aDayPct(a),v,c,(v!=null&&c!=null)?v-c:'']); });
   B.downloadCSV('yatirimlarim.csv',B.toCSV(rows)); }
 function pfLoadXLSX(cb){ if(window.XLSX){ cb(true); return; }
   var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
