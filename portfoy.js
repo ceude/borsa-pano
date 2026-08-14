@@ -62,10 +62,11 @@ function injectCSS(){
   '.pfgrp .gsub .nm{font-weight:600; text-transform:none; letter-spacing:0; font-size:10.5px; margin-top:1px}'+
   '.pfwarnflag{font-size:10px; font-weight:700; color:#7a2530; background:var(--down-bg); border:1px solid var(--down); border-radius:6px; padding:1px 6px; cursor:help}'+
   /* ---- rakam kayma (havaalanı tabelası) ---- */
-  '.odo{display:inline-block; height:1.2em; line-height:1.2em; overflow:hidden; vertical-align:-0.2em}'+
-  '.odoC{display:block; will-change:transform}'+
-  '.odoD{display:block; height:1.2em; line-height:1.2em; text-align:center}'+
-  '.odoS{display:inline-block; height:1.2em; line-height:1.2em; vertical-align:-0.2em; white-space:pre}'+
+  '.odo{position:relative; display:inline-block; line-height:1.2}'+
+  '.odoG{visibility:hidden}'+
+  '.odoW{position:absolute; left:0; top:0; right:0; bottom:0; overflow:hidden}'+
+  '.odoC{position:absolute; left:0; top:0; width:100%; will-change:transform}'+
+  '.odoD{height:1.2em; line-height:1.2em; text-align:center}'+
   '@media (prefers-reduced-motion:reduce){ .odoC{transition:none!important} }'+
   /* ---- dağılım halkası ---- */
   '.pfdist{display:flex; gap:22px; align-items:center; flex-wrap:wrap; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:16px 18px}'+
@@ -604,16 +605,18 @@ function pfOdoApply(root){
             if(c>='0' && c<='9'){
               var pi=n-off, from=(pi>=0 && pv[pi]!=null) ? +pv[pi] : 0; n++;
               var wrap=document.createElement('span'); wrap.className='odo';
+              var ghost=document.createElement('span'); ghost.className='odoG'; ghost.textContent=c;
+              var win=document.createElement('span'); win.className='odoW';
               var col=document.createElement('span'); col.className='odoC';
               for(var loop=0; loop<2; loop++) for(var d=0; d<=9; d++){
                 var s=document.createElement('span'); s.className='odoD'; s.textContent=d; col.appendChild(s);
               }
               var to=(10+(+c))*EM;
               col.style.transform='translateY(-'+(animate?(from*EM):to)+'em)';
-              wrap.appendChild(col); frag.appendChild(wrap);
+              win.appendChild(col); wrap.appendChild(ghost); wrap.appendChild(win); frag.appendChild(wrap);
               if(animate) cols.push({col:col, to:to});
             } else {
-              var t=document.createElement('span'); t.className='odoS'; t.textContent=c; frag.appendChild(t);
+              frag.appendChild(document.createTextNode(c));
             }
           });
           node.replaceChild(frag, ch);
