@@ -522,7 +522,14 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var selBtns=avail.length>1?('<div class="pfcur" id="pfSeriesSel" style="margin:0 0 10px; display:inline-flex">'+avail.map(function(sd){return '<button data-sk="'+sd.k+'" class="'+(sd.k===selDef.k?'on':'')+'">'+sd.t+'</button>';}).join('')+'</div>'):'';
   var chart=ser.pts.length?(pfLineChart(ser.pts,selDef.c,psym())+(ser.warn?'<div class="hint down" style="margin-top:6px">⚠ Tarihsel kur (rates.js) yüklenemediği için USD/€ değerleri güncel kurla çevrildi. <button class="ghost" id="pfRatesRetry" style="padding:2px 9px; margin-left:4px">Kur geçmişini yükle</button></div>':'')):'<div class="empty">Grafik için "Günü kaydet" ya da geçmiş yükle.</div>';
   var notesArr=(P.hist.points||[]).filter(function(p){return p.note;}).sort(function(a,b){return a.date<b.date?1:-1;});
-  var notesHtml=notesArr.length?('<details style="margin-top:10px"><summary style="cursor:pointer; font-weight:700; color:var(--dim); font-size:13px; padding:4px 0">Günlük notlar ('+notesArr.length+')</summary><div class="log" style="margin-top:6px">'+notesArr.map(function(p){return '<div class="e"><span>'+clean(p.note)+'</span><span class="t">'+p.date+'</span></div>';}).join('')+'</div></details>'):'';
+  function isRealNote(p){ var t=(p.note||'').trim().toUpperCase(); return !!t && t!=='YOK'; }
+  var yokN=notesArr.filter(function(p){ return !isRealNote(p); }).length;
+  var shownNotes=pfHideYok?notesArr.filter(isRealNote):notesArr;
+  var notesHtml=notesArr.length?('<details style="margin-top:10px"'+(pfNotesOpen?' open':'')+' id="pfNotesBox"><summary style="cursor:pointer; font-weight:700; color:var(--dim); font-size:13px; padding:4px 0">Günlük notlar ('+notesArr.length+')</summary>'+
+    (yokN?('<div style="display:flex; align-items:center; gap:10px; margin:6px 0 2px"><button class="ghost" id="pfYokBtn" style="padding:4px 11px">'+(pfHideYok?'"YOK"ları göster':'"YOK"ları gizle')+'</button><span class="cov">'+(pfHideYok?(shownNotes.length+' not gösteriliyor · '+yokN+' "YOK" gizli'):(yokN+' gün "YOK"')) +'</span></div>'):'')+
+    '<div class="log" style="margin-top:6px; max-height:320px; overflow:auto">'+
+    (shownNotes.length?shownNotes.map(function(p){return '<div class="e"><span>'+clean(p.note)+'</span><span class="t">'+pfDMY(p.date)+'</span></div>';}).join(''):'<div class="empty">gösterilecek not yok</div>')+
+    '</div></details>'):'';
   var syms=STOCKS().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);}).map(function(s){ return '<option value="'+clean(s.symbol)+'">'+(s.name||'')+'</option>'; }).join('');
   box.innerHTML=''+
     '<div class="pfhead"><div><h2 style="margin:0; font-size:22px">Yatırımlarım</h2><div class="sub">Her varlık tek satır. Satıra tıkla → o varlığın sayfası. Değerler '+psym()+'.</div></div><div class="pfcur" id="pfCur">'+curBtns+'</div></div>'+
@@ -535,12 +542,16 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   box.querySelectorAll('#pfCur button').forEach(function(b){ b.onclick=function(){ pf().disp=b.dataset.pc; save(); pfRender(); }; });
   var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
   pfWireChart(box);
+  var nb=$('pfNotesBox'); if(nb) nb.addEventListener('toggle', function(){ pfNotesOpen=nb.open; });
+  var yb=$('pfYokBtn'); if(yb) yb.onclick=function(ev){ ev.preventDefault(); pfHideYok=!pfHideYok; pfNotesOpen=true; pfRender(); };
   var rr=$('pfRatesRetry'); if(rr) rr.onclick=function(){ ratesTried=false; ratesLoading=false; pfLoadRates(function(){ pfRender(); }); };
   box.querySelectorAll('tr[data-open]').forEach(function(tr){ tr.onclick=function(){ VIEW={mode:'asset',id:tr.dataset.open}; pfRender(); }; });  $('pfTypeBar').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfAddType=b.dataset.t; $('pfTypeBar').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===pfAddType); }); pfPaintQuick(syms); }; });
   pfPaintQuick(syms);
 }
 var pfAddType='stock';
 var pfSeriesSel='value';
+var pfHideYok=true;      /* "YOK" notları varsayılan olarak gizli */
+var pfNotesOpen=false;   /* açık/kapalı durumu render'lar arasında korunsun */
 var pfUnlocked=false;   /* her sayfa yüklemesinde (oturumda) false başlar; her açılışta şifre sorulur */
 function pfPaintQuick(syms){ var bar=$('pfQuickBar'); if(!bar) return;
   var tools='<button class="ghost" id="pfSaveDayBtn">Günü kaydet</button><button class="ghost" id="pfUploadBtn">⤒ Geçmiş yükle</button><button class="ghost" id="pfCsvBtn">⤓ Dışa aktar</button>';
