@@ -65,6 +65,18 @@ function injectCSS(){
   '.odoC{display:block; will-change:transform}'+
   '.odoD{display:block; height:1em; line-height:1em; text-align:center}'+
   '@media (prefers-reduced-motion:reduce){ .odoC{transition:none!important} }'+
+  /* ---- dağılım halkası ---- */
+  '.pfdist{display:flex; gap:22px; align-items:center; flex-wrap:wrap; background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:16px 18px}'+
+  '.pfseg{transition:opacity .15s, stroke-width .15s; cursor:default}'+
+  '.pfdist.dim .pfseg{opacity:.28}'+
+  '.pfdist.dim .pfseg.on{opacity:1; stroke-width:26}'+
+  '.pflegend{flex:1; min-width:230px; display:flex; flex-direction:column; gap:2px}'+
+  '.pfleg{display:flex; align-items:center; gap:9px; font-size:12.5px; padding:5px 8px; border-radius:8px; cursor:default}'+
+  '.pfleg:hover{background:var(--line2)}'+
+  '.pfdot{width:9px; height:9px; border-radius:50%; flex:none}'+
+  '.pflab{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}'+
+  '.pfval{font-weight:600; white-space:nowrap}'+
+  '.pfpct{color:var(--faint); width:52px; text-align:right; white-space:nowrap}'+
   /* ---- mobil ---- */
   '@media(max-width:720px){'+
     '#v-portfolio{padding:14px 12px}'+
@@ -113,7 +125,19 @@ function hideRealPortfolio(){
   var rv=$('v-real'); if(rv && rv.classList.contains('active') && B && B.goView) B.goView('all');
 }
 function pfShow(){ pfUnlocked=false; VIEW={mode:'list',id:null}; B.goView('portfolio'); pfRender(); }
-function wire(){ var t=document.querySelector('.tab[data-v="portfolio"]'); if(t) t.onclick=pfShow; pf(); }
+function wire(){ var t=document.querySelector('.tab[data-v="portfolio"]'); if(t) t.onclick=pfShow; pf();
+  /* Tarayıcıda başka sekmeye geçilirse Yatırımlarım kilitlensin */
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ if(pfUnlocked){ pfUnlocked=false; VIEW={mode:'list',id:null}; } return; }
+    var v=$('v-portfolio');
+    if(v && v.classList.contains('active') && !pfUnlocked) pfRender();
+  });
+  window.addEventListener('blur', function(){ if(pfUnlocked){ pfUnlocked=false; VIEW={mode:'list',id:null}; } });
+  window.addEventListener('focus', function(){
+    var v=$('v-portfolio');
+    if(v && v.classList.contains('active') && !pfUnlocked) pfRender();
+  });
+}
 
 /* --- veri modeli --- */
 var PF_TYPES=[{k:'stock',t:'Hisse'},{k:'deposit',t:'Mevduat'},{k:'fund',t:'Yatırım Fonu'},
@@ -453,6 +477,48 @@ function pfDayTotals(dc){
 }
 /* Döviz işleminde ödeme para birimi, tutulan dövizle aynı ama birim fiyat 1'den çok uzaksa
    neredeyse kesin yanlış girilmiştir (ör. TL kuru girilip ödeme EUR bırakılmış). */
+/* Kümülatif DEĞER geçmişi — o varlıkta duran para (maliyet + kâr/zarar).
+   Fiyat geçmişi olan türlerde hesaplanır: hisse (history.js) ve döviz (rates.js). */
+function pfValueSeries(a, dc){
+  if(a.valMode!=='qty' || !a.tx || !a.tx.length) return null;
+  var txs=a.tx.slice().sort(function(x,y){return x.t-y.t;});
+  var t0=Math.floor(txs[0].t/1000), now=Math.floor(Date.now()/1000), times=[], px=null;
+
+  if(a.type==='stock'){
+    var H=B.HIST, h=a.symbol?(H&&H[a.symbol]):null; if(!h) return null;
+    var spanD=(now-t0)/86400;
+    var bars=(spanD>250 && h.w && h.w.length)?h.w:(h.d||[]);
+    if(!bars.length) return null;
+    bars.forEach(function(b){ if(b[0]>=t0) times.push({t:b[0], c:b[4]}); });
+    if(!times.length) return null;
+    px=function(p){ return convAtTime(p.c, aNativeCcy(a), dc, p.t); };
+  } else if(a.type==='fx'){
+    if(!ratesReady()) return null;
+    var hold=a.holdCcy||'EUR', step=Math.max(1, Math.ceil(((now-t0)/86400)/220));
+    var k=0;
+    RATEHIST.forEach(function(r){ if(r[0]<t0) return; if((k++)%step) return; times.push({t:r[0]}); });
+    if(!times.length) return null;
+    if(times[times.length-1].t<now-86400) times.push({t:now});
+    px=function(p){ return convAtTime(1, hold, dc, p.t); };
+  } else return null;                              /* altın/fon/mevduat: fiyat geçmişi yok */
+
+  var pts=[], ti=0;
+  times.forEach(function(p){
+    var q=0;
+    txs.forEach(function(t){ if(Math.floor(t.t/1000)<=p.t) q+=(t.side==='sell'?-1:1)*t.qty; });
+    if(q<=0.0000001) return;
+    var u=px(p); if(u==null) return;
+    var d=new Date(p.t*1000), pz=function(x){return(x<10?'0':'')+x;};
+    pts.push({y:q*u, date:d.getFullYear()+'-'+pz(d.getMonth()+1)+'-'+pz(d.getDate()), note:''});
+  });
+  if(pts.length<2) return null;
+  /* notu olan işlemleri en yakın noktaya iliştir */
+  txs.forEach(function(t){ if(!t.note) return;
+    var d=new Date(t.t), pz=function(x){return(x<10?'0':'')+x;};
+    var ds=d.getFullYear()+'-'+pz(d.getMonth()+1)+'-'+pz(d.getDate());
+    for(var i=0;i<pts.length;i++){ if(pts[i].date>=ds){ pts[i].note=t.note; break; } } });
+  return {pts:pts};
+}
 /* Kümülatif yatırım geçmişi — her işlem tarihinde elde kalan pozisyonun maliyeti (disp cinsinden).
    Her tür için hesaplanabilir; notu olan işlemler grafikte kırmızı işaretlenir. */
 function pfInvestSeries(a, dc){
@@ -522,6 +588,51 @@ function pfOdoApply(root){
       });
     }); });
   });
+}
+/* ---- Portföy dağılımı (halka + lejant) ---- */
+var PF_PAL=['#0bbfa6','#3b82f6','#f59e0b','#e0b000','#8b5cf6','#0891b2','#ec4899','#94a0ad','#10b981','#f0556b','#6366f1','#14b8a6'];
+function pfDonut(items, total){
+  var R=54, SW=22, C=2*Math.PI*R, off=0, segs='';
+  items.forEach(function(it){
+    var frac=total>0?it.value/total:0, len=frac*C;
+    if(len<=0) return;
+    segs+='<circle class="pfseg" data-i="'+it.i+'" cx="70" cy="70" r="'+R+'" fill="none" stroke="'+it.color+'" stroke-width="'+SW+'"'+
+      ' stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 70 70)"><title>'+
+      it.label.replace(/&/g,'&amp;').replace(/</g,'&lt;')+' · '+pf$(it.value)+' · %'+fmt(frac*100,1)+'</title></circle>';
+    off+=len;
+  });
+  return '<svg viewBox="0 0 140 140" width="150" height="150" style="flex:none">'+segs+
+    '<text x="70" y="66" text-anchor="middle" font-size="9" fill="var(--faint)">TOPLAM</text>'+
+    '<text x="70" y="80" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">'+pf$(total)+'</text></svg>';
+}
+function pfDistHtml(P){
+  var items=[], total=0;
+  if(pfDistMode==='type'){
+    var byT={};
+    Object.keys(P.assets).forEach(function(id){ var a=P.assets[id], v=aValueDisp(a); if(v==null||v<=0) return;
+      byT[a.type]=(byT[a.type]||0)+v; total+=v; });
+    items=Object.keys(byT).map(function(k){ return {label:pfTypeLabel(k), value:byT[k]}; });
+  } else {
+    Object.keys(P.assets).forEach(function(id){ var a=P.assets[id], v=aValueDisp(a); if(v==null||v<=0) return;
+      items.push({label:(a.name||clean(a.symbol||'—')), value:v}); total+=v; });
+  }
+  if(!items.length || total<=0) return '';
+  items.sort(function(a,b){ return b.value-a.value; });
+  if(items.length>10){ var rest=items.slice(9), sum=0; rest.forEach(function(x){ sum+=x.value; });
+    items=items.slice(0,9); items.push({label:'Diğer ('+rest.length+')', value:sum}); }
+  items.forEach(function(it,i){ it.i=i; it.color=PF_PAL[i%PF_PAL.length]; });
+  var legend=items.map(function(it){
+    return '<div class="pfleg" data-i="'+it.i+'"><span class="pfdot" style="background:'+it.color+'"></span>'+
+      '<span class="pflab">'+it.label+'</span>'+
+      '<span class="pfval">'+pf$(it.value)+'</span>'+
+      '<span class="pfpct">%'+fmt(it.value/total*100,1)+'</span></div>';
+  }).join('');
+  var modeBtns='<div class="pfcur" id="pfDistMode" style="display:inline-flex">'+
+    '<button data-dm="type" class="'+(pfDistMode==='type'?'on':'')+'">Tür</button>'+
+    '<button data-dm="asset" class="'+(pfDistMode==='asset'?'on':'')+'">Varlık</button></div>';
+  return '<div style="margin-top:22px"><div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px">'+
+    '<h3 style="font-size:16px; margin:0">Portföy dağılımı</h3>'+modeBtns+'</div>'+
+    '<div class="pfdist" id="pfDistBox">'+pfDonut(items,total)+'<div class="pflegend">'+legend+'</div></div></div>';
 }
 function pfAssetRow(a){
   var q=aQty(a),ac=aAvgCostDisp(a),u=aCurUnitDisp(a),v=aValueDisp(a),c=aCostDisp(a),pnl=(v!=null&&c!=null)?v-c:null,pct=(c>0&&pnl!=null)?pnl/c*100:null,nc=aNativeCcy(a),vn=aValueNative(a);
@@ -617,11 +728,20 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     '<div class="pfquick" id="pfQuickBar"></div>'+
     '<h3 style="font-size:16px; margin:0 0 8px">Portföy grafiği</h3>'+selBtns+chart+notesHtml+
     '<div style="margin-top:18px">'+listHtml+closedHtml+'</div>'+
+    pfDistHtml(P)+
     '<div class="disclaimer">Bu ekran senin girdiğin verilere dayanır ve bulut hesabınla eşitlenir. Hisse fiyatı ~15 dk gecikmeli panodan, gram altın TL fiyatı data.js\'ten; mevduat/fon değerlerini kendin güncellersin. $/€ maliyet, her alımın kendi günkü kurundan hesaplanır. Yatırım tavsiyesi değildir.</div>';
   box.querySelectorAll('#pfCur button').forEach(function(b){ b.onclick=function(){ pf().disp=b.dataset.pc; save(); pfRender(); }; });
   var ssel=$('pfSeriesSel'); if(ssel) ssel.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfSeriesSel=b.dataset.sk; pfRender(); }; });
   pfWireChart(box);
   pfOdoApply(box);
+  var dm=$('pfDistMode'); if(dm) dm.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfDistMode=b.dataset.dm; pfRender(); }; });
+  var dbox=$('pfDistBox');
+  if(dbox) dbox.querySelectorAll('.pfleg').forEach(function(l){
+    l.onmouseenter=function(){ dbox.classList.add('dim');
+      dbox.querySelectorAll('.pfseg').forEach(function(s){ s.classList.toggle('on', s.dataset.i===l.dataset.i); }); };
+    l.onmouseleave=function(){ dbox.classList.remove('dim');
+      dbox.querySelectorAll('.pfseg').forEach(function(s){ s.classList.remove('on'); }); };
+  });
   var nb=$('pfNotesBox'); if(nb) nb.addEventListener('toggle', function(){ pfNotesOpen=nb.open; });
   var yb=$('pfYokBtn'); if(yb) yb.onclick=function(ev){ ev.preventDefault(); pfHideYok=!pfHideYok; pfNotesOpen=true; pfRender(); };
   var rr=$('pfRatesRetry'); if(rr) rr.onclick=function(){ ratesTried=false; ratesLoading=false; pfLoadRates(function(){ pfRender(); }); };
@@ -632,6 +752,7 @@ var pfAddType='stock';
 var pfSeriesSel='value';
 var pfHideYok=true;      /* "YOK" notları varsayılan olarak gizli */
 var pfNotesOpen=false;   /* açık/kapalı durumu render'lar arasında korunsun */
+var pfDistMode='type';   /* dağılım halkası: tür / varlık */
 var pfUnlocked=false;   /* her sayfa yüklemesinde (oturumda) false başlar; her açılışta şifre sorulur */
 function pfPaintQuick(syms){ var bar=$('pfQuickBar'); if(!bar) return;
   var tools='<button class="ghost" id="pfSaveDayBtn">Günü kaydet</button><button class="ghost" id="pfUploadBtn">⤒ Geçmiş yükle</button><button class="ghost" id="pfCsvBtn">⤓ Dışa aktar</button>';
@@ -728,7 +849,7 @@ function pfRenderAsset(box, a){
         '<button data-cm="price" class="'+(VIEW.chart==='price'?'on':'')+'">Fiyat geçmişi</button>'+
         '<button data-cm="invest" class="'+(VIEW.chart==='invest'?'on':'')+'">Yatırım geçmişi</button></div>';
     }
-    chartSec='<h3 style="font-size:16px; margin:0 0 8px">'+(VIEW.chart==='invest'?'Yatırım geçmişi (kümülatif maliyet)':'Fiyat geçmişi')+'</h3>'+btns+'<div id="pfAssetChart"></div>';
+    chartSec='<h3 style="font-size:16px; margin:0 0 8px">'+(VIEW.chart==='invest'?'Yatırım geçmişi (bu varlıktaki para)':'Fiyat geçmişi')+'</h3>'+btns+'<div id="pfAssetChart"></div>';
   }
   var suspN=(a.tx||[]).filter(function(t){ return pfTxSuspect(a,t); }).length;
   var suspBar=suspN?('<div class="hint down" style="background:var(--down-bg); border:1px solid var(--down); border-radius:10px; padding:9px 11px; margin-bottom:14px">⚠ <b>'+suspN+' işlemde ödeme para birimi hatalı görünüyor</b> — aşağıdaki listede kırmızı satırlar. Bunlar kâr/zararı çok bozar; ✎ ile düzelt.</div>'):'';
@@ -746,10 +867,18 @@ function pfRenderAsset(box, a){
   box.querySelectorAll('.pftxD').forEach(function(b){ b.onclick=function(ev){ ev.stopPropagation(); pfDelTx(a, parseInt(b.dataset.txi,10)); }; });
   var cm=$('pfChMode'); if(cm) cm.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ VIEW.chart=b.dataset.cm; pfRender(); }; });
   if(VIEW.chart==='invest' && hasInv){
-    var iv=pfInvestSeries(a, dc), mnt=$('pfAssetChart');
-    if(mnt) mnt.innerHTML = iv.pts.length
-      ? (pfLineChart(iv.pts, '#0bbfa6', dsym)+'<div class="hint" style="margin-top:6px">Her işlem sonrası <b>elde kalan pozisyonun maliyeti</b> ('+dc+'). Satışta maliyet ortalama üzerinden düşer. Kırmızı noktalar: notu olan işlemler.</div>')
-      : '<div class="empty">işlem yok</div>';
+    var vs=pfValueSeries(a, dc), mnt=$('pfAssetChart');
+    if(mnt){
+      if(vs && vs.pts.length){
+        mnt.innerHTML = pfLineChart(vs.pts, '#0bbfa6', dsym)+
+          '<div class="hint" style="margin-top:6px">Bu varlıkta duran <b>para</b> ('+dc+') — maliyet + kâr/zarar, her tarih kendi günkü fiyat ve kuruyla. Kırmızı noktalar: notu olan işlemler.</div>';
+      } else {
+        var iv=pfInvestSeries(a, dc);
+        mnt.innerHTML = iv.pts.length
+          ? (pfLineChart(iv.pts, '#8b5cf6', dsym)+'<div class="hint" style="margin-top:6px">Bu varlık için <b>fiyat geçmişi yok</b> (gram altın, fon, mevduat ve panoda olmayan hisseler), o yüzden değer geçmişi çizilemiyor. Grafik <b>kümülatif maliyeti</b> gösteriyor. Kırmızı noktalar: notu olan işlemler.</div>')
+          : '<div class="empty">işlem yok</div>';
+      }
+    }
     pfWireChart(box);
   }
   else if(inPanel) pfAssetChart(a, $('pfAssetChart'));
