@@ -4467,6 +4467,9 @@ function startRealtime(){
 /* ===== Portföy (pf) uçtan uca şifreleme — anahtar sadece bellekte ===== */
 const PFC = {
   key: null, blob: null,
+  /* ok: S.pf'in GERÇEK veriyi taşıdığını gösterir. Çözme başarısızsa false kalır ve
+     buluttaki şifreli blob asla üzerine yazılmaz — yoksa boş portföy gerçeğin yerine geçer. */
+  ok: false,
   async setKey(pw, uid){
     const enc = new TextEncoder();
     const base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
@@ -4500,12 +4503,15 @@ snapshot = function(){
 /* Göndermeden önce güncel pf'i şifrele */
 const _pushRemote = pushRemote;
 pushRemote = function(seed){
-  if (PFC.key && S && S.pf) {
-    PFC.encrypt(S.pf).then(b => { PFC.blob = b; _pushRemote(seed); })
-                     .catch(() => _pushRemote(seed));
+  if (PFC.key && PFC.ok && S && S.pf) {
+    PFC.encrypt(S.pf).then(function(b){ PFC.blob = b; _pushRemote(seed); })
+                     .catch(function(e){
+                       console.warn('şifreleme hatası', e);
+                       setSyncStatus('şifreleme hatası — portföy kaydedilmedi');
+                     });   // eski blob'u yazma: yeni değişiklikleri sessizce kaybetmemek için
     return;
   }
-  _pushRemote(seed);
+  _pushRemote(seed);   // anahtar/veri güvenilir değil → snapshot mevcut blob'u aynen korur
 };
 
 /* Buluttan gelen pfEnc'i sakla; anahtar varsa çöz */
@@ -4513,16 +4519,23 @@ const _adoptRemote = adoptRemote;
 adoptRemote = function(remote){
   if (remote && remote.pfEnc) {
     PFC.blob = remote.pfEnc;
-    const r = Object.assign({}, remote); delete r.pfEnc;
+    var r = Object.assign({}, remote); delete r.pfEnc;
     if (PFC.key) {
       PFC.decrypt(remote.pfEnc)
-        .then(obj => { r.pf = obj; _adoptRemote(r); if (window.PF) PF.render(); })
-        .catch(() => _adoptRemote(r));
+        .then(function(obj){ r.pf = obj; PFC.ok = true; _adoptRemote(r); if (window.PF) PF.render(); })
+        .catch(function(e){
+          console.warn('portföy çözülemedi — bulut verisi korunuyor', e);
+          PFC.ok = false;                       // yazma kilitlenir, blob buluta dokunulmaz
+          _adoptRemote(r);
+        });
       return;
     }
-    _adoptRemote(r);          // anahtar yok → portföy kilitli kalır, blob korunur
+    PFC.ok = false;             // anahtar yok → portföy kilitli, blob korunur
+    _adoptRemote(r);
     return;
   }
+  /* Şifresiz (henüz geçiş yapılmamış) veri: gelen pf gerçek veridir */
+  if (remote && remote.pf) PFC.ok = true;
   _adoptRemote(remote);
 };
 
@@ -4534,8 +4547,10 @@ window.PF_VERIFY = async function(pw){
     if (error) return false;
     await PFC.setKey(pw, SB_USER.id);
     if (PFC.blob) {
-      try { S.pf = await PFC.decrypt(PFC.blob); }
-      catch(e){ console.warn('Portföy bu parolayla çözülemedi'); return false; }
+      try { S.pf = await PFC.decrypt(PFC.blob); PFC.ok = true; }
+      catch(e){ PFC.ok = false; console.warn('Portföy bu parolayla çözülemedi'); return false; }
+    } else {
+      PFC.ok = true;            // henüz şifreli blob yok: mevcut düz pf ilk kayıtta şifrelenecek
     }
     return true;
   }catch(e){ return false; }
@@ -4572,7 +4587,7 @@ async function pwChangeDo(){
   if(upd.error){ say('Değiştirilemedi: '+upd.error.message); return; }
   try{
     await PFC.setKey(nw, SB_USER.id);
-    if(plainPf){ S.pf = plainPf; PFC.blob = await PFC.encrypt(plainPf); pushRemote(false); }
+    if(plainPf){ S.pf = plainPf; PFC.ok = true; PFC.blob = await PFC.encrypt(plainPf); pushRemote(false); }
   }catch(e){ console.warn('yeniden şifreleme hatası', e); }
   dlgClose();
   setSyncStatus('şifre değiştirildi '+hhmm());
