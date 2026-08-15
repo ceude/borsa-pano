@@ -4413,11 +4413,80 @@ function startRealtime(){
     }).subscribe();
 }
   // Yatırımlarım kilidi — hesap şifresini Supabase ile doğrular
+/* ===== Portföy (pf) uçtan uca şifreleme — anahtar sadece bellekte ===== */
+const PFC = {
+  key: null, blob: null,
+  async setKey(pw, uid){
+    const enc = new TextEncoder();
+    const base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
+    this.key = await crypto.subtle.deriveKey(
+      { name:'PBKDF2', salt: enc.encode('pfv1:'+uid), iterations: 250000, hash:'SHA-256' },
+      base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+  },
+  b64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); },
+  ub64(s){ return Uint8Array.from(atob(s), c => c.charCodeAt(0)); },
+  async encrypt(obj){
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, this.key,
+                 new TextEncoder().encode(JSON.stringify(obj)));
+    return { v:1, iv:this.b64(iv), ct:this.b64(ct) };
+  },
+  async decrypt(blob){
+    const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv:this.ub64(blob.iv) }, this.key,
+                 this.ub64(blob.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+};
+
+/* Buluta giderken pf yerine pfEnc yaz */
+const _snapshot = snapshot;
+snapshot = function(){
+  const s = _snapshot();
+  if (PFC.blob) { delete s.pf; s.pfEnc = PFC.blob; }
+  return s;
+};
+
+/* Göndermeden önce güncel pf'i şifrele */
+const _pushRemote = pushRemote;
+pushRemote = function(seed){
+  if (PFC.key && S && S.pf) {
+    PFC.encrypt(S.pf).then(b => { PFC.blob = b; _pushRemote(seed); })
+                     .catch(() => _pushRemote(seed));
+    return;
+  }
+  _pushRemote(seed);
+};
+
+/* Buluttan gelen pfEnc'i sakla; anahtar varsa çöz */
+const _adoptRemote = adoptRemote;
+adoptRemote = function(remote){
+  if (remote && remote.pfEnc) {
+    PFC.blob = remote.pfEnc;
+    const r = Object.assign({}, remote); delete r.pfEnc;
+    if (PFC.key) {
+      PFC.decrypt(remote.pfEnc)
+        .then(obj => { r.pf = obj; _adoptRemote(r); if (window.PF) PF.render(); })
+        .catch(() => _adoptRemote(r));
+      return;
+    }
+    _adoptRemote(r);          // anahtar yok → portföy kilitli kalır, blob korunur
+    return;
+  }
+  _adoptRemote(remote);
+};
+
+/* Yatırımlarım kilidi + anahtar türetme */
 window.PF_VERIFY = async function(pw){
   try{
-    if(typeof SB_USER === 'undefined' || !SB_USER) return false;   // giriş yapılmamış
+    if (typeof SB_USER === 'undefined' || !SB_USER) return false;
     const { error } = await SB.auth.signInWithPassword({ email: SB_USER.email, password: pw });
-    return !error;                                                  // şifre doğruysa true
+    if (error) return false;
+    await PFC.setKey(pw, SB_USER.id);
+    if (PFC.blob) {
+      try { S.pf = await PFC.decrypt(PFC.blob); }
+      catch(e){ console.warn('Portföy bu parolayla çözülemedi'); return false; }
+    }
+    return true;
   }catch(e){ return false; }
 };
 function stopRealtime(){ if(realtimeCh){ try{SB.removeChannel(realtimeCh);}catch(e){} realtimeCh=null; } }
