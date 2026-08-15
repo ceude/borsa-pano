@@ -523,7 +523,14 @@ function pfDlgErr(msg){
    Böylece TL hissesi %1,4 artarken EUR/TRY de yükseldiyse EUR bazındaki değişim farklı çıkar. */
 function pfPrevRates(){
   if(!ratesReady()) return null;
-  var today=new Date().toISOString().slice(0,10), R=RATEHIST;
+  var R=RATEHIST, last=R[R.length-1];
+  /* "Dün" = bugünden önceki son kur kaydı. Takvime bakılmaz, tamamen veri odaklıdır:
+     - Cumartesi: güncel kur da son kayıt da Cuma kapanışı → değişim 0 (piyasa kapalı).
+     - Pazar akşamı / Pazartesi: güncel kur yeni değere geçtiği anda fark görünür.
+     Yani hafta sonu gerçekten bir hareket olur ve veriye yansırsa, gösterilir. */
+  var lastDay=new Date(last[0]*1000).toISOString().slice(0,10);
+  var today=new Date().toISOString().slice(0,10);
+  if(lastDay<today) return {usdtry:last[1], eurtry:last[2]};
   for(var i=R.length-1;i>=0;i--){
     var d=new Date(R[i][0]*1000).toISOString().slice(0,10);
     if(d<today) return {usdtry:R[i][1], eurtry:R[i][2]};
@@ -580,19 +587,48 @@ function pfXIRR(dc){
   var r=(lo+hi)/2, days=(today-t0)/86400;
   return {rate:r*100, days:days, skipped:skipped, n:flows.length};
 }
+/* Piyasa verisi BUGÜNE mi ait? Hafta sonu/tatilde son bar dünkü (Cuma) kalır;
+   o hareketi "bugün" saymamak için tazelik kontrolü yapılır. */
+function pfMktTime(m){ try{ var D=window.STOCK_DATA; return (D&&D.marketTimes&&D.marketTimes[m])||null; }catch(e){ return null; } }
+function pfSameLocalDay(ts){ if(!ts) return false;
+  var d=new Date(ts), n=new Date();
+  return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate(); }
+function pfFreshToday(m){
+  var t=m?pfMktTime(m):null;
+  if(t) return pfSameLocalDay(t*1000);
+  var wd=new Date().getDay(); return wd>=1 && wd<=5;      /* veri yoksa hafta içi varsay */
+}
+/* Portföydeki türlerden herhangi biri bugüne ait fiyat verisine sahip mi? */
+function pfAnyFresh(){
+  var A=pf().assets, any=false;
+  Object.keys(A).forEach(function(id){ var a=A[id];
+    if(a.type==='stock' && a.symbol && find(a.symbol)){ if(pfFreshToday(a.market||'BIST')) any=true; }
+    else if(a.type==='gold'){ var g=RATES().goldAt; if(g?pfSameLocalDay(g*1000):pfFreshToday(null)) any=true; }
+    else if(a.type==='fx'){ var r=ratesReady()?RATEHIST[RATEHIST.length-1]:null;
+      if(r && pfSameLocalDay(r[0]*1000)) any=true; }
+  });
+  return any;
+}
 function pfSameDay(ts){ if(!ts) return false;
   return new Date(ts).toISOString().slice(0,10)===new Date().toISOString().slice(0,10); }
 function aUnitTRYprev(a){                      /* 1 birimin dünkü TL karşılığı */
   if(a.type==='stock'){
     var s=a.symbol?find(a.symbol):null, pc=prevTRYper(aNativeCcy(a)); if(pc==null) return null;
-    if(s && s.prevClose!=null) return s.prevClose*pc;
+    if(s && s.prevClose!=null){
+      if(!pfFreshToday(a.market||s.market||'BIST')) return aUnitTRYnow(a);   /* piyasa bugün kapalı → değişim yok */
+      return s.prevClose*pc;
+    }
     if(a.curUnit!=null){                       /* manuel fiyatlı: bugün elle değiştiyse eski fiyat */
       var base=(pfSameDay(a.curAt) && a.prevUnit!=null)?a.prevUnit:a.curUnit;
       return base*pc;
     }
     return null;
   }
-  if(a.type==='gold'){ var gp=RATES().goldGramTRYPrev; return (gp!=null&&!isNaN(gp))?gp:null; }
+  if(a.type==='gold'){
+    var gAt=RATES().goldAt;
+    if(gAt){ if(!pfSameLocalDay(gAt*1000)) return aUnitTRYnow(a); }   /* veri odaklı: son altın barı bugüne ait mi */
+    else if(!pfFreshToday(null)) return aUnitTRYnow(a);               /* zaman damgası yoksa takvim tahmini */
+    var gp=RATES().goldGramTRYPrev; return (gp!=null&&!isNaN(gp))?gp:null; }
   if(a.type==='fx'){ return prevTRYper(a.holdCcy||'EUR'); }
   if(a.curUnit!=null){                         /* adet bazlı fon/kripto vb., birim fiyatı elle */
     var pc2=prevTRYper(a.ccy||'TRY'); if(pc2==null) return null;
@@ -858,7 +894,8 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     if(a.valMode==='amount' && (a.cost==null||isNaN(a.cost)) && a.curValue!=null) noCost.push(a.name||'—'); });
   var costWarn = noCost.length ? ('<div class="hint down" style="margin:-6px 0 12px">⚠ <b>'+noCost.length+'</b> varlıkta maliyet girilmemiş ('+noCost.slice(0,3).join(', ')+(noCost.length>3?' …':'')+'). Maliyeti 0 sayıldığı için <b>Toplam K/Z ve yüzde olduğundan yüksek</b> görünür — Düzenle ile anapara/maliyet gir.</div>') : '';
   var dt=pfDayTotals(cur);
-  var dayCard = dt ? ('<div><div class="k">Bugün'+(dt.unknown>0?' <span class="cov" title="Bugün elle güncellenmemiş ve piyasa verisi de olmayan varlıklar değişmemiş sayılır ve bu hesaba girmez">*</span>':'')+'</div><div class="v '+pnlCls(dt.chg)+'">'+
+  var mktShut = dt && Math.abs(dt.chg)<0.005 && !pfAnyFresh();
+  var dayCard = dt ? ('<div><div class="k">Bugün'+(mktShut?' <span class="cov" title="Elimizdeki en güncel fiyatlar bugüne ait değil — piyasalar kapalı ya da veri henüz yenilenmedi">· kapalı</span>':(dt.unknown>0?' <span class="cov" title="Bugün elle güncellenmemiş ve piyasa verisi de olmayan varlıklar değişmemiş sayılır ve bu hesaba girmez">*</span>':''))+'</div><div class="v '+pnlCls(dt.chg)+'">'+
       (dt.chg>0?'+':'')+pf$(dt.chg)+(dt.pct!=null?' <span style="font-size:15px">('+(dt.pct>0?'+':'')+fmt(dt.pct,2)+'%)</span>':'')+'</div></div>') : '';
   var realTot=0, realHas=false;
   Object.keys(P.assets).forEach(function(id){ var r=aRealizedDisp(P.assets[id]); if(r!=null && !isNaN(r) && r!==0){ realTot+=r; realHas=true; } });
