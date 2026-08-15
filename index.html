@@ -598,11 +598,15 @@
             <select id="btStrat">
               <option value="ma">MA kesişimi — bu sekmeye özel basit kural</option>
               <option value="short">Kısa Vade Adayları kuralları (fiyat bileşenleri)</option>
+              <option value="fib">Fibonacci sekmesi kuralları (pozitif bölge + güvenilirlik)</option>
             </select>
             <div class="tphelp"><b>Kısa Vade Adayları kuralları:</b> o sekmedeki puanın yalnız fiyattan hesaplanan bileşenleri (trend, 1A/3A momentum, göreli güç, RSI, volatilite, uzama, zirveye yakınlık) — geçmişte her gün yeniden hesaplanır. <b>Değer/kalite bileşeni çıkarılmıştır</b>; geçmiş bilanço verisi saklanmadığı için test edilemez. <b>MA kesişimi</b> ise hiçbir sekmeye karşılık gelmez, referans niteliğinde sade bir trend kuralıdır.</div></div>
           <div class="tpfield"><label>Skor eşiği (yalnız Kısa Vade stratejisinde)</label>
             <input class="fld" id="btScoreMin" type="number" value="70" min="0" max="100" step="5">
             <div class="tphelp">Skor bu eşiği <b>yeni aştığında</b> alım yapılır (her gün tekrar değil).</div></div>
+          <div class="tpfield"><label>Fibonacci güvenilirlik eşiği (yalnız Fibonacci stratejisinde)</label>
+            <input class="fld" id="btFibMin" type="number" value="70" min="0" max="100" step="5">
+            <div class="tphelp">Yalnız <b>yukarı bacakta</b>, fiyat bir destek seviyesine yakın <b>ve seviyenin üstündeyken</b> alım yapılır. Puan Fibonacci sekmesindeki güvenilirlikle <b>aynı bileşen ve ağırlıklara</b> sahiptir (kalite/temel veri içermez). Bu eşiği <b>yeni aştığında</b> girilir; pencere ve yakınlık için aşağıdaki kutular kullanılır.</div></div>
           <label class="hint" style="display:flex; align-items:center; gap:8px; margin:14px 0 8px">
             <input type="checkbox" id="btFib"> <b>Fibonacci filtresi ekle</b></label>
           <div class="tphelp" style="margin:-4px 0 10px">Açıkken yalnız <b>yukarı bacakta</b> ve 0.382/0.5/0.618/0.786 destek seviyelerinden birine yakınken alım yapılır. Sinyal sayısını çok azaltır.</div>
@@ -1277,6 +1281,9 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <div class="prow"><span>Üyelik</span><span class="pchip" id="roleBox">Standart Üye</span></div>
         <div class="prow"><span>Bulut</span><b id="authSync">—</b></div>
         <div id="upsell" class="hint" style="display:none; margin-top:10px">Standart üyelikte <b>Günlük</b>, <b>Kısa Vade</b> ve <b>Orta/Uzun</b> sekmeleri kapalıdır.</div>
+        <div class="psec">Güvenlik</div>
+        <button class="ghost" id="pwChangeBtn">🔑 Şifre değiştir</button>
+        <div class="hint" style="margin-top:6px">Portföyün şifreli saklandığı için şifre değişiminde <b>yeniden şifrelenir</b>; bu yüzden değişimi buradan yap, Supabase panelinden değil.</div>
         <div id="previewBox" style="display:none">
           <div class="psec">Görünüm</div>
           <button class="ghost" id="previewBtn">👁 Standart üye gözünden gör</button>
@@ -2708,6 +2715,40 @@ function btShortScore(P, i, mktR1){
   return ws>0? Math.round(vs/ws) : null;
 }
 /* Fibonacci filtresi: o güne kadarki pencerede yukarı bacak + destek seviyesine yakınlık */
+/* Fibonacci sekmesindeki güvenilirlik puanının GEÇMİŞE uygulanabilir hali.
+   Canlı fibScore ile AYNI bileşenler ve AYNI ağırlıklar; yalnız fiyattan hesaplanır. */
+function btFibEval(bars, P, i, look, thresh){
+  var start=Math.max(0,i-look+1), hi=-Infinity, lo=Infinity, hiI=-1, loI=-1;
+  for(var j=start;j<=i;j++){
+    if(bars[j][2]>hi){ hi=bars[j][2]; hiI=j; }
+    if(bars[j][3]<lo){ lo=bars[j][3]; loI=j; }
+  }
+  if(hiI<0||loI<0||hi<=lo) return null;
+  if(loI>hiI) return null;                      // aşağı bacak → pozitif bölge değil
+  var c=P.close[i]; if(c<lo) return null;       // dip kırılmış, kurulum geçersiz
+  var best=null;
+  FIBLV.forEach(function(L){
+    var lv=hi-(hi-lo)*L.r, dd=Math.abs(c-lv)/lv*100;
+    if(!best||dd<best.dist) best={r:L.r,q:L.q,level:lv,dist:dd};
+  });
+  if(best.dist>thresh) return null;             // hiçbir seviyeye yakın değil
+  var p={};
+  p.prox  = clampN((1-best.dist/thresh)*100, 0, 100);
+  p.hold  = (c>=best.level) ? 100 : 10;         // canlı sekmedeki gibi: altındaysa elenmez, düşük puan alır
+  p.level = best.q;
+  var legPct=(hi-lo)/lo*100;
+  p.swing = legPct>=20?100 : legPct>=10? 60+(legPct-10)/10*40 : clampN(legPct/10*60,15,60);
+  var age=i-Math.max(hiI,loI);
+  p.fresh = age<=40?100 : clampN(100-(age-40)*1.5, 20, 100);
+  var m50=P.ma50[i], m200=P.ma200[i];
+  if(m50!=null&&m200!=null) p.trend=(c>m200&&m50>m200)?100:(c>m200)?75:35;
+  else if(m50!=null) p.trend=c>m50?75:35; else p.trend=null;
+  var q=P.rsi[i];
+  p.rsi = q==null?null:((q>=35&&q<=55)?100:(q>55&&q<=65)?75:(q>65)?45:(q>=30)?70:45);
+  var W={prox:1.5, hold:1.4, level:1.2, trend:1.5, swing:1.0, fresh:0.8, rsi:0.8}, ws=0, vs=0;
+  for(var k in W){ if(p[k]!=null){ ws+=W[k]; vs+=W[k]*p[k]; } }
+  return ws>0? Math.round(vs/ws) : null;
+}
 function btFibOk(bars, i, look, thresh){
   var start=Math.max(0,i-look+1), hi=-Infinity, lo=Infinity, hiI=-1, loI=-1;
   for(var j=start;j<=i;j++){
@@ -2736,6 +2777,7 @@ function btCfg(){
     maxPos:  Math.max(1, parseInt($('btMaxPos').value,10)||5),
     strat:   $('btStrat').value,
     scoreMin:Math.max(0, parseInt($('btScoreMin').value,10)||70),
+    fibMin:  Math.max(0, parseInt(($('btFibMin')||{}).value,10)||70),
     fib:     $('btFib').checked,
     fibLook: Math.max(30, parseInt($('btFibLook').value,10)||120),
     fibNear: Math.max(0.5, parseFloat($('btFibNear').value)||5),
@@ -2799,17 +2841,23 @@ function btExecute(){
         var a=d.p.atr[i]; if(a==null||a<=0) return;
         var c=d.p.close[i], sig=false, rank=0;
         if(cfg.strat==='short'){
-          var sc=btShortScore(d.p,i,mktR1), sp=btShortScore(d.p,i-1,mktR1);
+          var sc=btShortScore(d.p,i,mktR1), scp=btShortScore(d.p,i-1,mktR1);
           if(sc==null) return;
-          sig = (sc>=cfg.scoreMin) && (sp==null || sp<cfg.scoreMin);   // eşiği yeni aşanlar
+          sig = (sc>=cfg.scoreMin) && (scp==null || scp<cfg.scoreMin); // eşiği yeni aşanlar
           rank = -sc;                                                  // yüksek skor önce
+        } else if(cfg.strat==='fib'){
+          var fv=btFibEval(d.bars,d.p,i,cfg.fibLook,cfg.fibNear);
+          if(fv==null) return;
+          var fp=btFibEval(d.bars,d.p,i-1,cfg.fibLook,cfg.fibNear);
+          sig = (fv>=cfg.fibMin) && (fp==null || fp<cfg.fibMin);       // eşiği yeni aşanlar
+          rank = -fv;                                                  // yüksek güvenilirlik önce
         } else {
           var ma=d.p.ma[i], mp=d.p.ma[i-1]; if(ma==null||mp==null) return;
           sig = (d.p.close[i-1]<=mp && c>ma);
           rank = (c/ma-1)*100;                                         // ortalamaya yakın olan önce
         }
         if(!sig) return;
-        if(cfg.fib && !btFibOk(d.bars,i,cfg.fibLook,cfg.fibNear)) return;
+        if(cfg.fib && cfg.strat!=='fib' && !btFibOk(d.bars,i,cfg.fibLook,cfg.fibNear)) return;
         cands.push({sym:sym,c:c,atr:a,rank:rank});
       });
       cands.sort(function(a,b){return a.rank-b.rank;});
@@ -2872,7 +2920,9 @@ function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
     '<div class="metric"><div class="k">Maks. düşüş</div><div class="v down">−'+fmt(maxDD,1)+'%</div></div>'+
     '</div>'+
     '<div class="hint" style="margin-top:8px">'+nSyms+' hisse · '+nDays+' işlem günü · <b>'+
-    (cfg.strat==='short'?('Kısa Vade skoru ≥'+cfg.scoreMin):('MA'+cfg.maN+' kesişimi'))+'</b>'+
+    (cfg.strat==='short'?('Kısa Vade skoru ≥'+cfg.scoreMin):
+     cfg.strat==='fib'?('Fibonacci güvenilirlik ≥'+cfg.fibMin+' (pozitif bölge, ≤%'+fmt(cfg.fibNear,1)+', '+cfg.fibLook+'g pencere)'):
+     ('MA'+cfg.maN+' kesişimi'))+'</b>'+
     (cfg.fib?(' + <b>Fibonacci filtresi</b> (≤%'+fmt(cfg.fibNear,1)+', '+cfg.fibLook+'g pencere)'):'')+
     ' · çıkış MA'+cfg.maN+' altı · stop '+cfg.atrMult+'×ATR · hedef '+cfg.targetR+'R · risk %'+cfg.risk+
     ' · en fazla '+cfg.maxPos+' pozisyon · maliyet '+(cfg.costs?'açık':'kapalı')+
@@ -3044,8 +3094,9 @@ function btActiveTxt(){
   var el=$('btActive'); if(!el) return;
   var st=$('btStrat')?$('btStrat').value:'ma';
   var fib=$('btFib')&&$('btFib').checked;
-  el.innerHTML='Şu an seçili: <b>'+(st==='short'?'Kısa Vade Adayları kuralları':'MA kesişimi (referans kural)')+'</b>'+
-    (fib?' + <b>Fibonacci filtresi</b>':'')+' · piyasa <b>'+(MK||'—')+'</b>';
+  el.innerHTML='Şu an seçili: <b>'+(st==='short'?'Kısa Vade Adayları kuralları':
+    st==='fib'?'Fibonacci sekmesi kuralları':'MA kesişimi (referans kural)')+'</b>'+
+    ((fib&&st!=='fib')?' + <b>Fibonacci filtresi</b>':'')+' · piyasa <b>'+(MK||'—')+'</b>';
 }
 function btReset(){
   btLastMk=null;
@@ -4489,6 +4540,44 @@ window.PF_VERIFY = async function(pw){
     return true;
   }catch(e){ return false; }
 };
+/* ===== Şifre değiştir (portföy anahtarını da taşır) ===== */
+function pwChangeDialog(){
+  if(!sbReady()){ dlg('Giriş gerekli','<p>Önce hesabına giriş yap.</p>',[{label:'Tamam',primary:true}]); return; }
+  var hasEnc = !!PFC.blob;
+  dlg('Şifre değiştir',
+    '<div class="tpfield"><label>Mevcut şifre</label><input class="fld" id="pwOld" type="password" autocomplete="current-password" style="width:100%"></div>'+
+    '<div class="tpfield"><label>Yeni şifre</label><input class="fld" id="pwNew" type="password" autocomplete="new-password" style="width:100%"><div class="tphelp">En az 8 karakter.</div></div>'+
+    '<div class="tpfield"><label>Yeni şifre (tekrar)</label><input class="fld" id="pwNew2" type="password" autocomplete="new-password" style="width:100%"></div>'+
+    (hasEnc?'<div class="hint">Portföyün şifreli saklanıyor. Değişiklik sırasında <b>yeni şifreyle yeniden şifrelenecek</b> — bu yüzden mevcut şifreni doğru girmen şart.</div>':'')+
+    '<div class="hint down" id="pwMsg" style="min-height:16px"></div>',
+    [{label:'Değiştir',primary:true,fn:function(){ pwChangeDo(); return false; }},{label:'Vazgeç'}]);
+}
+async function pwChangeDo(){
+  var msg=$('pwMsg'), oldPw=$('pwOld').value, nw=$('pwNew').value, nw2=$('pwNew2').value;
+  function say(t){ if(msg) msg.textContent=t; }
+  if(!oldPw||!nw){ say('Tüm alanları doldur.'); return; }
+  if(nw.length<8){ say('Yeni şifre en az 8 karakter olmalı.'); return; }
+  if(nw!==nw2){ say('Yeni şifreler eşleşmiyor.'); return; }
+  if(nw===oldPw){ say('Yeni şifre eskisiyle aynı.'); return; }
+  say('kontrol ediliyor…');
+  var chk = await SB.auth.signInWithPassword({ email: SB_USER.email, password: oldPw });
+  if(chk.error){ say('Mevcut şifre yanlış.'); return; }
+  var plainPf = null;
+  if(PFC.blob){
+    try{ await PFC.setKey(oldPw, SB_USER.id); plainPf = await PFC.decrypt(PFC.blob); }
+    catch(e){ say('Portföy mevcut şifreyle çözülemedi — şifre değiştirilmedi.'); return; }
+  } else if(S && S.pf && PFC.key){ plainPf = S.pf; }
+  say('şifre güncelleniyor…');
+  var upd = await SB.auth.updateUser({ password: nw });
+  if(upd.error){ say('Değiştirilemedi: '+upd.error.message); return; }
+  try{
+    await PFC.setKey(nw, SB_USER.id);
+    if(plainPf){ S.pf = plainPf; PFC.blob = await PFC.encrypt(plainPf); pushRemote(false); }
+  }catch(e){ console.warn('yeniden şifreleme hatası', e); }
+  dlgClose();
+  setSyncStatus('şifre değiştirildi '+hhmm());
+  dlg('Şifre değiştirildi','<p>Yeni şifren aktif.'+(plainPf?' Portföyün yeni şifreyle yeniden şifrelendi.':'')+'</p><div class="hint">Başka cihazlarda açık oturumun varsa orada da çıkış yapıp yeni şifreyle gir.</div>',[{label:'Tamam',primary:true}]);
+}
 function stopRealtime(){ if(realtimeCh){ try{SB.removeChannel(realtimeCh);}catch(e){} realtimeCh=null; } }
 var afterLoginBusy=false;
 function afterLogin(){
@@ -4561,6 +4650,7 @@ function wireCloud(){
   var close=function(){ var o=$('authOv'); if(o) o.classList.remove('open'); };
   var cb=$('cloudBtn'); if(cb) cb.onclick=open;
   var ac=$('authClose'); if(ac) ac.onclick=close;
+  var pwb=$('pwChangeBtn'); if(pwb) pwb.onclick=pwChangeDialog;
   wireBackdrop($('authOv'), close);
   function creds(){ return { email:($('authEmail')?$('authEmail').value.trim():''), pass:($('authPass')?$('authPass').value:'') }; }
   function msg(t){ var m=$('authMsg'); if(m) m.innerHTML=t; }
