@@ -1283,7 +1283,9 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <div id="upsell" class="hint" style="display:none; margin-top:10px">Standart üyelikte <b>Günlük</b>, <b>Kısa Vade</b> ve <b>Orta/Uzun</b> sekmeleri kapalıdır.</div>
         <div class="psec">Güvenlik</div>
         <button class="ghost" id="pwChangeBtn">🔑 Şifre değiştir</button>
-        <div class="hint" style="margin-top:6px">Portföyün şifreli saklandığı için şifre değişiminde <b>yeniden şifrelenir</b>; bu yüzden değişimi buradan yap, Supabase panelinden değil.</div>
+        <button class="ghost" id="rcNewBtn">🔐 Yeni kurtarma anahtarı</button>
+        <button class="ghost" id="rcUseBtn">🆘 Kurtarma anahtarıyla aç</button>
+        <div class="hint" style="margin-top:6px">Portföyün şifreli saklanır. Şifre değişimini <b>buradan</b> yap (Supabase panelinden değil) — anahtar otomatik taşınır. Şifreni unutursan <b>kurtarma anahtarıyla</b> açabilirsin.</div>
         <div id="previewBox" style="display:none">
           <div class="psec">Görünüm</div>
           <button class="ghost" id="previewBtn">👁 Standart üye gözünden gör</button>
@@ -4466,29 +4468,92 @@ function startRealtime(){
   // Yatırımlarım kilidi — hesap şifresini Supabase ile doğrular
 /* ===== Portföy (pf) uçtan uca şifreleme — anahtar sadece bellekte ===== */
 const PFC = {
+  /* key = DEK (veri anahtarı). Veri bununla şifrelenir; DEK'in kendisi iki ayrı
+     kilitle sarmalanır: parolandan türeyen anahtar ve kurtarma kodundan türeyen anahtar.
+     Birini kaybedersen diğeriyle açılır. Hiçbiri sunucuya gitmez. */
   key: null, blob: null,
   /* ok: S.pf'in GERÇEK veriyi taşıdığını gösterir. Çözme başarısızsa false kalır ve
      buluttaki şifreli blob asla üzerine yazılmaz — yoksa boş portföy gerçeğin yerine geçer. */
   ok: false,
-  async setKey(pw, uid){
+  b64(buf){ return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); },
+  ub64(s){ return Uint8Array.from(atob(s), function(c){ return c.charCodeAt(0); }); },
+  /* Sırdan (parola / kurtarma kodu) sarmalama anahtarı türet */
+  async kek(secret, uid, tag){
     const enc = new TextEncoder();
-    const base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
-    this.key = await crypto.subtle.deriveKey(
-      { name:'PBKDF2', salt: enc.encode('pfv1:'+uid), iterations: 250000, hash:'SHA-256' },
+    const base = await crypto.subtle.importKey('raw', enc.encode(secret), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name:'PBKDF2', salt: enc.encode('pfv2:'+tag+':'+uid), iterations: 250000, hash:'SHA-256' },
       base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
   },
-  b64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); },
-  ub64(s){ return Uint8Array.from(atob(s), c => c.charCodeAt(0)); },
+  async newDEK(){ return crypto.subtle.generateKey({name:'AES-GCM', length:256}, true, ['encrypt','decrypt']); },
+  async wrap(dek, kek){
+    const raw = await crypto.subtle.exportKey('raw', dek);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, kek, raw);
+    return { iv:this.b64(iv), ct:this.b64(ct) };
+  },
+  async unwrap(w, kek){
+    const raw = await crypto.subtle.decrypt({name:'AES-GCM', iv:this.ub64(w.iv)}, kek, this.ub64(w.ct));
+    return crypto.subtle.importKey('raw', raw, {name:'AES-GCM'}, true, ['encrypt','decrypt']);
+  },
+  /* Okunması kolay kurtarma kodu: 4x4 karakter, karıştırılabilir harfler (I,O,0,1) yok */
+  genCode(){
+    const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789', b=crypto.getRandomValues(new Uint8Array(16));
+    let s='';
+    for(let i=0;i<16;i++){ s += A[b[i] % A.length]; if(i%4===3 && i<15) s+='-'; }
+    return s;
+  },
+  normCode(c){ return (c||'').toUpperCase().replace(/[^A-Z0-9]/g,''); },
   async encrypt(obj){
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, this.key,
                  new TextEncoder().encode(JSON.stringify(obj)));
-    return { v:1, iv:this.b64(iv), ct:this.b64(ct) };
+    const b = { v:2, iv:this.b64(iv), ct:this.b64(ct) };
+    if(this.blob){ if(this.blob.wp) b.wp=this.blob.wp; if(this.blob.wr) b.wr=this.blob.wr; }
+    return b;
   },
   async decrypt(blob){
     const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv:this.ub64(blob.iv) }, this.key,
                  this.ub64(blob.ct));
     return JSON.parse(new TextDecoder().decode(pt));
+  },
+  /* Parolayla aç: v2 → DEK'i çöz; v1 (eski sürüm) → doğrudan çöz ve v2'ye yükselt */
+  async openWithPw(pw, uid){
+    if(!this.blob){                                  // ilk kurulum: yeni DEK üret
+      this.key = await this.newDEK();
+      return { fresh:true };
+    }
+    if(this.blob.v === 2 && this.blob.wp){
+      this.key = await this.unwrap(this.blob.wp, await this.kek(pw, uid, 'pw'));
+      return { fresh:false };
+    }
+    /* v1: anahtar doğrudan paroladan türemişti */
+    const enc = new TextEncoder();
+    const base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
+    const old = await crypto.subtle.deriveKey(
+      { name:'PBKDF2', salt: enc.encode('pfv1:'+uid), iterations: 250000, hash:'SHA-256' },
+      base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+    const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:this.ub64(this.blob.iv)}, old, this.ub64(this.blob.ct));
+    const data = JSON.parse(new TextDecoder().decode(pt));
+    this.key = await this.newDEK();                  // yeni DEK'e taşı
+    return { fresh:true, migrated:data };
+  },
+  /* Kurtarma koduyla aç */
+  async openWithCode(code, uid){
+    if(!this.blob || this.blob.v!==2 || !this.blob.wr) throw new Error('kurtarma anahtarı tanımlı değil');
+    this.key = await this.unwrap(this.blob.wr, await this.kek(this.normCode(code), uid, 'rc'));
+  },
+  /* DEK'i parolaya bağla (şifre değişiminde de bu kullanılır — veri yeniden şifrelenmez) */
+  async bindPw(pw, uid){
+    const w = await this.wrap(this.key, await this.kek(pw, uid, 'pw'));
+    this.blob = Object.assign({}, this.blob, { v:2, wp:w });
+  },
+  /* Yeni kurtarma kodu üret ve DEK'i ona bağla; kodu döndürür (yalnız bir kez gösterilir) */
+  async newRecovery(uid){
+    const code = this.genCode();
+    const w = await this.wrap(this.key, await this.kek(this.normCode(code), uid, 'rc'));
+    this.blob = Object.assign({}, this.blob, { v:2, wr:w });
+    return code;
   }
 };
 
@@ -4545,16 +4610,85 @@ window.PF_VERIFY = async function(pw){
     if (typeof SB_USER === 'undefined' || !SB_USER) return false;
     const { error } = await SB.auth.signInWithPassword({ email: SB_USER.email, password: pw });
     if (error) return false;
-    await PFC.setKey(pw, SB_USER.id);
-    if (PFC.blob) {
-      try { S.pf = await PFC.decrypt(PFC.blob); PFC.ok = true; }
-      catch(e){ PFC.ok = false; console.warn('Portföy bu parolayla çözülemedi'); return false; }
-    } else {
-      PFC.ok = true;            // henüz şifreli blob yok: mevcut düz pf ilk kayıtta şifrelenecek
+    let r;
+    try { r = await PFC.openWithPw(pw, SB_USER.id); }
+    catch(e){ PFC.ok=false; console.warn('Portföy bu parolayla açılamadı', e); return false; }
+
+    if (r.migrated) { S.pf = r.migrated; }                 // eski (v1) sürümden taşınan veri
+    else if (!r.fresh) {
+      try { S.pf = await PFC.decrypt(PFC.blob); }
+      catch(e){ PFC.ok=false; console.warn('Portföy çözülemedi', e); return false; }
+    }
+    PFC.ok = true;
+    await PFC.bindPw(pw, SB_USER.id);                      // veri anahtarını parolaya bağla
+
+    if (!PFC.blob || !PFC.blob.wr) {                        // kurtarma anahtarı yoksa üret ve göster
+      const code = await PFC.newRecovery(SB_USER.id);
+      pushRemote(false);
+      setTimeout(function(){ pfShowRecovery(code, true); }, 400);
     }
     return true;
-  }catch(e){ return false; }
+  }catch(e){ console.warn(e); return false; }
 };
+
+/* Kurtarma anahtarını bir kez göster */
+function pfShowRecovery(code, isNew){
+  dlg(isNew?'Kurtarma anahtarın hazır':'Yeni kurtarma anahtarı',
+    '<div class="hint down" style="margin-bottom:10px"><b>Bunu şimdi kaydet.</b> Bir daha gösterilmeyecek. Şifreni unutursan portföyünü açmanın <b>tek yolu</b> budur.</div>'+
+    '<div style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:19px; font-weight:700; letter-spacing:2px; text-align:center; padding:16px; background:var(--bg); border:1px solid var(--line); border-radius:12px; user-select:all">'+code+'</div>'+
+    '<button class="ghost" id="pfRcCopy" style="width:100%; margin-top:10px">📋 Kopyala</button>'+
+    '<div class="hint" style="margin-top:10px">Parola yöneticine kaydet ya da kâğıda yaz ve güvenli bir yere koy. Şifreni değiştirsen bile bu anahtar geçerli kalır.</div>',
+    [{label:'Kaydettim',primary:true}]);
+  var cp=$('pfRcCopy');
+  if(cp) cp.onclick=function(){
+    try{ navigator.clipboard.writeText(code); cp.textContent='✓ Kopyalandı'; }
+    catch(e){ cp.textContent='Kopyalanamadı — elle seç'; }
+  };
+}
+
+/* Kurtarma anahtarıyla portföyü aç ve mevcut şifreye yeniden bağla */
+window.PF_RECOVER_UI = function(){
+  if(!sbReady()){ dlg('Giriş gerekli','<p>Önce hesabına giriş yap.</p>',[{label:'Tamam',primary:true}]); return; }
+  dlg('Kurtarma anahtarıyla aç',
+    '<div class="tpfield"><label>Kurtarma anahtarı</label><input class="fld" id="rcCode" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%; font-family:ui-monospace,monospace; letter-spacing:1px"></div>'+
+    '<div class="tpfield"><label>Şu anki hesap şifren</label><input class="fld" id="rcPw" type="password" autocomplete="current-password" style="width:100%"><div class="tphelp">Portföy bu şifreye yeniden bağlanacak; sonraki açılışlarda bunu kullanacaksın.</div></div>'+
+    '<div class="hint down" id="rcMsg" style="min-height:16px"></div>',
+    [{label:'Aç ve bağla',primary:true,fn:function(){ pfRecoverDo(); return false; }},{label:'Vazgeç'}]);
+};
+async function pfRecoverDo(){
+  var msg=$('rcMsg'); function say(t){ if(msg) msg.textContent=t; }
+  var code=$('rcCode').value, pw=$('rcPw').value;
+  if(!code||!pw){ say('Her iki alanı da doldur.'); return; }
+  say('kontrol ediliyor…');
+  var chk = await SB.auth.signInWithPassword({ email: SB_USER.email, password: pw });
+  if(chk.error){ say('Hesap şifresi yanlış.'); return; }
+  try{
+    await PFC.openWithCode(code, SB_USER.id);
+    S.pf = await PFC.decrypt(PFC.blob);
+    PFC.ok = true;
+  }catch(e){ say('Kurtarma anahtarı geçersiz.'); return; }
+  await PFC.bindPw(pw, SB_USER.id);
+  pushRemote(false);
+  dlgClose();
+  if(window.PF) PF.render();
+  dlg('Portföy açıldı','<p>Portföyün kurtarıldı ve şu anki şifrene bağlandı.</p><div class="hint">Kurtarma anahtarın hâlâ geçerli. Yenilemek istersen Profil → Güvenlik bölümünü kullan.</div>',[{label:'Tamam',primary:true}]);
+}
+
+/* Yeni kurtarma anahtarı üret (eskisi geçersiz olur) */
+window.PF_NEWCODE_UI = function(){
+  if(!sbReady()){ dlg('Giriş gerekli','<p>Önce hesabına giriş yap.</p>',[{label:'Tamam',primary:true}]); return; }
+  if(!PFC.key || !PFC.ok){ dlg('Önce portföyü aç','<p>Yeni anahtar üretmek için önce Yatırımlarım sekmesini şifrenle aç.</p>',[{label:'Tamam',primary:true}]); return; }
+  dlg('Yeni kurtarma anahtarı',
+    '<p>Yeni bir anahtar üretilecek ve <b>eski anahtar geçersiz olacak</b>.</p>'+
+    '<div class="hint">Eski anahtarını kaybettiysen ya da başkası görmüş olabilirse bunu yap.</div>',
+    [{label:'Üret',primary:true,fn:function(){
+      PFC.newRecovery(SB_USER.id).then(function(code){
+        pushRemote(false);
+        setTimeout(function(){ pfShowRecovery(code, false); }, 250);
+      });
+    }},{label:'Vazgeç'}]);
+};
+
 /* ===== Şifre değiştir (portföy anahtarını da taşır) ===== */
 function pwChangeDialog(){
   if(!sbReady()){ dlg('Giriş gerekli','<p>Önce hesabına giriş yap.</p>',[{label:'Tamam',primary:true}]); return; }
@@ -4577,21 +4711,25 @@ async function pwChangeDo(){
   say('kontrol ediliyor…');
   var chk = await SB.auth.signInWithPassword({ email: SB_USER.email, password: oldPw });
   if(chk.error){ say('Mevcut şifre yanlış.'); return; }
-  var plainPf = null;
+
+  /* Veri anahtarını eski parolayla aç — veri yeniden şifrelenmez, yalnız sarmalama değişir */
+  var haveKey = false;
   if(PFC.blob){
-    try{ await PFC.setKey(oldPw, SB_USER.id); plainPf = await PFC.decrypt(PFC.blob); }
-    catch(e){ say('Portföy mevcut şifreyle çözülemedi — şifre değiştirilmedi.'); return; }
-  } else if(S && S.pf && PFC.key){ plainPf = S.pf; }
+    try{ await PFC.openWithPw(oldPw, SB_USER.id); haveKey = true; }
+    catch(e){ say('Portföy mevcut şifreyle açılamadı — şifre değiştirilmedi.'); return; }
+  } else if(PFC.key && PFC.ok){ haveKey = true; }
+
   say('şifre güncelleniyor…');
   var upd = await SB.auth.updateUser({ password: nw });
   if(upd.error){ say('Değiştirilemedi: '+upd.error.message); return; }
+
   try{
-    await PFC.setKey(nw, SB_USER.id);
-    if(plainPf){ S.pf = plainPf; PFC.ok = true; PFC.blob = await PFC.encrypt(plainPf); pushRemote(false); }
-  }catch(e){ console.warn('yeniden şifreleme hatası', e); }
+    if(haveKey){ await PFC.bindPw(nw, SB_USER.id); PFC.ok = true; pushRemote(false); }
+  }catch(e){ console.warn('yeniden bağlama hatası', e); }
+
   dlgClose();
   setSyncStatus('şifre değiştirildi '+hhmm());
-  dlg('Şifre değiştirildi','<p>Yeni şifren aktif.'+(plainPf?' Portföyün yeni şifreyle yeniden şifrelendi.':'')+'</p><div class="hint">Başka cihazlarda açık oturumun varsa orada da çıkış yapıp yeni şifreyle gir.</div>',[{label:'Tamam',primary:true}]);
+  dlg('Şifre değiştirildi','<p>Yeni şifren aktif.'+(haveKey?' Portföyün yeni şifrene bağlandı.':'')+'</p><div class="hint">Kurtarma anahtarın <b>değişmedi</b>, hâlâ geçerli. Başka cihazlarda açık oturumun varsa orada da çıkış yapıp yeni şifreyle gir.</div>',[{label:'Tamam',primary:true}]);
 }
 function stopRealtime(){ if(realtimeCh){ try{SB.removeChannel(realtimeCh);}catch(e){} realtimeCh=null; } }
 var afterLoginBusy=false;
@@ -4666,6 +4804,8 @@ function wireCloud(){
   var cb=$('cloudBtn'); if(cb) cb.onclick=open;
   var ac=$('authClose'); if(ac) ac.onclick=close;
   var pwb=$('pwChangeBtn'); if(pwb) pwb.onclick=pwChangeDialog;
+  var rcn=$('rcNewBtn'); if(rcn) rcn.onclick=function(){ if(window.PF_NEWCODE_UI) PF_NEWCODE_UI(); };
+  var rcu=$('rcUseBtn'); if(rcu) rcu.onclick=function(){ if(window.PF_RECOVER_UI) PF_RECOVER_UI(); };
   wireBackdrop($('authOv'), close);
   function creds(){ return { email:($('authEmail')?$('authEmail').value.trim():''), pass:($('authPass')?$('authPass').value:'') }; }
   function msg(t){ var m=$('authMsg'); if(m) m.innerHTML=t; }
