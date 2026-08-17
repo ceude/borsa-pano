@@ -1283,9 +1283,8 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
         <div id="upsell" class="hint" style="display:none; margin-top:10px">Standart üyelikte <b>Günlük</b>, <b>Kısa Vade</b> ve <b>Orta/Uzun</b> sekmeleri kapalıdır.</div>
         <div class="psec">Güvenlik</div>
         <button class="ghost" id="pwChangeBtn">🔑 Şifre değiştir</button>
-        <button class="ghost" id="rcNewBtn">🔐 Yeni kurtarma anahtarı</button>
-        <button class="ghost" id="rcUseBtn">🆘 Kurtarma anahtarıyla aç</button>
-        <div class="hint" style="margin-top:6px">Portföyün şifreli saklanır. Şifre değişimini <b>buradan</b> yap (Supabase panelinden değil) — anahtar otomatik taşınır. Şifreni unutursan <b>kurtarma anahtarıyla</b> açabilirsin.</div>
+        <button class="ghost" id="rcNewBtn">🔐 Kurtarma anahtarını yenile</button>
+        <button class="ghost" id="rcUseBtn">🆘 Şifremi unuttum</button>
         <div id="previewBox" style="display:none">
           <div class="psec">Görünüm</div>
           <button class="ghost" id="previewBtn">👁 Standart üye gözünden gör</button>
@@ -4697,7 +4696,7 @@ function pwChangeDialog(){
     '<div class="tpfield"><label>Mevcut şifre</label><input class="fld" id="pwOld" type="password" autocomplete="current-password" style="width:100%"></div>'+
     '<div class="tpfield"><label>Yeni şifre</label><input class="fld" id="pwNew" type="password" autocomplete="new-password" style="width:100%"><div class="tphelp">En az 8 karakter.</div></div>'+
     '<div class="tpfield"><label>Yeni şifre (tekrar)</label><input class="fld" id="pwNew2" type="password" autocomplete="new-password" style="width:100%"></div>'+
-    (hasEnc?'<div class="hint">Portföyün şifreli saklanıyor. Değişiklik sırasında <b>yeni şifreyle yeniden şifrelenecek</b> — bu yüzden mevcut şifreni doğru girmen şart.</div>':'')+
+    (hasEnc?'<div class="hint">Portföy erişimin otomatik taşınır, bir şey yapman gerekmez.</div>':'')+
     '<div class="hint down" id="pwMsg" style="min-height:16px"></div>',
     [{label:'Değiştir',primary:true,fn:function(){ pwChangeDo(); return false; }},{label:'Vazgeç'}]);
 }
