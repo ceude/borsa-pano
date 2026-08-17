@@ -48,6 +48,9 @@ function injectCSS(){
   '.pftypes{display:flex; gap:5px; flex-wrap:wrap; margin:8px 0 10px}'+
   '.pftypes button{border:1px solid var(--line); background:var(--surface); color:var(--dim); font-weight:700; font-size:12.5px; padding:7px 13px; border-radius:999px; cursor:pointer}'+
   '.pftypes button.on{background:var(--brand); color:#fff; border-color:var(--brand)}'+
+  '#pfPickTypes{margin:0 0 4px}'+
+  '.pfpick:hover{background:var(--line2)}'+
+  '#pfQuickBar .go{flex:0 0 auto}'+
   '.pfbadge{font-size:10px; padding:2px 7px; border-radius:6px; font-weight:700; background:var(--line2); color:var(--dim); vertical-align:middle}'+
   '#v-portfolio tbody tr{cursor:pointer}'+
   '.pfarrow{color:var(--faint); font-weight:700}'+
@@ -113,7 +116,9 @@ function injectCSS(){
     '.pfdist{gap:14px; padding:14px}'+
     '.pflegend{min-width:0}'+
     '#v-portfolio .pfquick{flex-direction:column; align-items:stretch}'+
-    '#v-portfolio .pfquick button,#v-portfolio .pfquick input{width:100%}'+
+    '#v-portfolio .pfquick{flex-direction:row; flex-wrap:wrap}'+
+    '#v-portfolio .pfquick .go{flex:1 1 44%}'+
+    '#v-portfolio .pfquick .ghost{flex:1 1 30%; font-size:12px; padding:8px 6px}'+
     '#v-portfolio .pfquick span[style*="flex:1"]{display:none}'+
     '#v-portfolio .log .e{flex-direction:column; gap:3px}'+
     '.pftxE,.pftxD{padding:6px 9px; font-size:15px}'+
@@ -975,7 +980,6 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
     '<div class="pfhead"><div><h2 style="margin:0; font-size:22px">Yatırımlarım</h2><div class="sub">Her varlık tek satır. Satıra tıkla → o varlığın sayfası. Değerler '+psym()+'.</div></div>'+
     '<div style="display:flex; align-items:center; gap:8px"><button class="ghost" id="pfLockBtn" title="Kilitle ve panoya dön">🔒 Kilitle</button><div class="pfcur" id="pfCur">'+curBtns+'</div></div></div>'+
     stat+costWarn+
-    '<div class="pftypes" id="pfTypeBar">'+PF_TYPES.map(function(T){ return '<button data-t="'+T.k+'"'+(T.k===pfAddType?' class="on"':'')+'>'+T.t+'</button>'; }).join('')+'</div>'+
     '<div class="pfquick" id="pfQuickBar"></div>'+
     '<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 8px"><h3 style="font-size:16px; margin:0">Portföy grafiği</h3>'+viewBtns+'</div>'+selBtns+chart+notesHtml+
     '<div style="margin-top:18px">'+listHtml+closedHtml+'</div>'+
@@ -998,10 +1002,9 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var nb=$('pfNotesBox'); if(nb) nb.addEventListener('toggle', function(){ pfNotesOpen=nb.open; });
   var yb=$('pfYokBtn'); if(yb) yb.onclick=function(ev){ ev.preventDefault(); pfHideYok=!pfHideYok; pfNotesOpen=true; pfRender(); };
   var rr=$('pfRatesRetry'); if(rr) rr.onclick=function(){ ratesTried=false; ratesLoading=false; pfLoadRates(function(){ pfRender(); }); };
-  box.querySelectorAll('tr[data-open]').forEach(function(tr){ tr.onclick=function(){ VIEW={mode:'asset',id:tr.dataset.open}; pfRender(); }; });  $('pfTypeBar').querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfAddType=b.dataset.t; $('pfTypeBar').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===pfAddType); }); pfPaintQuick(syms); }; });
+  box.querySelectorAll('tr[data-open]').forEach(function(tr){ tr.onclick=function(){ VIEW={mode:'asset',id:tr.dataset.open}; pfRender(); }; });
   pfPaintQuick(syms);
 }
-var pfAddType='stock';
 var pfSeriesSel='value';
 var pfHideYok=true;      /* "YOK" notları varsayılan olarak gizli */
 var pfNotesOpen=false;   /* açık/kapalı durumu render'lar arasında korunsun */
@@ -1009,25 +1012,89 @@ var pfDistMode='type';   /* dağılım halkası: tür / varlık */
 var pfChartView='chart'; /* portföy geçmişi: grafik / tablo */
 var pfPulseDate=null;    /* yeni kaydedilen gün — grafikte bir kez vurgulanır */
 var pfUnlocked=false;   /* her sayfa yüklemesinde (oturumda) false başlar; her açılışta şifre sorulur */
+/* Gri bant sade: yalnız AL / SAT (+ ikincil araçlar). Tür seçimi ve arama popup'ta. */
 function pfPaintQuick(syms){ var bar=$('pfQuickBar'); if(!bar) return;
-  var tools='<button class="ghost" id="pfSaveDayBtn">Günü kaydet</button><button class="ghost" id="pfUploadBtn">⤒ Geçmiş yükle</button><button class="ghost" id="pfCsvBtn">⤓ Dışa aktar</button>';
-  if(pfAddType==='stock'){
-    bar.innerHTML='<input class="search fld" id="pfQSym" list="pfQList" placeholder="hisse ara veya kendi sembolünü yaz → AL"><datalist id="pfQList">'+(syms||'')+'</datalist><button class="go buy" id="pfQBuy" style="padding:10px 18px">AL</button><span style="flex:1"></span>'+tools;
-    $('pfQBuy').onclick=pfQuickBuy; $('pfQSym').onkeydown=function(e){ if(e.key==='Enter') pfQuickBuy(); };
-  } else if(pfAddType==='gold'){
-    bar.innerHTML='<div class="hint" style="flex:1; min-width:160px"><b>Gram Altın</b> — kaç gram, ne ile ödedin?</div><button class="go buy" id="pfGoldBtn" style="padding:10px 18px">＋ Altın al</button><span style="flex:1"></span>'+tools;
-    $('pfGoldBtn').onclick=function(){ pfBuyGold(null); };
-  } else if(pfAddType==='fx'){
-    bar.innerHTML='<div class="hint" style="flex:1; min-width:160px"><b>Döviz</b> — hesap adı + hangi dövizi, ne ile aldın?</div><button class="go buy" id="pfFxBtn" style="padding:10px 18px">＋ Döviz al</button><span style="flex:1"></span>'+tools;
-    $('pfFxBtn').onclick=function(){ pfBuyFx(null); };
-  } else {
-    var lbl=pfTypeLabel(pfAddType);
-    bar.innerHTML='<div class="hint" style="flex:1; min-width:160px"><b>'+lbl+'</b> eklemek için formu aç.</div><button class="go buy" id="pfAddTypeBtn" style="padding:10px 18px">＋ '+lbl+' ekle</button><span style="flex:1"></span>'+tools;
-    $('pfAddTypeBtn').onclick=function(){ pfAddOther(null, pfAddType); };
-  }
+  PF_SYMS=syms||'';
+  bar.innerHTML=
+    '<button class="go buy" id="pfNewBuy" style="padding:11px 30px; font-size:15px">AL</button>'+
+    '<button class="go sell" id="pfNewSell" style="padding:11px 30px; font-size:15px">SAT</button>'+
+    '<span style="flex:1"></span>'+
+    '<button class="ghost" id="pfSaveDayBtn">Günü kaydet</button>'+
+    '<button class="ghost" id="pfUploadBtn">⤒ Geçmiş yükle</button>'+
+    '<button class="ghost" id="pfCsvBtn">⤓ Dışa aktar</button>';
+  $('pfNewBuy').onclick=function(){ pfPickDialog('buy'); };
+  $('pfNewSell').onclick=function(){ pfPickDialog('sell'); };
   $('pfSaveDayBtn').onclick=pfSaveDay; $('pfUploadBtn').onclick=pfUpload; $('pfCsvBtn').onclick=pfExport;
 }
-function pfQuickBuy(){ var raw=$('pfQSym').value, sym=pfResolve(raw);
+
+/* AL / SAT popup'ı — tür seçimi ve arama burada */
+var PF_SYMS='', pfPickType='stock';
+function pfPickDialog(side){
+  var isSell=(side==='sell');
+  dlg(isSell?'SAT — ne satıyorsun?':'AL — ne alıyorsun?',
+    '<div class="pftypes" id="pfPickTypes">'+PF_TYPES.map(function(T){
+      return '<button data-t="'+T.k+'"'+(T.k===pfPickType?' class="on"':'')+'>'+T.t+'</button>'; }).join('')+'</div>'+
+    '<div id="pfPickBody" style="margin-top:12px"></div>',
+    [{label:'Vazgeç'}]);
+  var tb=$('pfPickTypes');
+  if(tb) tb.querySelectorAll('button').forEach(function(b){ b.onclick=function(){
+    pfPickType=b.dataset.t;
+    tb.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x.dataset.t===pfPickType); });
+    pfPickBody(side); }; });
+  pfPickBody(side);
+}
+function pfPickBody(side){
+  var box=$('pfPickBody'); if(!box) return;
+  var isSell=(side==='sell'), t=pfPickType;
+
+  if(isSell){                                   /* SAT: mevcut varlıklardan seç */
+    var list=[]; var A=pf().assets;
+    Object.keys(A).forEach(function(id){ var a=A[id];
+      if(a.type!==t || a.valMode!=='qty') return;
+      if((aQty(a)||0)<=0.0000001) return;
+      list.push(a); });
+    list.sort(function(x,y){ return (aValueDisp(y)||0)-(aValueDisp(x)||0); });
+    if(!list.length){ box.innerHTML='<div class="empty">Bu türde satılacak varlığın yok.</div>'; return; }
+    box.innerHTML='<div class="log" style="max-height:280px; overflow:auto">'+list.map(function(a){
+      var q=aQty(a);
+      return '<div class="e pfpick" data-id="'+a.id+'" style="cursor:pointer"><span><b>'+(a.name||clean(a.symbol||'—'))+'</b>'+
+        (a.symbol?' <span class="nm">'+clean(a.symbol)+'</span>':'')+'</span>'+
+        '<span class="t">'+fmt(q,q%1?4:0)+' '+aUnitName(a)+' · '+pf$(aValueDisp(a))+' ›</span></div>'; }).join('')+'</div>'+
+      '<div class="hint" style="margin-top:8px">Satmak istediğin varlığa tıkla.</div>';
+    box.querySelectorAll('.pfpick').forEach(function(r){ r.onclick=function(){
+      var a=pf().assets[r.dataset.id]; if(!a) return; dlgClose(); pfAssetBuy(a,'sell'); }; });
+    return;
+  }
+
+  /* AL */
+  if(t==='stock'){
+    box.innerHTML='<div class="tpfield"><label>Hisse ara</label>'+
+      '<input class="fld" id="pfPickSym" list="pfPickList" placeholder="örn. ENKAI — panoda yoksa kendi sembolünü yaz" style="width:100%">'+
+      '<datalist id="pfPickList">'+PF_SYMS+'</datalist>'+
+      '<div class="tphelp">Panoda olmayan bir sembol yazarsan manuel hisse olarak eklenir.</div></div>'+
+      '<button class="go buy" id="pfPickGo" style="width:100%; padding:11px">Devam</button>';
+    var go=function(){ var raw=$('pfPickSym').value; if(!(raw||'').trim()) return;
+      dlgClose(); setTimeout(function(){ pfQuickBuyFrom(raw); }, 10); };
+    $('pfPickGo').onclick=go;
+    $('pfPickSym').onkeydown=function(e){ if(e.key==='Enter') go(); };
+    setTimeout(function(){ var el=$('pfPickSym'); if(el) el.focus(); },60);
+    return;
+  }
+  var meta={ gold:{t:'Gram Altın', d:'Kaç gram aldın, ne ile ödedin?'},
+             fx:{t:'Döviz', d:'Hesap adı + hangi döviz, ne ile aldın?'} };
+  if(meta[t]){
+    box.innerHTML='<div class="hint" style="margin-bottom:10px"><b>'+meta[t].t+'</b> — '+meta[t].d+'</div>'+
+      '<button class="go buy" id="pfPickGo" style="width:100%; padding:11px">Devam</button>';
+    $('pfPickGo').onclick=function(){ dlgClose(); setTimeout(function(){
+      if(t==='gold') pfBuyGold(pfGoldAsset(),'buy'); else pfBuyFx(null,'buy'); }, 10); };
+    return;
+  }
+  var lbl=pfTypeLabel(t);
+  box.innerHTML='<div class="hint" style="margin-bottom:10px"><b>'+lbl+'</b> ekle — ad, tutar/adet ve tarih sorulacak.</div>'+
+    '<button class="go buy" id="pfPickGo" style="width:100%; padding:11px">Devam</button>';
+  $('pfPickGo').onclick=function(){ dlgClose(); setTimeout(function(){ pfAddOther(null, t); }, 10); };
+}
+function pfQuickBuyFrom(raw){ var sym=pfResolve(raw);
   if(!sym){ var up=(raw||'').trim().toUpperCase(); if(!up){ dlg('Sembol gir','<p>Önce bir sembol yaz.</p>',[{label:'Tamam',primary:true}]); return; }
     var ex=pfAssetForSymbol(up); if(ex){ pfTxDialog(ex,null,'buy'); return; }
     pfManualStock(up); return; }
