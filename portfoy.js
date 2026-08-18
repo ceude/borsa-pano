@@ -50,6 +50,8 @@ function injectCSS(){
   '.pftypes button.on{background:var(--brand); color:#fff; border-color:var(--brand)}'+
   '#pfPickTypes{margin:0 0 4px}'+
   '.pfpick:hover{background:var(--line2)}'+
+  '.pfeye{padding:7px 10px; line-height:0; color:var(--dim)}'+
+  '.pfeye:hover{color:var(--ink)}'+
   '#pfQuickBar .go{flex:0 0 auto}'+
   '.pfbadge{font-size:10px; padding:2px 7px; border-radius:6px; font-weight:700; background:var(--line2); color:var(--dim); vertical-align:middle}'+
   '#v-portfolio tbody tr{cursor:pointer}'+
@@ -139,16 +141,43 @@ function injectDOM(){
     if(main){ var sec=document.createElement('section'); sec.className='view card'; sec.id='v-portfolio'; sec.innerHTML='<div id="pfBody"></div>'; main.appendChild(sec); } }
   hideRealPortfolio();
 }
-/* Gerçek Portföy sekmesini ve simülatördeki "gerçeğe aktar" butonlarını gizle */
+/* Eski "Gerçek Portföy" görünümü → "Uzun Vade Simülatör".
+   Üst menüden kaldırıldı; Simülatör sekmesinin içindeki düğmeyle açılıyor. */
 function hideRealPortfolio(){
   var tab=document.querySelector('.tab[data-v="real"]'); if(tab) tab.style.display='none';
-  var s2r=$('simToReal'); if(s2r) s2r.style.display='none';
   if(!document.getElementById('pfHideCss')){
     var st=document.createElement('style'); st.id='pfHideCss';
-    st.textContent='.tab[data-v="real"]{display:none!important} #simToReal{display:none!important} [data-real]{display:none!important}';
+    st.textContent='.tab[data-v="real"]{display:none!important}';
     document.head.appendChild(st);
   }
-  var rv=$('v-real'); if(rv && rv.classList.contains('active') && B && B.goView) B.goView('all');
+  /* Metinleri yeni ada göre güncelle */
+  var s2r=$('simToReal'); if(s2r){ s2r.textContent='Tümünü uzun vadeye aktar'; s2r.style.display=''; }
+  document.querySelectorAll('[data-real]').forEach(function(b){
+    b.style.display=''; if(b.textContent.indexOf('Gerçeğe')>=0) b.textContent='→ Uzun vade';
+  });
+  /* Simülatör araç çubuğuna açma düğmesi ekle */
+  if(!$('openLongSim')){
+    var host=s2r?s2r.parentNode:null;
+    if(host){
+      var b=document.createElement('button');
+      b.id='openLongSim'; b.className='ghost accent'; b.style.fontWeight='700';
+      b.textContent='📈 Uzun Vade Simülatör';
+      b.title='Uzun vadeli pozisyonlarını ayrı takip et';
+      b.onclick=function(){ if(B&&B.goView) B.goView('real'); };
+      host.insertBefore(b, host.firstChild);
+    }
+  }
+  /* Uzun vade görünümüne geri dön düğmesi */
+  var rv=$('v-real');
+  if(rv && !$('longSimBack')){
+    var bar=document.createElement('div');
+    bar.style.cssText='display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap';
+    bar.innerHTML='<button class="back" id="longSimBack" style="margin-bottom:0">← Simülatör</button>'+
+      '<h2 style="margin:0; font-size:20px">Uzun Vade Simülatör</h2>';
+    rv.insertBefore(bar, rv.firstChild);
+    var bk=bar.querySelector('#longSimBack');
+    if(bk) bk.onclick=function(){ if(B&&B.goView) B.goView('sim'); };
+  }
 }
 function pfShow(){ pfUnlocked=false; VIEW={mode:'list',id:null}; B.goView('portfolio'); pfRender(); }
 var PF_IDLE_MS=60000, pfLastAct=Date.now(), pfIdleTimer=null;
@@ -192,7 +221,18 @@ function pf(){ var S=B.S;
 function pcy(){ return pf().disp; }
 function psymCcy(c){ return c==='TRY'?'₺':c==='USD'?'$':'€'; }
 function psym(){ return psymCcy(pcy()); }
-function pf$(v){ return v==null?'—':psym()+fmt(v); }
+/* Gizli modda tutar ve adetler maskelenir; yüzdeler ve birim fiyatlar görünür kalır. */
+var pfHide=false;
+function pfMask(){ return '•••'; }
+function pf$(v){ if(v==null) return '—'; return pfHide?pfMask():(psym()+fmt(v)); }
+function pfMoney(sym,v,d){ if(v==null) return '—'; return pfHide?pfMask():(sym+fmt(v,d)); }
+function pfQ(v,d){ if(v==null) return '—'; return pfHide?pfMask():fmt(v,d); }
+/* Üstü çizili / normal göz ikonu (SVG — emoji değil) */
+function pfEyeSVG(off){
+  return '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+
+    '<path d="M1.5 12S5 5.5 12 5.5 22.5 12 22.5 12 19 18.5 12 18.5 1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3.2"/>'+
+    (off?'<line x1="3" y1="21" x2="21" y2="3"/>':'')+'</svg>';
+}
 function goldGramTRY(){ var g=RATES().goldGramTRY; return (g!=null&&!isNaN(g))?g:null; }
 
 /* güncel kur çevirileri */
@@ -402,7 +442,7 @@ function pfLineChart(pts, color, sym){
   var grid='';
   [mn,(mn+mx)/2,mx].forEach(function(v){ var y=Y(v).toFixed(1);
     grid+='<line x1="'+PL+'" y1="'+y+'" x2="'+(W-PR)+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"/>'+
-      '<text x="'+(PL-6)+'" y="'+(Y(v)+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--faint)">'+(sym||'')+fmt(v,0)+'</text>'; });
+      '<text x="'+(PL-6)+'" y="'+(Y(v)+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--faint)">'+(pfHide?'•••':((sym||'')+fmt(v,0)))+'</text>'; });
   var xlab='';
   [0, n>2?Math.floor((n-1)/2):null, n>1?n-1:null].forEach(function(i){ if(i==null) return;
     xlab+='<text x="'+X(i).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="var(--faint)">'+pfDMY(pts[i].date)+'</text>'; });
@@ -413,7 +453,7 @@ function pfLineChart(pts, color, sym){
   var band=(n>1)?((W-PL-PR)/(n-1)):(W-PL-PR);
   var hits=pts.map(function(p,i){
     var cx=X(i), x=Math.max(PL-band/2, cx-band/2);
-    var tip=(pfDMY(p.date)+' · '+(sym||'')+fmt(p.y)+(isNote(p)?(' · '+p.note):'')).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    var tip=(pfDMY(p.date)+' · '+(pfHide?'•••':((sym||'')+fmt(p.y)))+(isNote(p)?(' · '+p.note):'')).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
     return '<rect class="pfhit" x="'+x.toFixed(1)+'" y="'+PT+'" width="'+Math.max(band,3).toFixed(1)+'" height="'+(H-PT-PB)+'" fill="transparent"'+
       ' data-cx="'+cx.toFixed(1)+'" data-cy="'+Y(p.y).toFixed(1)+'" data-tip="'+tip+'"'+(isNote(p)?' data-note="1"':'')+'></rect>';
   }).join('');
@@ -480,10 +520,14 @@ function pfRenderLock(box){
     '<div class="sub" style="margin-bottom:14px">Hassas veri. Devam etmek için hesap şifreni gir.<br><span class="cov">60 sn hareketsizlikte tekrar kilitlenir.</span></div>'+
     '<input class="fld" id="pfPw" type="password" placeholder="şifre" autocomplete="current-password" style="width:100%; text-align:center">'+
     '<div class="hint down" id="pfPwMsg" style="min-height:16px; margin:8px 0"></div>'+
+    '<label style="display:flex; align-items:center; justify-content:center; gap:8px; margin:2px 0 12px; cursor:pointer; color:var(--dim); font-size:13px">'+
+      '<input type="checkbox" id="pfHideChk"'+(pfHide?' checked':'')+' style="width:16px; height:16px; accent-color:var(--brand)">'+
+      '<span>Tutarları gizli aç</span></label>'+
     '<button class="go buy" id="pfPwBtn" style="width:100%; padding:11px">Kilidi aç</button>'+
     '<button class="ghost" id="pfPwExit" style="width:100%; margin-top:8px; padding:10px">← Vazgeç, panoya dön</button></div>';
   var inp=$('pfPw'), btn=$('pfPwBtn'), msg=$('pfPwMsg');
   var ex=$('pfPwExit'); if(ex) ex.onclick=function(){ if(B&&B.goView) B.goView('all'); };
+  var hc=$('pfHideChk'); if(hc) hc.onchange=function(){ pfHide=hc.checked; };
   function submit(){ var pw=inp.value||''; if(!pw){ msg.textContent='Şifre gir.'; return; }
     btn.disabled=true; btn.textContent='kontrol ediliyor…'; msg.textContent='';
     pfVerifyPw(pw, function(ok){
@@ -883,10 +927,10 @@ function pfAssetRow(a){
   var q=aQty(a),ac=aAvgCostDisp(a),u=aCurUnitDisp(a),v=aValueDisp(a),c=aCostDisp(a),pnl=(v!=null&&c!=null)?v-c:null,pct=(c>0&&pnl!=null)?pnl/c*100:null,nc=aNativeCcy(a),vn=aValueNative(a);
   var dp=aDayPct(a), dc2=aDayChangeIn(a,pcy());
   return '<tr data-open="'+a.id+'"><td><b>'+(a.name||clean(a.symbol||'—'))+'</b>'+(a.symbol?' <span class="nm">'+clean(a.symbol)+'</span>':'')+' <span class="pfbadge">'+pfTypeLabel(a.type)+'</span><div class="nm">'+(a.note?a.note.slice(0,28):aUnitName(a))+pfManualNote(a)+'</div></td>'+
-    '<td>'+(q==null?'—':fmt(q,q%1?4:0))+'</td>'+
+    '<td>'+pfQ(q,q%1?4:0)+'</td>'+
     '<td>'+(ac==null?'—':psym()+fmt(ac))+'</td>'+
     '<td>'+(u==null?'—':psym()+fmt(u))+'</td>'+
-    '<td><span class="nm" style="font-size:13px">'+(vn==null?'—':psymCcy(nc)+fmt(vn))+'</span></td>'+
+    '<td><span class="nm" style="font-size:13px">'+pfMoney(psymCcy(nc),vn)+'</span></td>'+
     '<td class="'+pnlCls(dp)+'">'+(dp==null?'<span class="na">—</span>':((dp>0?'+':'')+fmt(dp,2)+'%<div class="nm '+pnlCls(dc2)+'">'+(dc2==null?'':(dc2>0?'+':'')+pf$(dc2))+'</div>'))+'</td>'+
     '<td><b>'+pf$(v)+'</b></td>'+
     '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+pf$(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
@@ -978,7 +1022,10 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   var syms=STOCKS().slice().sort(function(a,b){return a.symbol.localeCompare(b.symbol);}).map(function(s){ return '<option value="'+clean(s.symbol)+'">'+(s.name||'')+'</option>'; }).join('');
   box.innerHTML=''+
     '<div class="pfhead"><div><h2 style="margin:0; font-size:22px">Yatırımlarım</h2><div class="sub">Her varlık tek satır. Satıra tıkla → o varlığın sayfası. Değerler '+psym()+'.</div></div>'+
-    '<div style="display:flex; align-items:center; gap:8px"><button class="ghost" id="pfLockBtn" title="Kilitle ve panoya dön">🔒 Kilitle</button><div class="pfcur" id="pfCur">'+curBtns+'</div></div></div>'+
+    '<div style="display:flex; align-items:center; gap:8px">'+
+      '<button class="ghost pfeye" id="pfEyeBtn" title="'+(pfHide?'Tutarları göster':'Tutarları gizle')+'" aria-label="'+(pfHide?'Tutarları göster':'Tutarları gizle')+'">'+pfEyeSVG(pfHide)+'</button>'+
+      '<button class="ghost" id="pfLockBtn" title="Kilitle ve panoya dön">🔒 Kilitle</button>'+
+      '<div class="pfcur" id="pfCur">'+curBtns+'</div></div></div>'+
     stat+costWarn+
     '<div class="pfquick" id="pfQuickBar"></div>'+
     '<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 8px"><h3 style="font-size:16px; margin:0">Portföy grafiği</h3>'+viewBtns+'</div>'+selBtns+chart+notesHtml+
@@ -990,6 +1037,7 @@ function pfRenderList(box){ var P=pf(), t=pfTotals(), cur=pcy();
   pfWireChart(box);
   pfOdoApply(box);
   var cvb=$('pfChartView'); if(cvb) cvb.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfChartView=b.dataset.cv; pfRender(); }; });
+  var eb=$('pfEyeBtn'); if(eb) eb.onclick=function(){ pfHide=!pfHide; pfStatPrev={}; pfRender(); };
   var lb=$('pfLockBtn'); if(lb) lb.onclick=pfLockNow;
   var dm=$('pfDistMode'); if(dm) dm.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ pfDistMode=b.dataset.dm; pfRender(); }; });
   var dbox=$('pfDistBox');
@@ -1059,7 +1107,7 @@ function pfPickBody(side){
       var q=aQty(a);
       return '<div class="e pfpick" data-id="'+a.id+'" style="cursor:pointer"><span><b>'+(a.name||clean(a.symbol||'—'))+'</b>'+
         (a.symbol?' <span class="nm">'+clean(a.symbol)+'</span>':'')+'</span>'+
-        '<span class="t">'+fmt(q,q%1?4:0)+' '+aUnitName(a)+' · '+pf$(aValueDisp(a))+' ›</span></div>'; }).join('')+'</div>'+
+        '<span class="t">'+pfQ(q,q%1?4:0)+' '+aUnitName(a)+' · '+pf$(aValueDisp(a))+' ›</span></div>'; }).join('')+'</div>'+
       '<div class="hint" style="margin-top:8px">Satmak istediğin varlığa tıkla.</div>';
     box.querySelectorAll('.pfpick').forEach(function(r){ r.onclick=function(){
       var a=pf().assets[r.dataset.id]; if(!a) return; dlgClose(); pfAssetBuy(a,'sell'); }; });
@@ -1132,7 +1180,7 @@ function pfManualStock(sym, asset){
 /* =============== VARLIK sayfası =============== */
 function pfRenderAsset(box, a){
   var dc=VIEW.ccy||pcy(), dsym=psymCcy(dc);
-  function d$(v){ return v==null?'—':dsym+fmt(v); }
+  function d$(v){ return pfMoney(dsym,v); }
   var q=aQty(a), rem=aRemCost(a,dc), ac=(rem.qty!=null&&rem.qty>0)?rem.cost/rem.qty:null, u=aCurUnitIn(a,dc), v=aValueIn(a,dc), c=rem.cost, pnl=(v!=null&&c!=null)?v-c:null, pct=(c>0&&pnl!=null)?pnl/c*100:null, nc=aNativeCcy(a);
   var real=aRealizedIn(a,dc), isStock=(a.type==='stock'), inPanel=(a.type==='stock' && !!find(a.symbol)), unit=aUnitName(a);
   var ccyBtns='<div class="pfcur" id="pfAssetCur" style="margin-top:8px">'+['TRY','USD','EUR'].map(function(cc){ return '<button data-ac="'+cc+'" class="'+(cc===dc?'on':'')+'">'+psymCcy(cc)+' '+cc+'</button>'; }).join('')+'</div>';
@@ -1141,7 +1189,7 @@ function pfRenderAsset(box, a){
       '<div class="nm" style="font-size:13px; margin-top:4px">'+(a.note?a.note:('birim: '+unit))+pfManualNote(a)+'</div>'+ccyBtns+'</div>'+
       '<div style="text-align:right"><div class="px">'+d$(v)+'</div><div class="'+pnlCls(pnl)+'" style="font-weight:700">'+(pnl==null?'':(pnl>0?'+':'')+d$(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</div></div></div>';
   var metrics='<div class="metrics">'+
-    '<div class="metric"><div class="k">Adet ('+unit+')</div><div class="v">'+(q==null?'—':fmt(q,q%1?4:0))+'</div></div>'+
+    '<div class="metric"><div class="k">Adet ('+unit+')</div><div class="v">'+pfQ(q,q%1?4:0)+'</div></div>'+
     '<div class="metric"><div class="k">Ort. maliyet ('+dsym+'/'+unit+')</div><div class="v">'+(ac==null?(a.valMode==='amount'?'elle değer':'—'):dsym+fmt(ac))+'</div></div>'+
     '<div class="metric"><div class="k">Güncel birim ('+dsym+')</div><div class="v">'+(u==null?'—':dsym+fmt(u))+'</div></div>'+
     (aDayPct(a)!=null?('<div class="metric"><div class="k">Bugün</div><div class="v '+pnlCls(aDayPct(a))+'">'+(aDayPct(a)>0?'+':'')+fmt(aDayPct(a),2)+'% <span style="font-size:13px">'+(function(){var x=aDayChangeIn(a,dc); return x==null?'':'('+(x>0?'+':'')+d$(x)+')';})()+'</span></div></div>'):'')+
@@ -1160,7 +1208,7 @@ function pfRenderAsset(box, a){
     var alt=(usd!=null&&eur!=null)?(' <span class="cov">(≈ $'+fmt(usd)+' · €'+fmt(eur)+')</span>'):'';
     var susp=pfTxSuspect(a,x);
     var flag=susp?(' <span class="pfwarnflag" title="'+susp.replace(/"/g,'&quot;')+'">⚠ kontrol et</span>'):'';
-    return '<div class="e"'+(susp?' style="background:var(--down-bg)"':'')+'><span><b class="'+sc+'">'+st+'</b> '+fmt(x.qty,x.qty%1?4:0)+' '+unit+' × '+psymCcy(pay)+fmt(x.px)+' = '+psymCcy(pay)+fmt(tot)+alt+flag+(x.note?(' · '+x.note):'')+'</span><span class="t">'+new Date(x.t).toLocaleDateString('tr-TR')+' <button class="pftxE" data-txi="'+oi+'" title="Düzenle">✎</button><button class="pftxD" data-txi="'+oi+'" title="Sil">🗑</button></span></div>'; }).join(''):'<div class="empty">işlem yok</div>';
+    return '<div class="e"'+(susp?' style="background:var(--down-bg)"':'')+'><span><b class="'+sc+'">'+st+'</b> '+pfQ(x.qty,x.qty%1?4:0)+' '+unit+' × '+psymCcy(pay)+fmt(x.px)+' = '+pfMoney(psymCcy(pay),tot)+(pfHide?'':alt)+flag+(x.note?(' · '+x.note):'')+'</span><span class="t">'+new Date(x.t).toLocaleDateString('tr-TR')+' <button class="pftxE" data-txi="'+oi+'" title="Düzenle">✎</button><button class="pftxD" data-txi="'+oi+'" title="Sil">🗑</button></span></div>'; }).join(''):'<div class="empty">işlem yok</div>';
   var hasInv=(a.valMode==='qty' && a.tx && a.tx.length);
   if(!VIEW.chart || (VIEW.chart==='price' && !inPanel)) VIEW.chart = inPanel?'price':'invest';
   var chartSec='';
