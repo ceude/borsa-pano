@@ -258,6 +258,16 @@ function pfRateAt(tsec){ if(!ratesReady()) return null; var R=RATEHIST, lo=0, hi
   if(tsec<=R[0][0]) best=R[0]; else if(tsec>=R[hi][0]) best=R[hi];
   else { while(lo<=hi){ var m=(lo+hi)>>1; if(R[m][0]<=tsec){ best=R[m]; lo=m+1; } else hi=m-1; } }
   return {usdtry:best[1], eurtry:best[2]}; }
+/* Tarihsel gram altın (rates.js 4. sütun). Boş günlerde en yakın dolu güne düşer. */
+function pfGoldAt(tsec){
+  if(!ratesReady()) return null;
+  var R=RATEHIST, lo=0, hi=R.length-1, idx=0;
+  if(tsec<=R[0][0]) idx=0; else if(tsec>=R[hi][0]) idx=hi;
+  else { while(lo<=hi){ var m=(lo+hi)>>1; if(R[m][0]<=tsec){ idx=m; lo=m+1; } else hi=m-1; } }
+  for(var i=idx;i>=0 && i>idx-400;i--){ if(R[i][3]!=null && !isNaN(R[i][3])) return R[i][3]; }
+  for(var j=idx;j<R.length && j<idx+400;j++){ if(R[j][3]!=null && !isNaN(R[j][3])) return R[j][3]; }
+  return null;
+}
 function pfRateAtDate(dateStr){ var t=Date.parse(dateStr+'T12:00:00Z'); if(isNaN(t)) return null; return pfRateAt(Math.floor(t/1000)); }
 function convAtRate(v,from,to,r){ if(v==null||!r) return null;
   var tryv = from==='TRY'?v : from==='USD'?v*r.usdtry : v*r.eurtry;
@@ -923,6 +933,77 @@ function pfDistHtml(P){
     '<h3 style="font-size:16px; margin:0">Portföy dağılımı</h3>'+modeBtns+'</div>'+
     '<div class="pfdist" id="pfDistBox">'+pfDonut(items,total)+'<div class="pflegend">'+legend+'</div></div></div>';
 }
+/* ---- "Bunun yerine şunu alsaydım?" ----
+   Her alımda harcanan para o gün alternatife yatırılır, her satışta alınan para
+   kadar alternatiften satılır. Kalan miktar bugünkü fiyattan değerlenir. */
+var PF_ALTS=[{k:'gold',t:'Gram Altın'},{k:'EUR',t:'EUR'},{k:'USD',t:'USD'}];
+function pfAltUnitTRY(kind, tsec){
+  if(kind==='gold') return pfGoldAt(tsec);
+  var r=pfRateAt(tsec); if(!r) return null;
+  return kind==='USD'?r.usdtry:r.eurtry;
+}
+function pfAltNowTRY(kind){
+  if(kind==='gold') return goldGramTRY();
+  return toTRY(1, kind);
+}
+function pfAltFor(a, kind, dc){
+  if(a.valMode!=='qty' || !a.tx || !a.tx.length) return null;
+  var q=0, invested=0, shortfall=false;
+  var txs=a.tx.slice().sort(function(x,y){return x.t-y.t;});
+  for(var i=0;i<txs.length;i++){
+    var t=txs[i], ts=Math.floor(t.t/1000), pay=txPay(a,t);
+    var amtTRY=convAtTime(t.px*t.qty, pay, 'TRY', ts);
+    if(amtTRY==null) amtTRY=toTRY(t.px*t.qty, pay);
+    var u=pfAltUnitTRY(kind, ts);
+    if(amtTRY==null||u==null||u<=0) return null;
+    if(t.side==='sell'){ var out=amtTRY/u; if(out>q){ out=q; shortfall=true; } q-=out; }
+    else { q+=amtTRY/u; invested+=amtTRY; }
+  }
+  var un=pfAltNowTRY(kind); if(un==null) return null;
+  var altTRY=q*un, altVal=frTRY(altTRY, dc);
+  var realVal=aValueIn(a, dc);
+  if(altVal==null||realVal==null) return null;
+  return {qty:q, alt:altVal, real:realVal, diff:realVal-altVal,
+          pct:(altVal>0?(realVal/altVal-1)*100:null), shortfall:shortfall};
+}
+function pfAltCardHtml(a, dc, dsym){
+  if(a.valMode!=='qty' || !a.tx || !a.tx.length) return '';
+  var opts=PF_ALTS.filter(function(o){
+    if(a.type==='gold' && o.k==='gold') return false;                 /* kendisiyle kıyas anlamsız */
+    if(a.type==='fx' && (a.holdCcy||'EUR')===o.k) return false;
+    return true; });
+  if(!opts.length) return '';
+  if(!VIEW.alt || !opts.some(function(o){return o.k===VIEW.alt;})) VIEW.alt=opts[0].k;
+  var btns='<div class="pfcur" id="pfAltSel" style="display:inline-flex">'+opts.map(function(o){
+    return '<button data-alt="'+o.k+'" class="'+(o.k===VIEW.alt?'on':'')+'">'+o.t+'</button>'; }).join('')+'</div>';
+  var r=pfAltFor(a, VIEW.alt, dc);
+  var body;
+  if(!r){
+    body='<div class="empty">Bu karşılaştırma için tarihsel fiyat verisi eksik'+
+      (VIEW.alt==='gold'?' (gram altın geçmişi için rates.js güncellenmeli)':'')+'.</div>';
+  } else {
+    var altName=(opts.filter(function(o){return o.k===VIEW.alt;})[0]||{}).t;
+    var good=r.diff>0;
+    body='<div class="metrics" style="margin-bottom:0">'+
+      '<div class="metric"><div class="k">Şu anki gerçek değerin</div><div class="v">'+pfMoney(dsym,r.real)+'</div></div>'+
+      '<div class="metric"><div class="k">'+altName+' alsaydın</div><div class="v">'+pfMoney(dsym,r.alt)+'</div></div>'+
+      '<div class="metric"><div class="k">Fark</div><div class="v '+pnlCls(r.diff)+'">'+(r.diff>0?'+':'')+pfMoney(dsym,r.diff)+
+        (r.pct!=null?' <span style="font-size:13px">('+(r.pct>0?'+':'')+fmt(r.pct,1)+'%)</span>':'')+'</div></div>'+
+      '<div class="metric"><div class="k">Elinde olurdu</div><div class="v">'+pfQ(r.qty, r.qty<10?4:2)+
+        ' <span style="font-size:13px">'+(VIEW.alt==='gold'?'gram':VIEW.alt)+'</span></div></div>'+
+      '</div>'+
+      '<div class="hint" style="margin-top:10px">'+
+      (good?'Bu varlık, '+altName+'\'a göre <b>daha iyi</b> performans gösterdi.'
+           :'Aynı parayı '+altName+'\'a koysaydın <b>daha iyi</b> olurdun.')+
+      ' Her alımda harcadığın para o günkü fiyattan '+altName+'\'a, her satışta aldığın para kadarı geri çevrildi.'+
+      (r.shortfall?' <b>Not:</b> bir satışta alternatif miktar yetmedi, sıfırda sınırlandı.':'')+
+      (VIEW.alt==='gold'?' Gram altın, ons vadelisinden türetilir; kuyumcu fiyatından bir miktar sapabilir.':'')+
+      '</div>';
+  }
+  return '<div style="margin-top:22px"><div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px">'+
+    '<h3 style="font-size:16px; margin:0">Bunun yerine ne alsaydım?</h3>'+btns+'</div>'+
+    '<div style="background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:16px 18px">'+body+'</div></div>';
+}
 function pfAssetRow(a){
   var q=aQty(a),ac=aAvgCostDisp(a),u=aCurUnitDisp(a),v=aValueDisp(a),c=aCostDisp(a),pnl=(v!=null&&c!=null)?v-c:null,pct=(c>0&&pnl!=null)?pnl/c*100:null,nc=aNativeCcy(a),vn=aValueNative(a);
   var dp=aDayPct(a), dc2=aDayChangeIn(a,pcy());
@@ -1225,9 +1306,12 @@ function pfRenderAsset(box, a){
   var suspBar=suspN?('<div class="hint down" style="background:var(--down-bg); border:1px solid var(--down); border-radius:10px; padding:9px 11px; margin-bottom:14px">⚠ <b>'+suspN+' işlemde ödeme para birimi hatalı görünüyor</b> — aşağıdaki listede kırmızı satırlar. Bunlar kâr/zararı çok bozar; ✎ ile düzelt.</div>'):'';
   box.innerHTML=head+suspBar+metrics+actions+chartSec+
     '<h3 style="font-size:16px; margin:20px 0 8px">Bu varlıktaki işlemlerim <span class="nm" style="font-size:12px; font-weight:400">(✎ düzenle · 🗑 sil)</span></h3><div class="log scroll" style="max-height:300px">'+txHtml+'</div>'+
+    pfAltCardHtml(a, dc, dsym)+
     '<div class="disclaimer">Değerler <b>'+dc+'</b> cinsinden. Ort. maliyet, her alımın <b>kendi günkü kuruyla</b> '+dc+' karşılığının ağırlıklı ortalamasıdır — yani '+dc+' getirisi gerçek kur farkını içerir. Üstteki TL/USD/EUR düğmeleriyle getirini karşılaştır. Yatırım tavsiyesi değildir.</div>';
   $('pfBack').onclick=function(){ VIEW={mode:'list',id:null}; pfRender(); };
   var lb2=$('pfLockBtn2'); if(lb2) lb2.onclick=pfLockNow;
+  var as=$('pfAltSel'); if(as) as.querySelectorAll('button').forEach(function(b){
+    b.onclick=function(){ VIEW.alt=b.dataset.alt; pfRender(); }; });
   box.querySelectorAll('#pfAssetCur button').forEach(function(b){ b.onclick=function(){ VIEW.ccy=b.dataset.ac; pfRender(); }; });
   var bb=$('pfBuy'); if(bb) bb.onclick=function(){ pfAssetBuy(a,'buy'); };
   var sb=$('pfSell'); if(sb) sb.onclick=function(){ pfAssetBuy(a,'sell'); };
