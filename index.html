@@ -362,14 +362,14 @@
     <button class="tab" data-v="sig" title="Seçtiğin indikatörlere göre pozitif sinyal veren hisseler">İndikatörler</button>
     <button class="tab" data-v="sim" title="Simülatör — sanal para + oto-trader">Simülatör</button>
     <button class="tab" data-v="backtest" title="Geçmişte Test — stratejinin geriye dönük testi">Geçmiş Test</button>
-    <button class="tab" data-v="real" title="Gerçek Portföy">Gerçek Portföy</button>
+    <button class="tab" data-v="real" title="Uzun Vade Simülatör">Uzun Vade Simülatör</button>
   </nav>
 
   <main>
     <section class="view card" id="v-trade">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap">
         <button class="ghost" id="docBtn">📄 Bu sayfa nasıl çalışır?</button>
-        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Uzun vade<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
         <b>Önce oku.</b> Bu modül ~15 dk <b>gecikmeli</b> ve günde yalnız birkaç kez güncellenen veriyle çalışır → gerçek-zamanlı scalp/gün-içi icra için <b>uygun değildir</b>. Burası "bugün ne hareketli, hacim nerede, piyasayı kim yeniyor" diye bakılan <b>gecikmeli bir izleme listesi</b> ve bir <b>risk hesaplayıcıdır</b>. Hiçbir satır "al" sinyali değildir; gün içi yön güvenilir tahmin edilemez. Gerçek paradan önce Simülatörde dene, <b>her işleme stop koy</b>. Yatırım tavsiyesi değildir.
@@ -414,7 +414,7 @@
     <section class="view card" id="v-gunun">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap">
         <button class="ghost" id="docBtnShort">📄 Bu sayfa nasıl çalışır?</button>
-        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Uzun vade<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="hint" id="gununInfo" style="margin-bottom:14px"></div>
       <div class="scroll" id="gununBody"></div>
@@ -424,7 +424,7 @@
     <section class="view card" id="v-fib">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap">
         <button class="ghost" id="docBtnFib">📄 Bu sayfa nasıl çalışır?</button>
-        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Uzun vade<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
         <b>Önce oku.</b> Fibonacci seviyelerinin fiyatı öngördüğüne dair <b>sağlam bir kanıt yoktur</b>; çok sayıda kişi aynı seviyelere baktığı için kısmen kendini doğrulayan bir etkidir ve sık sık çalışmaz. Buradaki liste "fiyat şu an sık izlenen bir seviyenin yakınında" demektir — <b>alım ya da satım önerisi değildir</b>. Güvenilirlik puanı bu <b>kurulumun</b> derli topluluğunu ölçer, kazanma olasılığını değil. Yatırım tavsiyesi değildir.
@@ -444,7 +444,7 @@
     <section class="view card" id="v-sig">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap">
         <button class="ghost" id="docBtnSig">📄 Bu sayfa nasıl çalışır?</button>
-        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span>
+        <span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Uzun vade<span class="pmark both"></span>İkisi</span>
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
         <b>Önce oku.</b> Buradaki "pozitif sinyal", indikatörün <b>tanımı gereği</b> oluşan durumdur — fiyatın yükseleceği anlamına <b>gelmez</b>. Çok sayıda gösterge seçmek güveni artırmaz: çoğu aynı fiyat hareketini farklı biçimde ölçer. Bu yüzden sayım <b>gösterge değil, bağımsız aile</b> üzerinden yapılır — altı trend göstergesi seçsen bile bu <b>tek</b> bağımsız sinyaldir. Sinyaller ~15 dk gecikmeli <b>günlük kapanışlardan</b> hesaplanır. Yatırım tavsiyesi değildir.
@@ -465,13 +465,13 @@
     </section>
 
     <section class="view active card" id="v-screen">
-      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><button class="ghost" id="docBtnMid">📄 Bu sayfa nasıl çalışır?</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
+      <div class="controls"><input class="search" id="searchScreen" placeholder="sembol veya şirket ara…"><button class="ghost" id="clearFilters">Filtreleri temizle</button><button class="ghost" id="docBtnMid">📄 Bu sayfa nasıl çalışır?</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Uzun vade<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="screenTable"><thead><tr id="screenHead"></tr><tr id="screenFilterRow"></tr></thead><tbody id="screenBody"></tbody></table></div>
       <div class="disclaimer"><b>Skor = değer/kalite (0-100).</b> Düşük F/K + düşük P/D + yüksek özsermaye kârlılığı + düşük borç + yüksek marj → yüksek skor. Bu "ucuz ve sağlam mı"yı ölçer, "yükselir mi"yi değil. <b>Finans hisselerinde (banka/sigorta) Borç/Özsr skora katılmaz</b> — kaldıraç o işin doğasıdır. <b>Renk işaretleri</b> her metriğin kabaca iyi (<span class="q good">●</span> yeşil), orta (<span class="q mid">●</span> amber) veya zayıf (<span class="q bad">●</span> kırmızı) olduğunu gösterir — sektöre göre değişir, kesin kural değil yön gösterir. "Veri" sütunu skorun kaç metrikten çıktığını gösterir; düşükse skora temkinli yaklaş.</div>
     </section>
 
     <section class="view card" id="v-all">
-      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><button class="ghost accent" id="allXlsBtn" title="Görünen listeyi biçimlendirilmiş Excel dosyası (.xlsx) olarak indirir">⤓ Excel'e indir</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Gerçek<span class="pmark both"></span>İkisi</span></div>
+      <div class="controls"><input class="search" id="searchAll" placeholder="alfabetik liste — ara…"><button class="ghost accent" id="allXlsBtn" title="Görünen listeyi biçimlendirilmiş Excel dosyası (.xlsx) olarak indirir">⤓ Excel'e indir</button><span class="pmleg"><span class="pmark sim"></span>Sim<span class="pmark real"></span>Uzun vade<span class="pmark both"></span>İkisi</span></div>
       <div class="scroll"><table id="allTable"><thead><tr id="allHead"></tr></thead><tbody id="allBody"></tbody></table></div>
     </section>
 
@@ -541,7 +541,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
             <h3 style="margin:0; font-size:16px">Pozisyonlar</h3>
             <div style="display:flex; gap:8px">
-              <button class="ghost" id="simToReal">Tümünü gerçeğe aktar</button>
+              <button class="ghost" id="simToReal">Tümünü uzun vadeye aktar</button>
               <button class="ghost" id="setCash">Para yatır/çek</button>
               <button class="ghost" id="resetSim">Sıfırla</button>
             </div>
@@ -640,7 +640,7 @@
       <div class="simgrid">
         <div class="trade">
           <h3>İşlem</h3>
-          <div class="lead">Gerçek işlemlerini kaydet. Fiyatı kendin girersin.</div>
+          <div class="lead">Uzun vadeli pozisyonlarını kaydet. Fiyatı kendin girersin.</div>
           <input class="fld" id="rSym" list="symList" placeholder="sembol (örn THYAO)" style="width:100%; margin-bottom:10px">
           <datalist id="symList"></datalist>
           <div class="qtyrow">
@@ -839,7 +839,7 @@
 
       <h2>5. Sütun tanımları</h2>
       <table><tr><th>Sütun</th><th>Anlamı</th><th>Kaynak</th></tr>
-        <tr><td>Hisse</td><td>Kod + ad. Önündeki nokta: mor=Simülatörde, pembe=Gerçek portföyde var.</td><td>symbol/name</td></tr>
+        <tr><td>Hisse</td><td>Kod + ad. Önündeki nokta: mor=Simülatörde, pembe=Uzun Vade Simülatöründe var.</td><td>symbol/name</td></tr>
         <tr><td>Gün İçi Skor</td><td>0–100 "bugün dikkat çekme" puanı. AL sinyali değil.</td><td>Bölüm 6</td></tr>
         <tr><td>Gün %</td><td>Bugünkü değişim (önceki kapanışa göre).</td><td>changePct</td></tr>
         <tr><td>Rel.Hacim</td><td>Bugünkü hacim ÷ 20 gün ort. 1.0×=normal, yüksek=konviksiyon.</td><td>relVol</td></tr>
@@ -965,7 +965,7 @@ Skor = 799.1 / 8.9 ≈ 90</pre>
 
       <h2>4. Sütun tanımları</h2>
       <table><tr><th>Sütun</th><th>Anlamı</th></tr>
-        <tr><td>Hisse</td><td>Kod + ad. Önündeki nokta: mor=Simülatörde, pembe=Gerçek portföyde var.</td></tr>
+        <tr><td>Hisse</td><td>Kod + ad. Önündeki nokta: mor=Simülatörde, pembe=Uzun Vade Simülatöründe var.</td></tr>
         <tr><td>Sektör</td><td>Faaliyet alanı. Aynı sektörden en fazla 2 hisse.</td></tr>
         <tr><td>Kısa Vade Skor</td><td>Yukarıdaki 0–100 bileşim.</td></tr>
         <tr><td>Trend</td><td>↑↑ fiyat&gt;MA50&gt;MA200 · ↑ fiyat&gt;MA50 · ↓ fiyat≤MA50.</td></tr>
@@ -1053,7 +1053,7 @@ Skor = 4.30 / 5.5 × 100 ≈ 78</pre>
 
       <h2>4. Sütun tanımları</h2>
       <table><tr><th>Sütun</th><th>Anlamı</th></tr>
-        <tr><td>Hisse</td><td>Kod + ad. Nokta: mor=Simülatörde, pembe=Gerçek portföyde var.</td></tr>
+        <tr><td>Hisse</td><td>Kod + ad. Nokta: mor=Simülatörde, pembe=Uzun Vade Simülatöründe var.</td></tr>
         <tr><td>Skor</td><td>Yukarıdaki 0–100 değer/kalite puanı.</td></tr>
         <tr><td>Fiyat / Gün %</td><td>Güncel fiyat (~15 dk gecikmeli) ve bugünkü değişim.</td></tr>
         <tr><td>F/K</td><td>Fiyat/Kazanç. &lt;10 ucuz · 10–20 makul · &gt;20 pahalı · negatif = zarar.</td></tr>
@@ -1301,7 +1301,7 @@ oranlar: 0.236 · 0.382 · 0.5 · 0.618 · 0.786</pre>
           <button class="ghost" id="authRestore">Yerel yedeği geri yükle</button>
           <button class="ghost" id="authLogout">Çıkış</button>
         </div>
-        <div class="hint" style="margin-top:10px">Veriler yalnız bulutta tutulur; her değişiklik ~2.5 sn içinde yazılır ve açık olan diğer cihaza anında yansır. Buluttan veri alınmadan önce mevcut durumun oturum içi yedeği alınır (son 5) ve <b>gerçek işlem geçmişi asla silinmez</b>. Botu tek cihazda çalıştır.</div>
+        <div class="hint" style="margin-top:10px">Veriler yalnız bulutta tutulur; her değişiklik ~2.5 sn içinde yazılır ve açık olan diğer cihaza anında yansır. Buluttan veri alınmadan önce mevcut durumun oturum içi yedeği alınır (son 5) ve <b>işlem geçmişin asla silinmez</b>. Botu tek cihazda çalıştır.</div>
         <div class="psec">Notlarım</div>
         <div class="hint" style="margin-bottom:8px">Genel notlar / günlük haberler / banka önerileri. Bulutla eşitlenir. Hisseye özel not için bir hisseye tıkla.</div>
         <textarea id="notesArea" style="min-height:220px" placeholder="03.06 — X Bankası THYAO için 'AL', hedef …"></textarea>
@@ -2302,7 +2302,7 @@ $('simToReal').onclick=function(){
   var sim=simFor(MK), real=realFor(MK), n=0, now=Date.now();
   Object.keys(sim.holdings).forEach(function(sym){ var hh=sim.holdings[sym];
     real.log.push({t:now, side:'buy', sym:sym, qty:hh.qty, px:hh.cost/hh.qty, rate:(MK==='BIST'?EURTRY:null)}); n++; });
-  if(n){ save(); renderReal(); renderScreen(); renderAllList(); alert(n+' pozisyon gerçek portföye aktarıldı.'); goView('real'); }
+  if(n){ save(); renderReal(); renderScreen(); renderAllList(); alert(n+' pozisyon uzun vade simülatörüne aktarıldı.'); goView('real'); }
   else alert('Aktarılacak pozisyon yok.');
 };
 function renderSim(){
@@ -2318,7 +2318,7 @@ function renderSim(){
       '<td>'+(px==null?'—':fmt(px))+'</td>'+
       '<td>'+(val==null?'—':amt(MK,val))+'</td>'+
       '<td class="'+pnlCls(pnl)+'">'+(pnl==null?'—':(pnl>0?'+':'')+fmt(pnl)+(pct!=null?' ('+(pct>0?'+':'')+fmt(pct,1)+'%)':''))+'</td>'+
-      '<td><button class="miniact" data-trade="'+sym+'">İşlem yap</button> <button class="miniact" data-real="'+sym+'">→ Gerçeğe</button></td></tr>';
+      '<td><button class="miniact" data-trade="'+sym+'">İşlem yap</button> <button class="miniact" data-real="'+sym+'">→ Uzun vade</button></td></tr>';
   });
   $('simHold').innerHTML = rows?('<table><thead><tr><th class="l">Pozisyon</th><th>Fiyat</th><th>Değer</th><th>K/Z</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>')
     :'<div class="empty">pozisyon yok — bir hisse seç ve AL</div>';
@@ -2330,7 +2330,7 @@ function renderSim(){
   $('simHold').querySelectorAll('[data-real]').forEach(function(b){b.onclick=function(){
     var sym=b.dataset.real, hh=simFor(MK).holdings[sym]; if(!hh)return;
     realFor(MK).log.push({t:Date.now(),side:'buy',sym:sym,qty:hh.qty,px:hh.cost/hh.qty,rate:(MK==='BIST'?EURTRY:null)});
-    save(); renderReal(); renderScreen(); renderAllList(); alert(clean(sym)+' gerçek portföye eklendi.');
+    save(); renderReal(); renderScreen(); renderAllList(); alert(clean(sym)+' uzun vade simülatörüne eklendi.');
   };});
   var total=sim.cash+holdVal, dep=sim.deposited||0, pnl=total-dep;
   $('simDepV').innerHTML=amt(MK,dep);
@@ -2399,7 +2399,7 @@ function updateRealCost(){
 }
 ['rSym','rPrice','rQty'].forEach(function(id){ var el=$(id); if(el) el.oninput=updateRealCost; });
 $('resetReal').onclick=function(){
-  dlg('Gerçek portföyü sıfırla','<p><b>'+MK+'</b> gerçek portföyü ve <b>tüm işlem geçmişi</b> silinsin mi? Geri alınamaz ve bulut hesabına da yansır.</p>',
+  dlg('Uzun vade simülatörünü sıfırla','<p><b>'+MK+'</b> uzun vade simülatörü ve <b>tüm işlem geçmişi</b> silinsin mi? Geri alınamaz ve bulut hesabına da yansır.</p>',
     [{label:'Evet, sıfırla', primary:true, fn:function(){ S.real[MK]={deposited:0,log:[]}; save(); renderReal(); renderScreen(); renderAllList(); }},
      {label:'Vazgeç'}]);
 };
@@ -2419,7 +2419,7 @@ $('realSaveDay').onclick=function(){
   if(!S.realHist[MK]) S.realHist[MK]=[];
   S.realHist[MK]=S.realHist[MK].filter(function(r){return r.date!==today;});
   S.realHist[MK].push({date:today, value:realTotalNow()});
-  save(); renderRealChart(); alert('Bugünün gerçek portföy değeri kaydedildi.');
+  save(); renderRealChart(); alert('Bugünün uzun vade değeri kaydedildi.');
 };
 function renderReal(){
   var real=realFor(MK); var h=computeRealHoldings(real);
