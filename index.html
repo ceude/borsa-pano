@@ -564,13 +564,13 @@
       </div>
       <div class="disclaimer" style="border:1px solid var(--down); background:var(--down-bg); color:#7a2530; border-radius:12px; padding:12px 14px; margin-bottom:16px">
         <b>Önce oku.</b> Bu test <b>günlük</b> mumlarla ve <b>şu anki endeks üyeleri</b> üzerinde çalışır → <b>hayatta kalma yanlılığı</b> vardır (endeksten düşmüş hisseler listede yok, sonuç olduğundan iyi çıkar). Temettü, vergi, gün içi doluluk ve piyasa etkisi hesaba katılmaz. Ayarları en iyi sonucu verene göre seçmek <b>aşırı uydurma</b>dır — geçmişe uydurulan ayar gelecekte çalışmaz. Geçmiş performans geleceği <b>garanti etmez</b>. Yatırım tavsiyesi değildir.
-        <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--down)"><b>Neden Orta/Uzun Vade skoru burada yok?</b> O skor F/K, P/D, ROE gibi <b>temel</b> verilere dayanır ve elimizde yalnızca <b>bugünkü</b> değerleri var; geçmiş çeyreklerin bilançoları saklanmıyor. Bugünkü orana bakıp geçmişte alım yapmış gibi simüle etmek <b>ileriye bakma yanlılığı</b> olurdu — sonuç sistematik olarak harika çıkar ama hiçbir şey kanıtlamaz. Bu yüzden yalnız <b>fiyattan hesaplanabilen</b> stratejiler test edilebiliyor. (Günlük Trade skoru da test edilemez: relatif hacim gerektirir, geçmiş hacim saklanmıyor.)</div>
+        <div style="margin-top:8px; padding-top:8px; border-top:1px solid var(--down)"><b>Neden Orta/Uzun Vade skorunun kendisi burada yok?</b> O skor F/K, P/D, ROE gibi <b>temel</b> verilere dayanır ve elimizde yalnızca <b>bugünkü</b> değerleri var; geçmiş çeyreklerin bilançoları saklanmıyor. Bugünkü orana bakıp geçmişte alım yapmış gibi simüle etmek <b>ileriye bakma yanlılığı</b> olurdu — sonuç sistematik olarak harika çıkar ama hiçbir şey kanıtlamaz. Onun yerine <b>Uzun Vade trend kuralları</b> seçeneği var: aynı uzun vadeli bakışı <b>yalnız fiyattan</b> kurar (MA200 dizilimi + 6-12 ay momentum), bu yüzden geçmişe dürüstçe uygulanabilir. (Günlük Trade skoru da test edilemez: relatif hacim gerektirir, geçmiş hacim saklanmıyor.)</div>
       </div>
       <div class="botbar" style="margin-top:0">
         <div class="hint" style="margin-bottom:6px"><b>Hangi sekmenin kuralları test ediliyor?</b></div>
         <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Kısa Vade Adayları</span><b class="up">test edilebilir ✓ — strateji listesinden seç</b></div>
         <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Fibonacci</span><b class="up">test edilebilir ✓ — aşağıdaki filtre kutusu</b></div>
-        <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Orta/Uzun Vade Adayları</span><b class="down">test edilemez — geçmiş bilanço verisi yok</b></div>
+        <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Orta/Uzun Vade Adayları</span><b class="down">temel skor test edilemez — yerine <b>Uzun Vade trend</b> kuralları</b></div>
         <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:3px 0"><span>Günlük Trade</span><b class="down">test edilemez — geçmiş hacim verisi yok</b></div>
         <div class="hint" id="btActive" style="margin-top:8px"></div>
       </div>
@@ -599,6 +599,7 @@
               <option value="ma">MA kesişimi — bu sekmeye özel basit kural</option>
               <option value="short">Kısa Vade Adayları kuralları (fiyat bileşenleri)</option>
               <option value="fib">Fibonacci sekmesi kuralları (pozitif bölge + güvenilirlik)</option>
+              <option value="long">Uzun Vade trend kuralları (MA200 dizilimi + 6-12 ay momentum)</option>
             </select>
             <div class="tphelp"><b>Kısa Vade Adayları kuralları:</b> o sekmedeki puanın yalnız fiyattan hesaplanan bileşenleri (trend, 1A/3A momentum, göreli güç, RSI, volatilite, uzama, zirveye yakınlık) — geçmişte her gün yeniden hesaplanır. <b>Değer/kalite bileşeni çıkarılmıştır</b>; geçmiş bilanço verisi saklanmadığı için test edilemez. <b>MA kesişimi</b> ise hiçbir sekmeye karşılık gelmez, referans niteliğinde sade bir trend kuralıdır.</div></div>
           <div class="tpfield"><label>Skor eşiği (yalnız Kısa Vade stratejisinde)</label>
@@ -2677,15 +2678,42 @@ function btPrep(bars, maN){
     if(i>14){ var oc=close[i-14]-close[i-15]; gain-=Math.max(oc,0); loss-=Math.max(-oc,0); }
     rsi.push(i>=14 ? (loss<=0?100:100-100/(1+(gain/14)/(loss/14))) : null);
   }
-  var ret1m=[], ret3m=[], hi252=[];
+  var ret1m=[], ret3m=[], ret6m=[], ret12m=[], hi252=[];
   for(i=0;i<n;i++){
     ret1m.push(i>=21 ? (close[i]/close[i-21]-1)*100 : null);
     ret3m.push(i>=64 ? (close[i]/close[i-64]-1)*100 : null);
+    ret6m.push(i>=126 ? (close[i]/close[i-126]-1)*100 : null);
+    ret12m.push(i>=252 ? (close[i]/close[i-252]-1)*100 : null);
     var w=Math.min(252,i+1), mx=-Infinity;
     for(var k=i-w+1;k<=i;k++) if(bars[k][2]>mx) mx=bars[k][2];
     hi252.push(mx);
   }
-  return {close:close, ma:ma, atr:atr, ma50:ma50, ma200:ma200, rsi:rsi, ret1m:ret1m, ret3m:ret3m, hi252:hi252};
+  return {close:close, ma:ma, atr:atr, ma50:ma50, ma200:ma200, rsi:rsi, ret1m:ret1m, ret3m:ret3m, ret6m:ret6m, ret12m:ret12m, hi252:hi252};
+}
+/* UZUN VADE (fiyat bazlı) — Orta/Uzun sekmesinin temel-veri skoru geçmişe uygulanamadığı için
+   (bilanço geçmişi yok → ileriye bakma yanlılığı), uzun vadeli yatırımcının gerçekten
+   uygulayabileceği trend + momentum kuralları test edilir.
+   Çekirdek: MA200 üstünde, MA50>MA200 (altın dizilim), aşırı uzamamış, 6-12 ay momentumu güçlü. */
+function btLongScore(P, i){
+  var c=P.close[i], m50=P.ma50[i], m200=P.ma200[i];
+  if(c==null||m50==null||m200==null) return null;
+  if(!(c>m200 && m50>m200)) return null;              // uzun vade trendi yoksa aday değil
+  var p={};
+  p.trend = (c>m50) ? 100 : 70;                       // MA50 üstü tercih, altı da kabul (geri çekilme)
+  var lift = (m200>0) ? (m50/m200-1)*100 : null;      // dizilimin genişliği = trendin olgunluğu
+  p.lift  = lift==null?null:(lift<=1?45 : lift<=10? 45+(lift-1)/9*55 : clampN(100-(lift-10)*1.5,45,100));
+  var r12=P.ret12m[i], r6=P.ret6m[i];
+  p.mom12 = r12==null?null:(r12<=0 ? clampN(35+r12*1.2,0,35) : clampN(35+(r12/40)*65,35,100));
+  p.mom6  = r6==null?null:(r6<=0 ? clampN(40+r6*1.5,0,40) : clampN(40+(r6/25)*60,40,100));
+  var ext = (m50>0)?(c/m50-1)*100:null;               // aşırı uzama = kovalamaca riski
+  p.ext = ext==null?null:(ext<-8?35 : ext<=10?100 : ext<=20?65 : clampN(65-(ext-20)*4,10,65));
+  var q=P.rsi[i];
+  p.rsi = q==null?null:((q>=45&&q<=70)?100:(q>70&&q<=80)?55:(q>80)?25:(q>=35)?70:35);
+  var dd=(P.hi252[i]>0)?(c/P.hi252[i]-1)*100:null;    // zirveye yakınlık
+  p.high = dd==null?null:clampN((dd+35)/35*100,0,100);
+  var W={trend:1.6, lift:1.2, mom12:1.5, mom6:1.0, ext:1.2, rsi:0.8, high:0.9}, ws=0, vs=0;
+  for(var k in W){ if(p[k]!=null){ ws+=W[k]; vs+=W[k]*p[k]; } }
+  return ws>0? Math.round(vs/ws) : null;
 }
 /* Kısa Vade skorunun FİYAT bileşenleri (kalite hariç — geçmiş temel veri yok).
    Canlı sekmedeki fSetup ile aynı kurallar; göreli güç piyasa ortalamasına karşı. */
@@ -2846,6 +2874,12 @@ function btExecute(){
           if(sc==null) return;
           sig = (sc>=cfg.scoreMin) && (scp==null || scp<cfg.scoreMin); // eşiği yeni aşanlar
           rank = -sc;                                                  // yüksek skor önce
+        } else if(cfg.strat==='long'){
+          var lv=btLongScore(d.p,i);
+          if(lv==null) return;
+          var lp=btLongScore(d.p,i-1);
+          sig = (lv>=cfg.scoreMin) && (lp==null || lp<cfg.scoreMin);   // eşiği yeni aşanlar
+          rank = -lv;                                                  // en yüksek puanlılar önce
         } else if(cfg.strat==='fib'){
           var fv=btFibEval(d.bars,d.p,i,cfg.fibLook,cfg.fibNear);
           if(fv==null) return;
@@ -2921,7 +2955,8 @@ function btRender(cfg, eq, trades, maxDD, finalEq, bh, nDays, nSyms){
     '<div class="metric"><div class="k">Maks. düşüş</div><div class="v down">−'+fmt(maxDD,1)+'%</div></div>'+
     '</div>'+
     '<div class="hint" style="margin-top:8px">'+nSyms+' hisse · '+nDays+' işlem günü · <b>'+
-    (cfg.strat==='short'?('Kısa Vade skoru ≥'+cfg.scoreMin):
+    (cfg.strat==='long'?('Uzun Vade trend skoru ≥'+cfg.scoreMin):
+     cfg.strat==='short'?('Kısa Vade skoru ≥'+cfg.scoreMin):
      cfg.strat==='fib'?('Fibonacci güvenilirlik ≥'+cfg.fibMin+' (pozitif bölge, ≤%'+fmt(cfg.fibNear,1)+', '+cfg.fibLook+'g pencere)'):
      ('MA'+cfg.maN+' kesişimi'))+'</b>'+
     (cfg.fib?(' + <b>Fibonacci filtresi</b> (≤%'+fmt(cfg.fibNear,1)+', '+cfg.fibLook+'g pencere)'):'')+
@@ -3096,7 +3131,8 @@ function btActiveTxt(){
   var st=$('btStrat')?$('btStrat').value:'ma';
   var fib=$('btFib')&&$('btFib').checked;
   el.innerHTML='Şu an seçili: <b>'+(st==='short'?'Kısa Vade Adayları kuralları':
-    st==='fib'?'Fibonacci sekmesi kuralları':'MA kesişimi (referans kural)')+'</b>'+
+    st==='fib'?'Fibonacci sekmesi kuralları':
+    st==='long'?'Uzun Vade trend kuralları':'MA kesişimi (referans kural)')+'</b>'+
     ((fib&&st!=='fib')?' + <b>Fibonacci filtresi</b>':'')+' · piyasa <b>'+(MK||'—')+'</b>';
 }
 function btReset(){
