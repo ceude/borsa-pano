@@ -243,8 +243,10 @@ for mkt, idx in BENCH.items():
 #      değerleri O GÜNKÜ kurdan çevirir.
 # =====================================================================
 def write_rates_js(path=OUT_RATES, period="10y"):
+    """rates.js — [epochSec, usdtry, eurtry, gramAltinTRY]
+    4. sütun: GC=F (ons/USD) → gram/USD → gram/TL. Veri yoksa null."""
     try:
-        fxh = yf.download(["USDTRY=X", "EURTRY=X"], period=period, interval="1d",
+        fxh = yf.download(["USDTRY=X", "EURTRY=X", "GC=F"], period=period, interval="1d",
                           group_by="ticker", progress=False)
 
         def close_series(sym):
@@ -255,25 +257,42 @@ def write_rates_js(path=OUT_RATES, period="10y"):
 
         u = close_series("USDTRY=X")
         e = close_series("EURTRY=X")
+        g = close_series("GC=F")
         if u is None or e is None or len(u) == 0 or len(e) == 0:
             print("rates.js: kur verisi alınamadı, atlandı.")
             return
 
         df = pd.concat([u.rename("usd"), e.rename("eur")], axis=1).dropna().sort_index()
 
+        # Altın: kur günlerine hizala, tatil boşluklarını son bilinen değerle doldur
+        if g is not None and len(g) > 0:
+            gram = (g / 31.1034768).reindex(df.index).ffill()
+        else:
+            gram = None
+            print("rates.js: altın (GC=F) verisi yok, 4. sütun null yazılacak.")
+
         rows = []
         for ts, row in df.iterrows():
             epoch = int(ts.timestamp()) if hasattr(ts, "timestamp") else int(ts)
-            rows.append([epoch, round(float(row["usd"]), 4), round(float(row["eur"]), 4)])
+            usd = round(float(row["usd"]), 4)
+            eur = round(float(row["eur"]), 4)
+            gv = None
+            if gram is not None:
+                x = gram.get(ts)
+                if x is not None and pd.notna(x):
+                    gv = round(float(x) * float(row["usd"]), 2)   # gram/USD × USDTRY
+            rows.append([epoch, usd, eur, gv])
 
         with open(path, "w", encoding="utf-8") as f:
             f.write("window.RATE_HISTORY=" + json.dumps(rows, separators=(",", ":")) + ";")
 
-        print(f"rates.js yazıldı: {len(rows)} gün "
+        ng = sum(1 for r in rows if r[3] is not None)
+        print(f"rates.js yazıldı: {len(rows)} gün, altın dolu {ng} gün "
               f"({datetime.datetime.utcfromtimestamp(rows[0][0]).date()} → "
               f"{datetime.datetime.utcfromtimestamp(rows[-1][0]).date()})")
     except Exception as ex:
         print("rates.js hata:", ex)
+
 
 write_rates_js()
 
