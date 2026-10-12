@@ -91,6 +91,12 @@ SYMBOLS = {
         "DXCM","MCHP","BIIB","ON","WBD","GFS","MDB","CEG","ARM","SMCI",
     ],
     "BIST": get_bist_all(),
+    # ETF'ler — Xetra (EUR) listeleri. Pano tarama ekranında görünmez; yalnız
+    # Yatırımlarım'da canlı fiyat için çekilir. Yeni ETF eklemek: buraya sembolü yaz.
+    #   VWCE.DE  Vanguard FTSE All-World USD (Acc)      IE00BK5BQT80
+    #   EQQB.DE  Invesco EQQQ Nasdaq-100 USD (Acc)      IE00BFZXGZ54
+    #   IUSN.DE  iShares MSCI World Small Cap USD (Acc) IE00BF4RFH31
+    "ETF": ["VWCE.DE", "EQQB.DE", "IUSN.DE"],
 }
 
 BENCH = {"DAX": "^GDAXI", "NASDAQ": "^NDX", "BIST": "XU100.IS"}
@@ -340,7 +346,7 @@ for market, syms in SYMBOLS.items():
 
             rec = {
                 "symbol": sym, "market": market,
-                "name": info.get("shortName") or info.get("longName") or sym,
+                "name": (info.get("longName") if market == "ETF" else None) or info.get("shortName") or info.get("longName") or sym,
                 "sector": info.get("sector"),
                 "currency": info.get("currency") or ("TRY" if market == "BIST" else "USD" if market == "NASDAQ" else "EUR"),
                 "price": r2(price, 4), "prevClose": r2(prev, 4),
